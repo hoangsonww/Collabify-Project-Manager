@@ -1,0 +1,21 @@
+{
+  "name": "Collabify | Your Project Management Solution",
+  "short_name": "Collabify",
+  "description": "The ultimate platform to seamlessly plan, organize, and collaborate on projects with your team.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
