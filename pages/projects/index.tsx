@@ -43,7 +43,8 @@ const cardVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-export default function ProjectsPage({ projects }: ProjectsPageProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function ProjectsPage({ userSub, projects }: ProjectsPageProps) {
   const [localProjects, setLocalProjects] = useState(projects);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [joinDialogOpen, setJoinDialogOpen] = useState(false);
@@ -56,20 +57,27 @@ export default function ProjectsPage({ projects }: ProjectsPageProps) {
     if (!name) return toast.error("Project name is required");
 
     try {
+      // Create project first
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, description }),
       });
-
-      if (!res.ok) throw new Error();
-
+      if (!res.ok) throw new Error("Project creation failed");
       const project = await res.json();
+
+      // Call join endpoint to automatically join the created project
+      const joinRes = await fetch(`/api/projects/${project.projectId}/join`, {
+        method: "POST",
+      });
+      if (!joinRes.ok) throw new Error("Failed to join project");
+
       setLocalProjects((prev) => [...prev, project]);
-      toast.success("Project created!");
+      toast.success("Project created and joined!");
       setCreateDialogOpen(false);
-    } catch {
-      toast.error("Could not create project");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      toast.error("Could not create and join project");
     }
   }
 
@@ -195,7 +203,7 @@ export default function ProjectsPage({ projects }: ProjectsPageProps) {
           </motion.p>
         ) : (
           <motion.div
-            className="grid gap-4"
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
             variants={containerVariants}
             initial="hidden"
             animate="visible"

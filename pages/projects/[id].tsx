@@ -129,7 +129,15 @@ export default function ProjectDetailPage({
     });
     if (res.ok) {
       toast.success("Joined project");
-      router.replace(router.asPath);
+      // Update local state to include the current user as a member
+      setLocalProject((prevProject) => {
+        if (!prevProject) return prevProject;
+        // Prevent duplicate entries if the user is already a member
+        if (prevProject.members.includes(userSub)) return prevProject;
+        return { ...prevProject, members: [...prevProject.members, userSub] };
+      });
+    } else {
+      toast.error("Error joining project");
     }
   };
 
