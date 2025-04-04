@@ -13,11 +13,9 @@
 [![Docker](https://img.shields.io/badge/Docker-Container-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-Collabify is a modern, feature-rich project management tool designed to help teams plan, organize, and collaborate seamlessly. Built on [Next.js](https://nextjs.org/) (as a full-stack framework), styled with [Tailwind CSS](https://tailwindcss.com/), and powered by [Shadcn UI](https://ui.shadcn.com/), Collabify provides a great user experience with beautiful UI components and smooth animations via [Framer Motion](https://www.framer.com/motion/).
+**Collabify** is a modern, feature-rich project management tool designed to help teams plan, organize, and collaborate seamlessly. Built on [Next.js](https://nextjs.org/) (as a full-stack framework), styled with [Tailwind CSS](https://tailwindcss.com/), and powered by [Shadcn UI](https://ui.shadcn.com/), Collabify provides a great user experience with beautiful UI components and smooth animations via [Framer Motion](https://www.framer.com/motion/).
 
-One of the key features is secure authentication using [Auth0](https://auth0.com/), which is integrated using both Regular Web Applications (RWA) and Machine-to-Machine (M2M) credentials, with Role-Based Access Control (RBAC) for enhanced security. The application also utilizes [MongoDB](https://www.mongodb.com/) for data storage, ensuring reliable and scalable data management.
-
-Another key functionality is `i18n` - internationalization, which allows the application to support multiple languages. Currently, Vietnamese and English are supported, but more languages can be added easily. This feature is particularly useful for teams working in different regions or with diverse language preferences.
+One of the key features is secure authentication using [Auth0](https://auth0.com/), which is integrated using both Regular Web Applications (RWA) and Machine-to-Machine (M2M) credentials, with Role-Based Access Control (RBAC) for enhanced security. The application also utilizes [MongoDB](https://www.mongodb.com/) for data storage, ensuring reliable and scalable data management. Internationalization (i18n) support is provided through the [i18next](https://www.i18next.com/) library, allowing for easy localization of the application.
 
 <p align="center">
   <img src="img/collabify.png" alt="Collabify Logo" width="60%" style="border-radius: 8px">
@@ -44,6 +42,7 @@ Another key functionality is `i18n` - internationalization, which allows the app
   - [5. Testing the Application](#5-testing-the-application)
 - [Shadcn UI](#shadcn-ui)
 - [Tailwind CSS](#tailwind-css)
+- [Internationalization (i18n)](#internationalization-i18n)
 - [Deployment](#deployment)
 - [Containerization](#containerization)
 - [License](#license)

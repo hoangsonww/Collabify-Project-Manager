@@ -27,6 +27,12 @@ export default function Document() {
           property="og:description"
           content="The ultimate platform to seamlessly plan, organize, and collaborate on projects with your team – all in one place."
         />
+        <meta
+          property="og:site_name"
+          content="Collabify | Your Project Management Solution"
+        />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:locale:alternate" content="vi_VN" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://collabify-pm.vercel.app/" />
         <meta

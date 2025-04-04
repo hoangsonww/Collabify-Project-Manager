@@ -6,30 +6,36 @@ import Footer from "@/components/Footer";
 import { Toaster } from "sonner";
 import "../i18n";
 import { Suspense } from "react";
+import Head from "next/head";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <Suspense
-      fallback={
-        <div className="fixed inset-0 flex items-center justify-center bg-background">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-white" />
-        </div>
-      }
-    >
-      <UserProvider>
-        <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors">
-          <NavBar />
+    <>
+      <Head>
+        <title>Collabify | Your Project Management Solution</title>
+      </Head>
+      <Suspense
+        fallback={
+          <div className="fixed inset-0 flex items-center justify-center bg-background">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-white" />
+          </div>
+        }
+      >
+        <UserProvider>
+          <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors">
+            <NavBar />
 
-          <main className="flex-grow container mx-auto p-4">
-            <Component {...pageProps} />
-          </main>
+            <main className="flex-grow container mx-auto p-4">
+              <Component {...pageProps} />
+            </main>
 
-          <Footer />
+            <Footer />
 
-          {/* Sonner Toast Portal */}
-          <Toaster position="bottom-right" richColors closeButton />
-        </div>
-      </UserProvider>
-    </Suspense>
+            {/* Sonner Toast Portal */}
+            <Toaster position="bottom-right" richColors closeButton />
+          </div>
+        </UserProvider>
+      </Suspense>
+    </>
   );
 }
