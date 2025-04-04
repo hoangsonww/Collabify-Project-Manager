@@ -58,7 +58,11 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
   // Use the "projects" namespace
   const { t } = useTranslation("projects");
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   async function handleCreateProject(formData: FormData) {
+    if (isSubmitting) return;
+
     const name = formData.get("name")?.toString().trim();
     const description = formData.get("description")?.toString().trim();
 
@@ -66,17 +70,18 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
       return toast.error(t("projectNameRequired"));
     }
 
+    setIsSubmitting(true);
+
     try {
-      // Create project first
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, description }),
       });
       if (!res.ok) throw new Error("Project creation failed");
+
       const project = await res.json();
 
-      // Call join endpoint to automatically join the created project
       const joinRes = await fetch(`/api/projects/${project.projectId}/join`, {
         method: "POST",
       });
@@ -88,12 +93,20 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error(t("couldNotCreateJoin"));
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
+  const [isJoining, setIsJoining] = useState(false);
+
   async function handleJoinProject(formData: FormData) {
+    if (isJoining) return;
+
     const id = formData.get("projectId")?.toString().trim();
     if (!id) return toast.error(t("projectIdLabel"));
+
+    setIsJoining(true);
 
     try {
       const res = await fetch(`/api/projects/${id}/join`, {
@@ -103,10 +116,11 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
 
       toast.success(t("joinedProject"));
       setJoinDialogOpen(false);
-      // Directly redirect to the project details page using the provided id
       router.push(`/projects/${id}`);
     } catch {
       toast.error(t("couldNotJoin"));
+    } finally {
+      setIsJoining(false);
     }
   }
 

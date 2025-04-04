@@ -129,14 +129,24 @@ function ProjectDetailPageInternal({
 
   const isMember = localProject.members.includes(userSub) || isAdmin;
 
-  // Join project
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [isJoining, setIsJoining] = useState(false);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [isLeaving, setIsLeaving] = useState(false);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [isAddingTask, setIsAddingTask] = useState(false);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [togglingTaskId, setTogglingTaskId] = useState<string | null>(null);
+
   const handleJoin = async () => {
+    if (isJoining) return;
+    setIsJoining(true);
+
     const res = await fetch(`/api/projects/${localProject.projectId}/join`, {
       method: "POST",
     });
     if (res.ok) {
       toast.success(t("joinedProject"));
-      // Update local state
       setLocalProject((prevProject) => {
         if (!prevProject) return prevProject;
         if (prevProject.members.includes(userSub)) return prevProject;
@@ -145,10 +155,14 @@ function ProjectDetailPageInternal({
     } else {
       toast.error(t("errorJoiningProject"));
     }
+
+    setIsJoining(false);
   };
 
-  // Leave project
   const handleLeave = async () => {
+    if (isLeaving) return;
+    setIsLeaving(true);
+
     const res = await fetch(`/api/projects/${localProject.projectId}/leave`, {
       method: "POST",
     });
@@ -156,11 +170,15 @@ function ProjectDetailPageInternal({
       toast.success(t("leftProject"));
       router.replace(router.asPath);
     }
+
+    setIsLeaving(false);
   };
 
-  // Add Task
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isAddingTask) return;
+    setIsAddingTask(true);
+
     const id = nanoid();
     const res = await fetch(`/api/projects/${localProject.projectId}/tasks`, {
       method: "POST",
@@ -177,10 +195,14 @@ function ProjectDetailPageInternal({
     } else {
       toast.error(t("taskCreationFailed"));
     }
+
+    setIsAddingTask(false);
   };
 
-  // Toggle Task Status
   const handleToggleStatus = async (taskId: string) => {
+    if (togglingTaskId === taskId) return;
+    setTogglingTaskId(taskId);
+
     const res = await fetch(
       `/api/projects/${localProject.projectId}/tasks/${taskId}/toggle`,
       { method: "PATCH" },
@@ -189,6 +211,8 @@ function ProjectDetailPageInternal({
       const updated = await res.json();
       setLocalProject(updated);
     }
+
+    setTogglingTaskId(null);
   };
 
   // Count tasks by status

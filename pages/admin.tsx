@@ -150,9 +150,10 @@ function AdminPageInternal() {
     ],
   };
 
-  // Handle submission of add/remove role
   const handleRoleChange = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitLoading) return;
+
     setFeedback(null);
     setFeedbackError(null);
     setSubmitLoading(true);
@@ -168,7 +169,6 @@ function AdminPageInternal() {
         throw new Error(data.error || "Unknown error");
       }
       setFeedback(data.message);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setFeedbackError(err.message);
     } finally {
