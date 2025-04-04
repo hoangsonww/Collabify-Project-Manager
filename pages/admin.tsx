@@ -169,6 +169,7 @@ function AdminPageInternal() {
         throw new Error(data.error || "Unknown error");
       }
       setFeedback(data.message);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setFeedbackError(err.message);
     } finally {
