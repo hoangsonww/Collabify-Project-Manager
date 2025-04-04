@@ -17,6 +17,10 @@ import { Bar, Line } from "react-chartjs-2";
 import { motion } from "framer-motion";
 import Head from "next/head";
 
+// (1) Import react-i18next + dynamic
+import { useTranslation } from "react-i18next";
+import dynamic from "next/dynamic";
+
 // Register Chart.js components
 ChartJS.register(
   CategoryScale,
@@ -40,8 +44,11 @@ const cardVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-export default function AdminPage() {
+// (2) Real component using the "admin" namespace
+function AdminPageInternal() {
   const { user, error, isLoading } = useUser();
+  const { t } = useTranslation("admin");
+
   const [roleList, setRoleList] = useState<string[]>([]);
   const [loadingRoles, setLoadingRoles] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -111,7 +118,7 @@ export default function AdminPage() {
     labels: Object.keys(logsByType),
     datasets: [
       {
-        label: "Logs by Type",
+        label: t("logsByType"),
         data: Object.values(logsByType),
         backgroundColor: "rgba(59, 130, 246, 0.5)",
         borderColor: "rgba(59, 130, 246, 1)",
@@ -134,7 +141,7 @@ export default function AdminPage() {
     labels: sortedDays,
     datasets: [
       {
-        label: "Logs Over Time",
+        label: t("logsOverTime"),
         data: sortedDays.map((day) => logsByDay[day]),
         fill: false,
         backgroundColor: "rgba(16, 185, 129, 0.5)",
@@ -174,7 +181,7 @@ export default function AdminPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black text-white">
         <Loader2 className="animate-spin w-6 h-6 mr-2" />
-        Loading...
+        {t("loading")}
       </div>
     );
   }
@@ -186,7 +193,7 @@ export default function AdminPage() {
   if (!user) {
     return (
       <p className="text-center text-white bg-black min-h-screen flex items-center justify-center">
-        Please log in to view this page.
+        {t("pleaseLoginViewPage")}
       </p>
     );
   }
@@ -194,7 +201,7 @@ export default function AdminPage() {
   if (!isAdmin) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p>You do not have permission to view this page.</p>
+        <p>{t("noPermission")}</p>
       </div>
     );
   }
@@ -202,11 +209,8 @@ export default function AdminPage() {
   return (
     <>
       <Head>
-        <title>Collabify | Admin Panel</title>
-        <meta
-          name="description"
-          content="Manage system-wide settings, user roles, and view system logs with Collabify."
-        />
+        <title>{t("adminTitle")}</title>
+        <meta name="description" content={t("adminMetaDesc")} />
       </Head>
       <motion.div
         className="min-h-screen bg-black text-white p-6 font-sans space-y-8"
@@ -220,7 +224,7 @@ export default function AdminPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          Admin Panel
+          {t("adminPanel")}
         </motion.h1>
         <motion.p
           className="text-gray-300 mb-6"
@@ -228,7 +232,7 @@ export default function AdminPage() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.6 }}
         >
-          Manage system-wide settings, user roles, and view system logs.
+          {t("manageSystemWide")}
         </motion.p>
 
         <motion.div
@@ -242,14 +246,14 @@ export default function AdminPage() {
             variants={cardVariants}
             className="bg-black border border-white p-6 rounded shadow transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl"
           >
-            <h2 className="text-xl font-semibold mb-2">User Management</h2>
-            <p className="text-gray-400 text-sm mb-4">
-              Assign or revoke roles for a user.
-            </p>
+            <h2 className="text-xl font-semibold mb-2">
+              {t("userManagement")}
+            </h2>
+            <p className="text-gray-400 text-sm mb-4">{t("assignOrRevoke")}</p>
             <form onSubmit={handleRoleChange} className="space-y-4">
               <div>
                 <label className="block text-gray-300 text-sm mb-1">
-                  User Sub (e.g. auth0|abc123):
+                  {t("userSubLabel")}
                 </label>
                 <input
                   type="text"
@@ -261,7 +265,7 @@ export default function AdminPage() {
               </div>
               <div>
                 <label className="block text-gray-300 text-sm mb-1">
-                  Role Name (e.g. admin):
+                  {t("roleNameLabel")}
                 </label>
                 <input
                   type="text"
@@ -273,15 +277,15 @@ export default function AdminPage() {
               </div>
               <div>
                 <label className="block text-gray-300 text-sm mb-1">
-                  Action:
+                  {t("actionLabel")}
                 </label>
                 <select
                   value={action}
                   onChange={(e) => setAction(e.target.value)}
                   className="w-full p-2 bg-black border border-gray-600 rounded"
                 >
-                  <option value="add">Add Role</option>
-                  <option value="remove">Remove Role</option>
+                  <option value="add">{t("addRole")}</option>
+                  <option value="remove">{t("removeRole")}</option>
                 </select>
               </div>
               <button
@@ -289,7 +293,7 @@ export default function AdminPage() {
                 disabled={submitLoading}
                 className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition-colors"
               >
-                {submitLoading ? "Processing..." : "Submit"}
+                {submitLoading ? t("processing") : t("submit")}
               </button>
               {feedback && <p className="text-green-400">{feedback}</p>}
               {feedbackError && <p className="text-red-400">{feedbackError}</p>}
@@ -301,14 +305,14 @@ export default function AdminPage() {
             variants={cardVariants}
             className="bg-black border border-white p-6 rounded shadow transition-transform duration-300 hover:scale-102"
           >
-            <h2 className="text-xl font-semibold mb-2">System Logs</h2>
+            <h2 className="text-xl font-semibold mb-2">{t("systemLogs")}</h2>
             <p className="text-gray-400 text-sm mb-4">
-              View recent login activity, audit logs, and alerts.
+              {t("recentLoginActivity")}
             </p>
             {loadingLogs ? (
               <div className="flex items-center">
                 <Loader2 className="animate-spin w-6 h-6 mr-2" />
-                Loading logs...
+                {t("loading")}
               </div>
             ) : logs.length > 0 ? (
               <ul className="space-y-2 max-h-96 overflow-y-auto">
@@ -325,7 +329,7 @@ export default function AdminPage() {
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-500">No logs available.</p>
+              <p className="text-gray-500">{t("noLogsAvailable")}</p>
             )}
           </motion.div>
         </motion.div>
@@ -342,7 +346,7 @@ export default function AdminPage() {
             variants={cardVariants}
             className="bg-black border border-white p-6 rounded shadow transition-transform duration-300 hover:scale-102"
           >
-            <h2 className="text-xl font-semibold mb-2">Logs by Type</h2>
+            <h2 className="text-xl font-semibold mb-2">{t("logsByType")}</h2>
             <Bar
               data={barChartData}
               options={{ plugins: { legend: { display: true } } }}
@@ -354,7 +358,7 @@ export default function AdminPage() {
             variants={cardVariants}
             className="bg-black border border-white p-6 rounded shadow transition-transform duration-300 hover:scale-102"
           >
-            <h2 className="text-xl font-semibold mb-2">Logs Over Time</h2>
+            <h2 className="text-xl font-semibold mb-2">{t("logsOverTime")}</h2>
             <Line
               data={lineChartData}
               options={{ plugins: { legend: { display: true } } }}
@@ -365,3 +369,8 @@ export default function AdminPage() {
     </>
   );
 }
+
+// (3) Export a client-only version (no SSR) to avoid hydration mismatch
+export default dynamic(() => Promise.resolve(AdminPageInternal), {
+  ssr: false,
+});

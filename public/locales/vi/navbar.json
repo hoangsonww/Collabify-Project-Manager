@@ -1,0 +1,11 @@
+{
+  "language": "Ngôn ngữ",
+  "english": "Tiếng Anh / English",
+  "vietnamese": "Tiếng Việt / Vietnamese",
+  "loginSignUp": "Đăng nhập / Đăng ký",
+  "dashboard": "Bảng điều khiển",
+  "projects": "Dự án",
+  "profile": "Hồ sơ",
+  "admin": "Quản trị",
+  "logout": "Đăng xuất"
+}

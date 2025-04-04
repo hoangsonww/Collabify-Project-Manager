@@ -6,6 +6,7 @@
 [![Auth0](https://img.shields.io/badge/Auth0-Security-brightgreen?style=for-the-badge&logo=auth0)](https://auth0.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Cloud-green?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
 [![React Query](https://img.shields.io/badge/React_Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white)](https://tanstack.com/query/latest)
+[![i18n](https://img.shields.io/badge/i18next-Multilingual-blueviolet?style=for-the-badge&logo=translate)](https://www.i18next.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/)
@@ -15,6 +16,8 @@
 Collabify is a modern, feature-rich project management tool designed to help teams plan, organize, and collaborate seamlessly. Built on [Next.js](https://nextjs.org/) (as a full-stack framework), styled with [Tailwind CSS](https://tailwindcss.com/), and powered by [Shadcn UI](https://ui.shadcn.com/), Collabify provides a great user experience with beautiful UI components and smooth animations via [Framer Motion](https://www.framer.com/motion/).
 
 One of the key features is secure authentication using [Auth0](https://auth0.com/), which is integrated using both Regular Web Applications (RWA) and Machine-to-Machine (M2M) credentials, with Role-Based Access Control (RBAC) for enhanced security. The application also utilizes [MongoDB](https://www.mongodb.com/) for data storage, ensuring reliable and scalable data management.
+
+Another key functionality is `i18n` - internationalization, which allows the application to support multiple languages. Currently, Vietnamese and English are supported, but more languages can be added easily. This feature is particularly useful for teams working in different regions or with diverse language preferences.
 
 <p align="center">
   <img src="img/collabify.png" alt="Collabify Logo" width="60%" style="border-radius: 8px">
@@ -311,6 +314,32 @@ Collabify uses [Tailwind CSS](https://tailwindcss.com/) for styling. Tailwind CS
 You can customize the Tailwind CSS configuration by modifying the `tailwind.config.js` file in the root directory. You can add custom colors, fonts, and other styles as needed.
 
 To learn more about Tailwind CSS, check out the [documentation](https://tailwindcss.com/docs).
+
+## Internationalization (i18n)
+
+Collabify supports internationalization (i18n) using the [i18next](https://www.i18next.com/) library. Currently, it supports Vietnamese and English languages, but you can easily add more languages by following the i18next documentation.
+
+To get started with i18n, you can find the configuration in the `i18n.js` file in the root directory. The translations for each language are stored in the `public/locales` directory.
+
+Step-by-step instructions for adding a new language:
+
+1. Modify the `components/Navbar.tsx` file to include the new language in the language switcher.
+
+2. Create a new folder in `public/locales` with the language code (e.g., `fr` for French).
+
+3. Inside the new folder, create a `<component>.json` file with the translations for that language. For example, `common.json` for common phrases, or `navbar.json` for navbar-specific translations.
+
+4. Add the translations in the JSON file. For example:
+
+   ```json
+   {
+     "welcome": "Bienvenue",
+     "projects": "Projets",
+     "tasks": "Tâches"
+   }
+   ```
+
+5. Test the new language by switching to it in the application. You should see the translations applied!
 
 ## Deployment
 

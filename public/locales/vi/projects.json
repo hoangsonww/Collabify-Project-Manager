@@ -1,0 +1,22 @@
+{
+  "title": "Dự Án Của Bạn",
+  "metaDesc": "Quản lý các dự án – tham gia, tạo và theo dõi mọi dự án cộng tác với Collabify.",
+  "joinProject": "Tham Gia Dự Án",
+  "projectIdLabel": "Mã Dự Án",
+  "pasteProjectId": "Dán mã dự án...",
+  "createProject": "Tạo Dự Án",
+  "createNewProject": "Tạo Dự Án Mới",
+  "projectName": "Tên Dự Án",
+  "projectNamePlaceholder": "Tên dự án...",
+  "projectDescriptionPlaceholder": "Mô tả tùy chọn...",
+  "projectDescription": "Mô Tả",
+  "submitJoin": "Tham Gia",
+  "submitCreate": "Tạo",
+  "noProjectsYet": "Bạn chưa tham gia hoặc tạo bất kỳ dự án nào.",
+  "clickToViewDetails": "Nhấp vào một dự án để xem chi tiết.",
+  "projectNameRequired": "Tên dự án là bắt buộc",
+  "projectCreatedJoined": "Dự án đã được tạo và tham gia!",
+  "couldNotCreateJoin": "Không thể tạo và tham gia dự án",
+  "joinedProject": "Đã tham gia dự án!",
+  "couldNotJoin": "Không thể tham gia dự án. Có thể bạn đã tham gia?"
+}

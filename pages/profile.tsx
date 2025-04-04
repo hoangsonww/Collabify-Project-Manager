@@ -4,8 +4,13 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Head from "next/head";
 
-export default function ProfilePage() {
+// (1) Import react-i18next and dynamic
+import { useTranslation } from "react-i18next";
+import dynamic from "next/dynamic";
+
+function ProfilePageInternal() {
   const { user, error, isLoading } = useUser();
+  const { t } = useTranslation("profile");
   const [roles, setRoles] = useState<string[]>([]);
   const [loadingRoles, setLoadingRoles] = useState(true);
 
@@ -42,7 +47,7 @@ export default function ProfilePage() {
           animate={{ opacity: 1 }}
           className="text-white"
         >
-          Loading...
+          {t("loading")}
         </motion.p>
       </div>
     );
@@ -66,7 +71,7 @@ export default function ProfilePage() {
           animate={{ opacity: 1 }}
           className="text-white"
         >
-          Please log in to view your profile.
+          {t("pleaseLogIn")}
         </motion.p>
       </div>
     );
@@ -74,11 +79,8 @@ export default function ProfilePage() {
   return (
     <>
       <Head>
-        <title>Collabify | Your Profile</title>
-        <meta
-          name="description"
-          content="Manage system-wide settings, user roles, and view system logs with Collabify."
-        />
+        <title>{t("pageTitle")}</title>
+        <meta name="description" content={t("metaDesc")} />
       </Head>
       <div className="bg-black min-h-screen text-white p-6 font-sans">
         <motion.h1
@@ -87,7 +89,7 @@ export default function ProfilePage() {
           transition={{ duration: 0.6 }}
           className="text-3xl font-bold mb-6 text-center"
         >
-          Your Profile
+          {t("header")}
         </motion.h1>
 
         <motion.div
@@ -131,12 +133,12 @@ export default function ProfilePage() {
                 transition={{ delay: 0.4 }}
                 className="text-sm"
               >
-                <span className="font-semibold">Roles:</span>{" "}
+                <span className="font-semibold">{t("rolesLabel")}</span>{" "}
                 {loadingRoles
-                  ? "Loading roles..."
+                  ? t("loadingRoles")
                   : roles.length > 0
                     ? roles.join(", ")
-                    : "None"}
+                    : t("none")}
               </motion.div>
             </div>
           </div>
@@ -145,3 +147,8 @@ export default function ProfilePage() {
     </>
   );
 }
+
+// (2) Export a client-only version to prevent SSR/hydration issues
+export default dynamic(() => Promise.resolve(ProfilePageInternal), {
+  ssr: false,
+});

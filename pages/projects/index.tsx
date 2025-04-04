@@ -19,6 +19,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import Head from "next/head";
 
+// (1) Import react-i18next + dynamic
+import { useTranslation } from "react-i18next";
+import dynamic from "next/dynamic";
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+};
+
+// Local types
 type ProjectType = {
   _id: string;
   projectId: string;
@@ -32,29 +48,23 @@ type ProjectsPageProps = {
   projects: ProjectType[];
 };
 
-// Animation variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0 },
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function ProjectsPage({ userSub, projects }: ProjectsPageProps) {
+// (2) The real functional component using translations
+function ProjectsPageInternal({ projects }: ProjectsPageProps) {
   const [localProjects, setLocalProjects] = useState(projects);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [joinDialogOpen, setJoinDialogOpen] = useState(false);
   const router = useRouter();
 
+  // Use the "projects" namespace
+  const { t } = useTranslation("projects");
+
   async function handleCreateProject(formData: FormData) {
     const name = formData.get("name")?.toString().trim();
     const description = formData.get("description")?.toString().trim();
 
-    if (!name) return toast.error("Project name is required");
+    if (!name) {
+      return toast.error(t("projectNameRequired"));
+    }
 
     try {
       // Create project first
@@ -73,17 +83,17 @@ export default function ProjectsPage({ userSub, projects }: ProjectsPageProps) {
       if (!joinRes.ok) throw new Error("Failed to join project");
 
       setLocalProjects((prev) => [...prev, project]);
-      toast.success("Project created and joined!");
+      toast.success(t("projectCreatedJoined"));
       setCreateDialogOpen(false);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      toast.error("Could not create and join project");
+      toast.error(t("couldNotCreateJoin"));
     }
   }
 
   async function handleJoinProject(formData: FormData) {
     const id = formData.get("projectId")?.toString().trim();
-    if (!id) return toast.error("Project ID required");
+    if (!id) return toast.error(t("projectIdLabel"));
 
     try {
       const res = await fetch(`/api/projects/${id}/join`, {
@@ -91,22 +101,22 @@ export default function ProjectsPage({ userSub, projects }: ProjectsPageProps) {
       });
       if (!res.ok) throw new Error();
 
-      toast.success("Joined project!");
+      toast.success(t("joinedProject"));
       setJoinDialogOpen(false);
       // Directly redirect to the project details page using the provided id
       router.push(`/projects/${id}`);
     } catch {
-      toast.error("Could not join project. Maybe already joined?");
+      toast.error(t("couldNotJoin"));
     }
   }
 
   return (
     <>
       <Head>
-        <title>Collabify | Your Projects</title>
+        <title>Collabify | {t("title")}</title>
         <meta
           name="description"
-          content="Manage your projects – join, create, and track all your collaborative projects with Collabify."
+          content={t("metaDesc") || "Manage your projects with Collabify."}
         />
       </Head>
       <motion.div
@@ -122,7 +132,7 @@ export default function ProjectsPage({ userSub, projects }: ProjectsPageProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-3xl font-bold text-foreground">Your Projects</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t("title")}</h1>
           <div className="flex gap-4">
             <Dialog open={joinDialogOpen} onOpenChange={setJoinDialogOpen}>
               <DialogTrigger asChild>
@@ -130,12 +140,12 @@ export default function ProjectsPage({ userSub, projects }: ProjectsPageProps) {
                   variant="secondary"
                   className="hover:scale-102 transition-transform cursor-pointer"
                 >
-                  Join Project
+                  {t("joinProject")}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Join a Project</DialogTitle>
+                  <DialogTitle>{t("joinProject")}</DialogTitle>
                 </DialogHeader>
                 <form
                   className="space-y-4"
@@ -144,13 +154,16 @@ export default function ProjectsPage({ userSub, projects }: ProjectsPageProps) {
                     handleJoinProject(new FormData(e.currentTarget));
                   }}
                 >
-                  <Label htmlFor="projectId">Project ID</Label>
-                  <Input name="projectId" placeholder="Paste project ID..." />
+                  <Label htmlFor="projectId">{t("projectIdLabel")}</Label>
+                  <Input
+                    name="projectId"
+                    placeholder={t("pasteProjectId") || ""}
+                  />
                   <Button
                     type="submit"
                     className="w-full hover:scale-102 transition-transform cursor-pointer"
                   >
-                    Join
+                    {t("submitJoin")}
                   </Button>
                 </form>
               </DialogContent>
@@ -159,12 +172,12 @@ export default function ProjectsPage({ userSub, projects }: ProjectsPageProps) {
             <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="hover:scale-102 transition-transform cursor-pointer">
-                  Create Project
+                  {t("createProject")}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Create New Project</DialogTitle>
+                  <DialogTitle>{t("createNewProject")}</DialogTitle>
                 </DialogHeader>
                 <form
                   className="space-y-4"
@@ -173,18 +186,24 @@ export default function ProjectsPage({ userSub, projects }: ProjectsPageProps) {
                     handleCreateProject(new FormData(e.currentTarget));
                   }}
                 >
-                  <Label htmlFor="name">Project Name</Label>
-                  <Input name="name" placeholder="Project name..." required />
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="name">{t("projectName")}</Label>
+                  <Input
+                    name="name"
+                    placeholder={t("projectNamePlaceholder") || ""}
+                    required
+                  />
+                  <Label htmlFor="description">
+                    {t("projectDescriptionPlaceholder")}
+                  </Label>
                   <Input
                     name="description"
-                    placeholder="Optional description..."
+                    placeholder={t("projectDescriptionPlaceholder") || ""}
                   />
                   <Button
                     type="submit"
                     className="w-full hover:scale-101 transition-transform cursor-pointer"
                   >
-                    Create
+                    {t("submitCreate")}
                   </Button>
                 </form>
               </DialogContent>
@@ -199,7 +218,7 @@ export default function ProjectsPage({ userSub, projects }: ProjectsPageProps) {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
           >
-            You haven’t joined or created any projects yet.
+            {t("noProjectsYet")}
           </motion.p>
         ) : (
           <motion.div
@@ -240,8 +259,7 @@ export default function ProjectsPage({ userSub, projects }: ProjectsPageProps) {
           transition={{ delay: 0.3 }}
         >
           <p className="text-muted-foreground">
-            {localProjects.length > 0 &&
-              "Click on a project to view its details."}
+            {localProjects.length > 0 && t("clickToViewDetails")}
           </p>
         </motion.div>
       </motion.div>
@@ -249,6 +267,7 @@ export default function ProjectsPage({ userSub, projects }: ProjectsPageProps) {
   );
 }
 
+// (3) Server-side data fetching (unchanged)
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session = await getSession(req, res);
   if (!session?.user)
@@ -269,3 +288,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   return { props: { userSub, projects: serialized } };
 };
+
+// (4) Export a client-only version to avoid SSR mismatch
+export default dynamic(() => Promise.resolve(ProjectsPageInternal), {
+  ssr: false,
+});

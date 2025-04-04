@@ -1,3 +1,4 @@
+// pages/projects/[id].tsx
 import { getSession } from "@auth0/nextjs-auth0";
 import { GetServerSideProps } from "next";
 import { dbConnect } from "@/lib/mongodb";
@@ -49,6 +50,10 @@ import {
 import { motion } from "framer-motion";
 import Head from "next/head";
 
+// (1) Import react-i18next + dynamic
+import { useTranslation } from "react-i18next";
+import dynamic from "next/dynamic";
+
 ChartJS.register(
   BarElement,
   ArcElement,
@@ -58,18 +63,19 @@ ChartJS.register(
   Legend,
 );
 
-type Props = {
-  userSub: string | null;
-  isAdmin: boolean;
-  project: ProjectType | null;
-};
-
-export default function ProjectDetailPage({
+// The main component that uses translations
+function ProjectDetailPageInternal({
   userSub,
   isAdmin,
   project,
-}: Props) {
+}: {
+  userSub: string | null;
+  isAdmin: boolean;
+  project: ProjectType | null;
+}) {
   const router = useRouter();
+  const { t } = useTranslation("projectDetail");
+
   const [localProject, setLocalProject] = useState(project);
   const [newTask, setNewTask] = useState("");
   const [assignee, setAssignee] = useState("");
@@ -80,7 +86,7 @@ export default function ProjectDetailPage({
     Record<string, { name?: string; email?: string }>
   >({});
 
-  // Animate container and cards using Framer Motion
+  // Animate container and cards with Framer Motion
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
@@ -91,12 +97,12 @@ export default function ProjectDetailPage({
     visible: { opacity: 1, y: 0 },
   };
 
+  // Fetch user info for each member
   useEffect(() => {
     async function fetchInfo() {
+      if (!localProject) return;
       const results: Record<string, { name?: string; email?: string }> = {};
       await Promise.all(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         localProject.members.map(async (sub) => {
           try {
             const res = await fetch(
@@ -104,8 +110,7 @@ export default function ProjectDetailPage({
             );
             const json = await res.json();
             results[sub] = { name: json.name, email: json.email };
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          } catch (e) {
+          } catch {
             results[sub] = {};
           }
         }),
@@ -118,39 +123,42 @@ export default function ProjectDetailPage({
     }
   }, [localProject?.members]);
 
-  if (!userSub || !localProject)
-    return <p className="text-white">Please log in or invalid project.</p>;
+  if (!userSub || !localProject) {
+    return <p className="text-white">{t("invalidProjectOrLogin")}</p>;
+  }
 
   const isMember = localProject.members.includes(userSub) || isAdmin;
 
+  // Join project
   const handleJoin = async () => {
     const res = await fetch(`/api/projects/${localProject.projectId}/join`, {
       method: "POST",
     });
     if (res.ok) {
-      toast.success("Joined project");
-      // Update local state to include the current user as a member
+      toast.success(t("joinedProject"));
+      // Update local state
       setLocalProject((prevProject) => {
         if (!prevProject) return prevProject;
-        // Prevent duplicate entries if the user is already a member
         if (prevProject.members.includes(userSub)) return prevProject;
         return { ...prevProject, members: [...prevProject.members, userSub] };
       });
     } else {
-      toast.error("Error joining project");
+      toast.error(t("errorJoiningProject"));
     }
   };
 
+  // Leave project
   const handleLeave = async () => {
     const res = await fetch(`/api/projects/${localProject.projectId}/leave`, {
       method: "POST",
     });
     if (res.ok) {
-      toast.success("Left project");
+      toast.success(t("leftProject"));
       router.replace(router.asPath);
     }
   };
 
+  // Add Task
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
     const id = nanoid();
@@ -165,12 +173,13 @@ export default function ProjectDetailPage({
       setNewTask("");
       setAssignee("");
       setOpen(false);
-      toast.success("Task added");
+      toast.success(t("taskAdded"));
     } else {
-      toast.error("Task creation failed");
+      toast.error(t("taskCreationFailed"));
     }
   };
 
+  // Toggle Task Status
   const handleToggleStatus = async (taskId: string) => {
     const res = await fetch(
       `/api/projects/${localProject.projectId}/tasks/${taskId}/toggle`,
@@ -182,6 +191,7 @@ export default function ProjectDetailPage({
     }
   };
 
+  // Count tasks by status
   const statusCounts = { todo: 0, "in-progress": 0, done: 0 };
   localProject.tasks.forEach((t) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -189,6 +199,7 @@ export default function ProjectDetailPage({
     statusCounts[t.status] = (statusCounts[t.status] || 0) + 1;
   });
 
+  // Chart options
   const chartOptions = {
     plugins: {
       legend: { labels: { color: "#ffffff" } },
@@ -206,6 +217,7 @@ export default function ProjectDetailPage({
     },
   };
 
+  // Bar & Pie Data
   const barData = {
     labels: ["To Do", "In Progress", "Done"],
     datasets: [
@@ -267,15 +279,13 @@ export default function ProjectDetailPage({
             <Dialog open={leaveDialogOpen} onOpenChange={setLeaveDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="destructive" className="cursor-pointer">
-                  <LogOut className="h-4 w-4" /> Leave
+                  <LogOut className="h-4 w-4" /> {t("btnLeave")}
                 </Button>
               </DialogTrigger>
               <DialogContent className="bg-black border border-white text-white">
                 <DialogHeader>
-                  <DialogTitle>Confirm Leave</DialogTitle>
-                  <DialogDescription>
-                    Are you sure you want to leave this project?
-                  </DialogDescription>
+                  <DialogTitle>{t("confirmLeaveTitle")}</DialogTitle>
+                  <DialogDescription>{t("confirmLeaveDesc")}</DialogDescription>
                 </DialogHeader>
                 <div className="flex gap-4 mt-4">
                   <Button
@@ -286,21 +296,21 @@ export default function ProjectDetailPage({
                     }}
                     className="cursor-pointer"
                   >
-                    Yes, Leave
+                    {t("yesLeave")}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => setLeaveDialogOpen(false)}
                     className="cursor-pointer"
                   >
-                    Cancel
+                    {t("cancel")}
                   </Button>
                 </div>
               </DialogContent>
             </Dialog>
           ) : (
             <Button className="cursor-pointer" onClick={handleJoin}>
-              <LogIn className="h-4 w-4" /> Join
+              <LogIn className="h-4 w-4" /> {t("btnJoin")}
             </Button>
           )}
 
@@ -310,16 +320,16 @@ export default function ProjectDetailPage({
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                   <Button variant="outline" className="cursor-pointer">
-                    <Plus className="h-4 w-4" /> New Task
+                    <Plus className="h-4 w-4" /> {t("btnNewTask")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-black border border-white text-white">
                   <DialogHeader>
-                    <DialogTitle>Add a Task</DialogTitle>
+                    <DialogTitle>{t("addTaskModalTitle")}</DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleAddTask} className="space-y-4">
                     <div>
-                      <Label className="mb-2">Task Title</Label>
+                      <Label className="mb-2">{t("taskTitleLabel")}</Label>
                       <Input
                         value={newTask}
                         onChange={(e) => setNewTask(e.target.value)}
@@ -328,10 +338,12 @@ export default function ProjectDetailPage({
                       />
                     </div>
                     <div>
-                      <Label className="mb-2">Assign To</Label>
+                      <Label className="mb-2">{t("assignToLabel")}</Label>
                       <Select onValueChange={(v) => setAssignee(v)}>
                         <SelectTrigger className="bg-black text-white border border-white">
-                          <SelectValue placeholder="Select member (optional)" />
+                          <SelectValue
+                            placeholder={t("selectMemberOptional") || ""}
+                          />
                         </SelectTrigger>
                         <SelectContent className="bg-black text-white border border-white">
                           {localProject.members.map((sub) => {
@@ -347,7 +359,7 @@ export default function ProjectDetailPage({
                       </Select>
                     </div>
                     <Button type="submit" className="w-full cursor-pointer">
-                      Create
+                      {t("createTaskBtn")}
                     </Button>
                   </form>
                 </DialogContent>
@@ -357,16 +369,13 @@ export default function ProjectDetailPage({
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="secondary" className="cursor-pointer">
-                    <Users className="h-4 w-4" /> Invite
+                    <Users className="h-4 w-4" /> {t("inviteBtn")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-black border border-white text-white">
                   <DialogHeader>
-                    <DialogTitle>Share this Project ID</DialogTitle>
-                    <DialogDescription>
-                      Share this ID with your teammates to invite them to this
-                      project.
-                    </DialogDescription>
+                    <DialogTitle>{t("inviteTitle")}</DialogTitle>
+                    <DialogDescription>{t("inviteDesc")}</DialogDescription>
                   </DialogHeader>
                   <Input
                     value={localProject.projectId}
@@ -376,11 +385,11 @@ export default function ProjectDetailPage({
                   <Button
                     onClick={() => {
                       navigator.clipboard.writeText(localProject.projectId);
-                      toast.success("Copied ID");
+                      toast.success(t("copiedIdMsg"));
                     }}
                     className="cursor-pointer"
                   >
-                    <ClipboardCopy className="h-4 w-4" /> Copy
+                    <ClipboardCopy className="h-4 w-4" /> {t("copyBtn")}
                   </Button>
                 </DialogContent>
               </Dialog>
@@ -396,43 +405,46 @@ export default function ProjectDetailPage({
               initial="hidden"
               animate="visible"
             >
-              {/* Bar Chart with Title */}
+              {/* Bar Chart */}
               <motion.div
                 variants={cardVariants}
                 className="bg-black border border-white p-4 rounded shadow transition-transform duration-300 hover:scale-101"
               >
                 <h2 className="text-lg font-semibold mb-4 text-white">
-                  Task Progress Overview
+                  {t("taskProgressOverview")}
                 </h2>
                 <Bar data={barData} options={chartOptions} />
               </motion.div>
 
-              {/* Pie Chart with Title */}
+              {/* Pie Chart */}
               <motion.div
                 variants={cardVariants}
                 className="bg-black border border-white p-4 rounded shadow transition-transform duration-300 hover:scale-101"
               >
                 <h2 className="text-lg font-semibold mb-4 text-white">
-                  Task Status Distribution
+                  {t("taskStatusDistribution")}
                 </h2>
                 <Pie data={pieData} options={chartOptions} />
               </motion.div>
             </motion.div>
 
+            {/* Task Table */}
             <motion.div
               className="bg-black border border-white p-4 rounded shadow transition-transform duration-300"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <h2 className="text-xl font-semibold mb-4 text-white">Tasks</h2>
+              <h2 className="text-xl font-semibold mb-4 text-white">
+                {t("tasks")}
+              </h2>
               <table className="w-full text-sm">
                 <thead className="bg-gray-800 text-gray-300">
                   <tr>
-                    <th className="text-left p-2">Title</th>
-                    <th className="text-left p-2">Status</th>
-                    <th className="text-left p-2">Assignee</th>
-                    <th className="text-left p-2">Action</th>
+                    <th className="text-left p-2">{t("title")}</th>
+                    <th className="text-left p-2">{t("status")}</th>
+                    <th className="text-left p-2">{t("assignee")}</th>
+                    <th className="text-left p-2">{t("action")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -444,7 +456,7 @@ export default function ProjectDetailPage({
                       </td>
                       <td className="p-2 text-xs text-white">
                         {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                        {/* @ts-ignore */}
+                        {/*@ts-ignore*/}
                         {task.assignedTo
                           ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore
@@ -464,7 +476,7 @@ export default function ProjectDetailPage({
                           onClick={() => handleToggleStatus(task._id)}
                           className="text-white border-white cursor-pointer"
                         >
-                          <CircleCheck className="mr-2 h-4 w-4" /> Toggle
+                          <CircleCheck className="mr-2 h-4 w-4" /> {t("toggle")}
                         </Button>
                       </td>
                     </tr>
@@ -479,6 +491,9 @@ export default function ProjectDetailPage({
   );
 }
 
+// =======================================
+// SERVER-SIDE PROPS (unchanged)
+// =======================================
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
@@ -518,3 +533,8 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   return { props: { userSub, isAdmin, project: serialized } };
 };
+
+// (2) Export a dynamic, client-only version
+export default dynamic(() => Promise.resolve(ProjectDetailPageInternal), {
+  ssr: false,
+});

@@ -1,0 +1,23 @@
+{
+  "loading": "Loading...",
+  "adminTitle": "Collabify | Admin Panel",
+  "adminMetaDesc": "Manage system-wide settings, user roles, and view system logs with Collabify.",
+  "pleaseLoginViewPage": "Please log in to view this page.",
+  "noPermission": "You do not have permission to view this page.",
+  "adminPanel": "Admin Panel",
+  "manageSystemWide": "Manage system-wide settings, user roles, and view system logs.",
+  "userManagement": "User Management",
+  "assignOrRevoke": "Assign or revoke roles for a user.",
+  "userSubLabel": "User Sub (e.g. auth0|abc123):",
+  "roleNameLabel": "Role Name (e.g. admin):",
+  "actionLabel": "Action:",
+  "addRole": "Add Role",
+  "removeRole": "Remove Role",
+  "processing": "Processing...",
+  "submit": "Submit",
+  "systemLogs": "System Logs",
+  "recentLoginActivity": "View recent login activity, audit logs, and alerts.",
+  "noLogsAvailable": "No logs available.",
+  "logsByType": "Logs by Type",
+  "logsOverTime": "Logs Over Time"
+}

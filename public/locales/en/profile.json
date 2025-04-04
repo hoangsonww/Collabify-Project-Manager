@@ -1,0 +1,10 @@
+{
+  "pageTitle": "Collabify | Your Profile",
+  "metaDesc": "Manage system-wide settings, user roles, and view system logs with Collabify.",
+  "header": "Your Profile",
+  "loading": "Loading...",
+  "pleaseLogIn": "Please log in to view your profile.",
+  "rolesLabel": "Roles:",
+  "loadingRoles": "Loading roles...",
+  "none": "None"
+}

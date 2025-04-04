@@ -1,0 +1,23 @@
+{
+  "loading": "Đang tải...",
+  "adminTitle": "Collabify | Bảng Quản Trị",
+  "adminMetaDesc": "Quản lý cài đặt hệ thống, vai trò người dùng và xem nhật ký hệ thống với Collabify.",
+  "pleaseLoginViewPage": "Vui lòng đăng nhập để xem trang này.",
+  "noPermission": "Bạn không có quyền truy cập trang này.",
+  "adminPanel": "Bảng Quản Trị",
+  "manageSystemWide": "Quản lý cài đặt toàn hệ thống, vai trò người dùng và xem nhật ký hệ thống.",
+  "userManagement": "Quản Lý Người Dùng",
+  "assignOrRevoke": "Thêm hoặc xóa vai trò cho một người dùng.",
+  "userSubLabel": "User Sub (VD: auth0|abc123):",
+  "roleNameLabel": "Tên Vai Trò (VD: admin):",
+  "actionLabel": "Hành Động:",
+  "addRole": "Thêm Vai Trò",
+  "removeRole": "Xóa Vai Trò",
+  "processing": "Đang xử lý...",
+  "submit": "Gửi",
+  "systemLogs": "Nhật Ký Hệ Thống",
+  "recentLoginActivity": "Xem hoạt động đăng nhập gần đây, nhật ký kiểm toán và thông báo.",
+  "noLogsAvailable": "Không có nhật ký nào.",
+  "logsByType": "Nhật Ký Theo Loại",
+  "logsOverTime": "Nhật Ký Theo Thời Gian"
+}

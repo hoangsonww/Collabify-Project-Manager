@@ -1,0 +1,22 @@
+{
+  "pleaseLogIn": "Vui lòng đăng nhập để xem bảng điều khiển của bạn.",
+  "dashboardTitle": "Bảng Điều Khiển",
+  "dashboardPageTitle": "Collabify | Bảng Điều Khiển",
+  "dashboardMetaDesc": "Xem thống kê dự án, tỷ lệ hoàn thành nhiệm vụ và nhiều hơn nữa với Collabify.",
+  "yourProjects": "Dự Án Của Bạn",
+  "totalTasks": "Tổng Nhiệm Vụ",
+  "completedTasks": "Nhiệm Vụ Đã Hoàn Thành",
+  "completionRate": "Tỷ Lệ Hoàn Thành",
+  "inProgress": "Nhiệm Vụ Đang Thực Hiện",
+  "toDo": "Nhiệm Vụ Cần Làm",
+  "largestProject": "Dự Án Lớn Nhất",
+  "smallestProject": "Dự Án Nhỏ Nhất",
+  "tasksByStatus": "Nhiệm Vụ Theo Trạng Thái",
+  "doneVsNotDone": "Hoàn Thành vs Chưa Hoàn Thành",
+  "tasksCreatedVsCompleted": "Nhiệm Vụ Đã Tạo vs Đã Hoàn Thành",
+  "statusDistribution": "Phân Bố Trạng Thái",
+  "status": "Trạng Thái",
+  "noProjectsFound": "Không có dự án nào.",
+  "top5Projects": "Top 5 Dự Án (theo tổng nhiệm vụ)",
+  "adminNote": "Bạn là quản trị viên và có thể xem tất cả dự án. (Chỉ là ghi chú.)"
+}

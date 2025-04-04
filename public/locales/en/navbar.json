@@ -1,0 +1,11 @@
+{
+  "language": "Language",
+  "english": "English / Tiếng Anh",
+  "vietnamese": "Vietnamese / Tiếng Việt",
+  "loginSignUp": "Login / Sign Up",
+  "dashboard": "Dashboard",
+  "projects": "Projects",
+  "profile": "Profile",
+  "admin": "Admin",
+  "logout": "Logout"
+}

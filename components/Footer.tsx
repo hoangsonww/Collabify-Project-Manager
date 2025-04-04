@@ -1,8 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Github, Linkedin, Mail, Globe } from "lucide-react";
+import dynamic from "next/dynamic";
+import { useTranslation } from "react-i18next";
 
-export function Footer() {
+function FooterInternal() {
+  const { t } = useTranslation("footer");
+  const currentYear = new Date().getFullYear();
+
   return (
     <motion.footer
       className="w-full border-t border-gray-700 bg-brandPurple text-white text-sm py-4 mt-8"
@@ -12,22 +19,16 @@ export function Footer() {
     >
       <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
         <div className="flex flex-col md:flex-row items-center gap-2">
+          <span>{t("copyright", { year: currentYear })}</span>
           <span>
-            © {new Date().getFullYear()} Collabify. All rights reserved.
-          </span>
-          <span>
-            Built with{" "}
-            <span role="img" aria-label="love">
-              ❤️
-            </span>{" "}
-            by{" "}
+            {t("builtWith", { love: t("love") })} {t("by")}{" "}
             <Link
               href="https://sonnguyenhoang.com"
               target="_blank"
               rel="noopener noreferrer"
               className="underline hover:text-gray-300 transition-colors"
             >
-              Son Nguyen
+              {t("sonNguyen")}
             </Link>
             .
           </span>
@@ -40,7 +41,7 @@ export function Footer() {
             className="flex items-center gap-1 hover:text-gray-300 transition-colors"
           >
             <Github size={16} />
-            <span className="hidden md:inline">GitHub</span>
+            <span className="hidden md:inline">{t("github")}</span>
           </Link>
           <Link
             href="https://www.linkedin.com/in/hoangsonw"
@@ -49,14 +50,14 @@ export function Footer() {
             className="flex items-center gap-1 hover:text-gray-300 transition-colors"
           >
             <Linkedin size={16} />
-            <span className="hidden md:inline">LinkedIn</span>
+            <span className="hidden md:inline">{t("linkedin")}</span>
           </Link>
           <Link
             href="mailto:hoangson091104@gmail.com"
             className="flex items-center gap-1 hover:text-gray-300 transition-colors"
           >
             <Mail size={16} />
-            <span className="hidden md:inline">Email</span>
+            <span className="hidden md:inline">{t("email")}</span>
           </Link>
           <Link
             href="https://sonnguyenhoang.com"
@@ -65,10 +66,12 @@ export function Footer() {
             className="flex items-center gap-1 hover:text-gray-300 transition-colors"
           >
             <Globe size={16} />
-            <span className="hidden md:inline">Website</span>
+            <span className="hidden md:inline">{t("website")}</span>
           </Link>
         </div>
       </div>
     </motion.footer>
   );
 }
+
+export default dynamic(() => Promise.resolve(FooterInternal), { ssr: false });

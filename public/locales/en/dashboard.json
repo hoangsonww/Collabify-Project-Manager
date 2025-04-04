@@ -1,0 +1,22 @@
+{
+  "pleaseLogIn": "Please log in to view your dashboard.",
+  "dashboardPageTitle": "Collabify | Dashboard",
+  "dashboardMetaDesc": "View your project statistics, task completion rates, and more with Collabify.",
+  "dashboardTitle": "Dashboard",
+  "yourProjects": "Your Projects",
+  "totalTasks": "Total Tasks",
+  "completedTasks": "Completed Tasks",
+  "completionRate": "Completion Rate",
+  "inProgress": "In-Progress Tasks",
+  "toDo": "To Do Tasks",
+  "largestProject": "Largest Project",
+  "smallestProject": "Smallest Project",
+  "tasksByStatus": "Tasks by Status",
+  "doneVsNotDone": "Done vs Not Done",
+  "tasksCreatedVsCompleted": "Tasks Created vs Completed",
+  "statusDistribution": "Status Distribution",
+  "status": "Status",
+  "noProjectsFound": "No projects found.",
+  "top5Projects": "Top 5 Projects (by total tasks)",
+  "adminNote": "You are an admin and can see all projects. (Just a note.)"
+}

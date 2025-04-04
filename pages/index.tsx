@@ -1,3 +1,7 @@
+// pages/index.tsx
+
+import dynamic from "next/dynamic";
+import Head from "next/head";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
@@ -11,17 +15,19 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import Head from "next/head";
 
-export default function Home() {
+// We import i18n in _app.tsx anyway, but do it again just in case:
+import { useTranslation } from "react-i18next";
+
+// 1) We create a "RealHome" component that uses react-i18next for translations
+function RealHome() {
+  const { t } = useTranslation("collabify");
+
   return (
     <>
       <Head>
-        <title>Collabify | Your Project Management Solution</title>
-        <meta
-          name="description"
-          content="Manage system-wide settings, user roles, and view system logs with Collabify."
-        />
+        <title>{t("title")}</title>
+        <meta name="description" content={t("metaDesc")} />
       </Head>
       <div className="relative min-h-screen bg-background text-foreground overflow-hidden flex flex-col items-center justify-center transition-colors duration-300">
         <div className="relative z-10 w-full max-w-6xl px-4 py-16 flex flex-col items-center">
@@ -34,12 +40,9 @@ export default function Home() {
             className="text-center mb-12"
           >
             <h1 className="text-5xl md:text-6xl font-extrabold leading-[1.2] mb-6 bg-gradient-to-r from-pink-600 via-red-600 to-yellow-400 text-transparent bg-clip-text animate-gradient">
-              Collabify
+              {t("heroTitle")}
             </h1>
-            <p className="text-xl max-w-2xl mx-auto">
-              The ultimate platform to seamlessly plan, organize, and
-              collaborate on projects with your team – all in one place.
-            </p>
+            <p className="text-xl max-w-2xl mx-auto">{t("heroSubtitle")}</p>
           </motion.div>
 
           {/* CTA Button */}
@@ -52,7 +55,7 @@ export default function Home() {
           >
             <Link href="/api/auth/login">
               <Button className="bg-primary text-primary-foreground hover:bg-primary/100 transform hover:scale-105 px-6 py-3 rounded-lg shadow-lg text-lg transition-all duration-300 cursor-pointer">
-                Get Started
+                {t("getStarted")}
               </Button>
             </Link>
           </motion.div>
@@ -66,20 +69,20 @@ export default function Home() {
             className="w-full mb-12"
           >
             <h2 className="text-2xl font-semibold mb-6 text-center">
-              How Collabify Works
+              {t("howItWorks")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <HowItWorksStep
-                title="Create Projects"
-                text="Set up new projects instantly and define tasks or milestones."
+                title={t("createProjects")}
+                text={t("createProjectsText")}
               />
               <HowItWorksStep
-                title="Invite Your Team"
-                text="Add collaborators, assign roles, and keep everyone aligned."
+                title={t("inviteTeam")}
+                text={t("inviteTeamText")}
               />
               <HowItWorksStep
-                title="Track Progress"
-                text="Use real-time dashboards, charts, and tasks to ensure on-time delivery."
+                title={t("trackProgress")}
+                text={t("trackProgressText")}
               />
             </div>
           </motion.div>
@@ -93,41 +96,38 @@ export default function Home() {
             className="w-full mb-12"
           >
             <h2 className="text-2xl font-semibold mb-6 text-center">
-              Features
+              {t("features")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <FeatureCard
                 icon={<Briefcase className="w-8 h-8 text-primary" />}
-                title="Organize Projects"
-                description="Manage multiple projects seamlessly with clear task assignments."
+                title={t("organizeProjects")}
+                description={t("organizeProjectsText")}
               />
               <FeatureCard
                 icon={<Users className="w-8 h-8 text-primary" />}
-                title="Collaborate"
-                description="Invite team members, discuss tasks, and keep everyone in sync."
+                title={t("collaborate")}
+                description={t("collaborateText")}
               />
               <FeatureCard
                 icon={<CalendarCheck className="w-8 h-8 text-primary" />}
-                title="Stay on Track"
-                description="Monitor deadlines with built-in charts and real-time updates."
+                title={t("stayOnTrack")}
+                description={t("stayOnTrackText")}
               />
-              {/* Additional Card 1: Auth0 Integration */}
               <FeatureCard
                 icon={<Lock className="w-8 h-8 text-primary" />}
-                title="Secure Authentication"
-                description="Leverage Auth0 for secure, seamless, and reliable user authentication."
+                title={t("secureAuth")}
+                description={t("secureAuthText")}
               />
-              {/* Additional Card 2: Customizable Workflows */}
               <FeatureCard
                 icon={<Sliders className="w-8 h-8 text-primary" />}
-                title="Customizable Workflows"
-                description="Tailor workflows to suit your team’s unique project management needs."
+                title={t("customWorkflows")}
+                description={t("customWorkflowsText")}
               />
-              {/* Additional Card 3: Analytics & Insights */}
               <FeatureCard
                 icon={<BarChart className="w-8 h-8 text-primary" />}
-                title="Analytics & Insights"
-                description="Gain actionable insights through real-time analytics and reporting."
+                title={t("analytics")}
+                description={t("analyticsText")}
               />
             </div>
           </motion.div>
@@ -140,12 +140,10 @@ export default function Home() {
             transition={{ delay: 0.15, duration: 0.4, ease: "easeOut" }}
             className="mt-12 text-center"
           >
-            <h2 className="text-2xl font-semibold mb-4">
-              Ready to transform your team’s productivity?
-            </h2>
+            <h2 className="text-2xl font-semibold mb-4">{t("finalCTA")}</h2>
             <Link href="/api/auth/login">
               <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90 transform hover:scale-105 px-6 py-3 rounded-lg shadow-md text-lg transition-all duration-300 cursor-pointer">
-                Start Collabifying!
+                {t("startCollabifying")}
               </Button>
             </Link>
           </motion.div>
@@ -209,3 +207,7 @@ function HowItWorksStep({ title, text }: { title: string; text: string }) {
     </Card>
   );
 }
+
+// 2) Export a client-only version of RealHome
+const Home = dynamic(() => Promise.resolve(RealHome), { ssr: false });
+export { Home as default };

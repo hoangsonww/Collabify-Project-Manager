@@ -1,0 +1,22 @@
+{
+  "title": "Your Projects",
+  "metaDesc": "Manage your projects – join, create, and track all your collaborative projects with Collabify.",
+  "joinProject": "Join Project",
+  "projectIdLabel": "Project ID",
+  "pasteProjectId": "Paste project ID...",
+  "createProject": "Create Project",
+  "createNewProject": "Create New Project",
+  "projectName": "Project Name",
+  "projectNamePlaceholder": "Project name...",
+  "projectDescriptionPlaceholder": "Optional description...",
+  "projectDescription": "Description",
+  "submitJoin": "Join",
+  "submitCreate": "Create",
+  "noProjectsYet": "You haven’t joined or created any projects yet.",
+  "clickToViewDetails": "Click on a project to view its details.",
+  "projectNameRequired": "Project name is required",
+  "projectCreatedJoined": "Project created and joined!",
+  "couldNotCreateJoin": "Could not create and join project",
+  "joinedProject": "Joined project!",
+  "couldNotJoin": "Could not join project. Maybe already joined?"
+}
