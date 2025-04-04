@@ -33,7 +33,7 @@ export default function Home() {
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="text-center mb-12"
           >
-            <h1 className="text-5xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-pink-600 via-red-600 to-yellow-400 text-transparent bg-clip-text animate-gradient">
+            <h1 className="text-5xl md:text-6xl font-extrabold leading-[1.2] mb-6 bg-gradient-to-r from-pink-600 via-red-600 to-yellow-400 text-transparent bg-clip-text animate-gradient">
               Collabify
             </h1>
             <p className="text-xl max-w-2xl mx-auto">

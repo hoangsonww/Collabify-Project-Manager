@@ -26,7 +26,6 @@ const SwaggerPage = () => {
       <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
       <style>
         {`
-          /* Force all text to be white and background to be pure black */
           body, .swagger-ui, .swagger-ui * {
             color: white !important;
             background-color: #000000 !important;
@@ -34,9 +33,8 @@ const SwaggerPage = () => {
           .swagger-ui .topbar {
             background-color: #000000 !important;
           }
-          /* Ensure the Swagger container does not use fixed full height */
           #swagger-ui {
-            margin-bottom: 5rem; /* extra space so Footer is pushed down */
+            margin-bottom: 5rem;
           }
         `}
       </style>

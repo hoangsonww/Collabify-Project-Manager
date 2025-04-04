@@ -1,15 +1,24 @@
-# Collabify - A GitHub Project Board Alternative 📈
+# Collabify - A Jira & Trello Alternative 🧩
 
-[![Next.js](https://img.shields.io/badge/Next.js-13-blue?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-blue?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Shadcn UI](https://img.shields.io/badge/Shadcn_UI-v1.0-purple?style=for-the-badge)](https://ui.shadcn.com/)
-[![Auth0](https://img.shields.io/badge/Auth0-Secure-brightgreen?style=for-the-badge&logo=auth0)](https://auth0.com/)
+[![Auth0](https://img.shields.io/badge/Auth0-Security-brightgreen?style=for-the-badge&logo=auth0)](https://auth0.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Cloud-green?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
+[![React Query](https://img.shields.io/badge/React_Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white)](https://tanstack.com/query/latest)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/)
+[![Docker](https://img.shields.io/badge/Docker-Container-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 Collabify is a modern, feature-rich project management tool designed to help teams plan, organize, and collaborate seamlessly. Built on [Next.js](https://nextjs.org/) (as a full-stack framework), styled with [Tailwind CSS](https://tailwindcss.com/), and powered by [Shadcn UI](https://ui.shadcn.com/), Collabify provides a great user experience with beautiful UI components and smooth animations via [Framer Motion](https://www.framer.com/motion/).
 
-One of the key features is secure authentication using [Auth0](https://auth0.com/), which is integrated using both Regular Web Applications (RWA) and Machine-to-Machine (M2M) credentials. MongoDB is used as the primary database to store projects and tasks.
+One of the key features is secure authentication using [Auth0](https://auth0.com/), which is integrated using both Regular Web Applications (RWA) and Machine-to-Machine (M2M) credentials, with Role-Based Access Control (RBAC) for enhanced security. The application also utilizes [MongoDB](https://www.mongodb.com/) for data storage, ensuring reliable and scalable data management.
+
+<p align="center">
+  <img src="img/collabify.png" alt="Collabify Logo" width="60%" style="border-radius: 8px">
+</p>
 
 ## Table of Contents
 
@@ -22,12 +31,18 @@ One of the key features is secure authentication using [Auth0](https://auth0.com
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Environment Variables](#environment-variables)
+- [Why Auth0?](#why-auth0)
+  - [Benefits of using Auth0](#benefits-of-using-auth0)
 - [Auth0 Setup Guide](#auth0-setup-guide)
   - [1. Setting Up Your Auth0 Tenant](#1-setting-up-your-auth0-tenant)
   - [2. Creating the Regular Web Application (RWA)](#2-creating-the-regular-web-application-rwa)
   - [3. Creating the Machine-to-Machine (M2M) Application](#3-creating-the-machine-to-machine-m2m-application)
   - [4. Configuring Your Auth0 API and Client Grants](#4-configuring-your-auth0-api-and-client-grants)
+  - [5. Testing the Application](#5-testing-the-application)
+- [Shadcn UI](#shadcn-ui)
+- [Tailwind CSS](#tailwind-css)
 - [Deployment](#deployment)
+- [Containerization](#containerization)
 - [License](#license)
 - [Contact](#contact)
 - [Contributing](#contributing)
@@ -59,6 +74,8 @@ Currently live at: [https://collabify-pm.vercel.app/](https://collabify-pm.verce
 
 ## Tech Stack
 
+Collabify is built using a modern tech stack that ensures a great user experience and robust functionality. Here are the key technologies used in this project:
+
 - **Framework:** [Next.js](https://nextjs.org/)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components:** [Shadcn UI](https://ui.shadcn.com/)
@@ -69,44 +86,47 @@ Currently live at: [https://collabify-pm.vercel.app/](https://collabify-pm.verce
 - **Icons:** [Lucide React](https://lucide.dev/)
 - **State Management:** [React Query](https://react-query.tanstack.com/) for data fetching and caching
 - **Deployment:** [Vercel](https://vercel.com/) (recommended for Next.js apps)
-- **and more!**
+- **Code Formatting:** [Prettier](https://prettier.io/) for consistent code style
+- **Linting:** [ESLint](https://eslint.org/) for identifying and fixing code quality issues
+- **Version Control:** [Git](https://git-scm.com/) for version control and collaboration
+- **and many more!**
 
 ## User Interface
 
 ### Landing Page
 
 <p align="center">
-  <img src="img/home.png" alt="Home Page" width="100%">
+  <img src="img/home.png" alt="Home Page" width="100%" style="border-radius: 8px">
 </p>
 
 ### Dashboard
 
 <p align="center">
-  <img src="img/dashboard.png" alt="Dashboard Page" width="100%">
+  <img src="img/dashboard.png" alt="Dashboard Page" width="100%" style="border-radius: 8px">
 </p>
 
 ### Project List Page
 
 <p align="center">
-  <img src="img/projects.png" alt="Project Page" width="100%">
+  <img src="img/projects.png" alt="Project Page" width="100%" style="border-radius: 8px">
 </p>
 
 ### Project Details Page
 
 <p align="center">
-  <img src="img/project-details.png" alt="Project Detail Page" width="100%">
+  <img src="img/project-details.png" alt="Project Detail Page" width="100%" style="border-radius: 8px">
 </p>
 
 ### Admin Panel
 
 <p align="center">
-  <img src="img/admin-panel.png" alt="Admin Page" width="100%">
+  <img src="img/admin-panel.png" alt="Admin Page" width="100%" style="border-radius: 8px">
 </p>
 
 ### Swagger API Documentation
 
 <p align="center">
-  <img src="img/swagger.png" alt="Swagger API Documentation" width="100%">
+  <img src="img/swagger.png" alt="Swagger API Documentation" width="100%" style="border-radius: 8px">
 </p>
 
 **and more!**
@@ -133,6 +153,8 @@ Collabify provides a set of RESTful API endpoints for managing projects, tasks, 
 | `/api/users/roles`                         | GET            | Get roles associated with the user                        |
 
 To access the API documentation, you can use the Swagger UI integrated into the application. Simply navigate to `/api-docs` in your browser after starting the application. This will provide you with a user-friendly interface to explore the available endpoints, their parameters, and expected responses.
+
+More API endpoints will be added in the future, and the documentation will be updated accordingly. The API is designed to be extensible, allowing for easy addition of new features and functionalities as needed.
 
 ## Getting Started
 
@@ -179,6 +201,29 @@ AUTH0_M2M_CLIENT_SECRET=your_m2m_client_secret
 AUTH0_TENANT_DOMAIN=your-auth0-tenant-domain.auth0.com
 ```
 
+Note: MongoDB connection string should be in the format: `mongodb+srv://<username>:<password>@cluster.mongodb.net/<dbname>?retryWrites=true&w=majority`. Alternatively, if you are using a local MongoDB instance, it can be `mongodb://localhost:27017/collabify`.
+
+## Why Auth0?
+
+Collabify uses Auth0 for secure authentication and authorization. Auth0 provides a robust and scalable solution for managing user identities, roles, and permissions. By leveraging Auth0, we can ensure that user data is protected and that only authorized users have access to specific features and functionalities within the application.
+
+### Benefits of using Auth0:
+
+- **Security:** Auth0 provides advanced security features, including multi-factor authentication (MFA), anomaly detection, and secure token storage.
+- **Scalability:** Auth0 can handle millions of users and provides a seamless experience for both small and large applications.
+- **Ease of Use:** The Auth0 dashboard is user-friendly, making it easy to manage users, roles, and permissions.
+- **Integration:** Auth0 integrates easily with various platforms and technologies, allowing for quick setup and configuration.
+- **Customizability:** Auth0 allows for custom login pages, user flows, and branding, enabling you to create a unique authentication experience for your users.
+- **Role-Based Access Control (RBAC):** Auth0 supports RBAC, allowing you to define user roles and permissions easily. This is crucial for applications like Collabify, where different users may have different levels of access to projects and tasks.
+- **Social Login:** Auth0 supports social login options (e.g., Google, Facebook, GitHub), making it easier for users to sign up and log in without creating a new account.
+- **User Management:** Auth0 provides a comprehensive user management system, allowing you to view user profiles, roles, and activity logs.
+- **API Security:** Auth0 can secure your APIs by issuing access tokens and validating them, ensuring that only authorized users can access your backend services.
+- **Ensured Compliance:** Auth0 is compliant with various security standards and regulations, such as GDPR, HIPAA, and SOC 2, ensuring that your application meets industry standards for data protection.
+
+With Auth0, Collabify can provide a secure and efficient authentication process, ensuring that user data is protected and that users have the appropriate access to the features they need.
+
+> Disclaimer: I strongly believe that Auth0 is on its way to becoming the best authentication solution for web applications. It is a powerful tool that simplifies the authentication process and provides a wide range of features to enhance security and user experience. However, please note that this is my personal opinion, and I encourage you to evaluate different authentication solutions based on your specific needs and requirements.
+
 ## Auth0 Setup Guide
 
 Follow these steps to configure Auth0 for Collabify:
@@ -202,9 +247,10 @@ Follow these steps to configure Auth0 for Collabify:
 4. **Select Application Type:** Choose **Regular Web Applications**.
 5. **Configure Allowed URLs:**
 
-- **Allowed Callback URLs:** `http://localhost:3000/api/auth/callback`
-- **Allowed Logout URLs:** `http://localhost:3000`
-- **Allowed Web Origins:** `http://localhost:3000`
+   - **Allowed Callback URLs:** `http://localhost:3000/api/auth/callback`
+   - **Allowed Logout URLs:** `http://localhost:3000`
+   - **Allowed Web Origins:** `http://localhost:3000`
+   - Add more as needed, especially when you deploy to production, or if, for some reason, your app starts up on a different port.
 
 6. **Save your settings.**
 7. Copy the **Client ID** and **Client Secret** into your `.env.local` as `AUTH0_CLIENT_ID` and `AUTH0_CLIENT_SECRET`.
@@ -244,6 +290,28 @@ Follow these steps to configure Auth0 for Collabify:
 
 3. **Sign Up/Log In:** Use the login button to authenticate with Auth0. You should be redirected to the Auth0 login page. Upon successful login, you will be redirected back to your application, automatically.
 
+## Shadcn UI
+
+Collabify uses [Shadcn UI](https://ui.shadcn.com/) for its UI components. Shadcn UI provides a set of pre-designed components that are easy to use and customize. You can find the documentation for Shadcn UI [here](https://ui.shadcn.com/docs).
+
+Most, if not all, components have already been added to the project. You can find them in the `components` directory. Feel free to explore and customize them as needed.
+
+However, if you need to add new components, you can do so by running the following command:
+
+```bash
+npx shadcn@latest add <component-name>
+```
+
+Replace `<component-name>` with the name of the component you want to add (e.g. `button`, `card`, etc.). This will automatically generate the necessary files and import them into your project.
+
+## Tailwind CSS
+
+Collabify uses [Tailwind CSS](https://tailwindcss.com/) for styling. Tailwind CSS is a utility-first CSS framework that allows you to build custom designs without leaving your HTML. It provides a set of pre-defined classes that you can use to style your components.
+
+You can customize the Tailwind CSS configuration by modifying the `tailwind.config.js` file in the root directory. You can add custom colors, fonts, and other styles as needed.
+
+To learn more about Tailwind CSS, check out the [documentation](https://tailwindcss.com/docs).
+
 ## Deployment
 
 Collabify is built with Next.js, so it’s optimized for platforms like [Vercel](https://vercel.com/). For deployment:
@@ -256,6 +324,18 @@ Collabify is built with Next.js, so it’s optimized for platforms like [Vercel]
 
 For other platforms, refer to the [Next.js deployment documentation](https://nextjs.org/docs/deployment).
 
+For now, our project is live on Vercel at [https://collabify-pm.vercel.app/](https://collabify-pm.vercel.app/). Feel free to check it out and explore the features!
+
+## Containerization
+
+Collabify also comes with a Dockerfile for easy containerization. You can build and run the application in a Docker container using the following commands:
+
+```bash
+docker-compose up
+```
+
+This will build the Docker image and start the application in a container. Make sure you have Docker installed and running on your machine.
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
@@ -263,6 +343,12 @@ This project is licensed under the [MIT License](LICENSE).
 ## Contact
 
 For questions or contributions, please reach out to [Son Nguyen](https://sonnguyenhoang.com).
+
+- GitHub: [@hoangsonww](https://github.com/hoangsonww)
+- LinkedIn: [@hoangsonw](https://www.linkedin.com/in/hoangsonw/)
+- Email: [hoangson091104@gmail.com](mailto:hoangson091104@gmail.com)
+
+I know the Auth0 stuff may be a bit overwhelming, but don't worry! I've got your back. If you have any questions or need help with the setup, just reach out to me. I'm here to assist you every step of the way. Let's make this project a success together! 💪
 
 ## Contributing
 
@@ -287,3 +373,5 @@ Collabify is designed with a great UI powered by Next.js, Tailwind CSS, and Shad
 ---
 
 Happy managing your projects with Collabify! If you have any questions or need assistance, feel free to reach out. Enjoy building and collaborating! 🎉
+
+[🔝 Back to Top](#collabify---a-jira--trello-alternative-)

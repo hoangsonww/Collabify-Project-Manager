@@ -14,7 +14,7 @@ export default function Document() {
           name="keywords"
           content="project management, collaboration, team planning, productivity, organization"
         />
-        <meta name="author" content="Your Name or Company Name" />
+        <meta name="author" content="Son Nguyen" />
         <meta name="robots" content="index, follow" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -28,15 +28,15 @@ export default function Document() {
           content="The ultimate platform to seamlessly plan, organize, and collaborate on projects with your team – all in one place."
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.yourdomain.com" />
+        <meta property="og:url" content="https://collabify-pm.vercel.app/" />
         <meta
           property="og:image"
-          content="https://www.yourdomain.com/og-image.jpg"
+          content="https://collabify-pm.vercel.app/apple-touch-icon.png"
         />
 
         {/* Twitter Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@YourTwitterHandle" />
+        <meta name="twitter:site" content="@hoangsonw" />
         <meta
           name="twitter:title"
           content="Collabify - Seamlessly Collaborate & Manage Projects"
@@ -47,7 +47,7 @@ export default function Document() {
         />
         <meta
           name="twitter:image"
-          content="https://www.yourdomain.com/twitter-image.jpg"
+          content="https://collabify-pm.vercel.app/apple-touch-icon.png"
         />
 
         {/* Manifest and Icons */}
@@ -55,8 +55,14 @@ export default function Document() {
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
+        {/* Fonts */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+
         {/* Theme Color */}
-        <meta name="theme-color" content="#10b981" />
+        <meta name="theme-color" content="#000000" />
       </Head>
       <body className="bg-background text-foreground">
         <Main />

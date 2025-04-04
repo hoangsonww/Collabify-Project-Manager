@@ -75,12 +75,11 @@ export default async function handler(
         headers: { Authorization: `Bearer ${mgmtToken}` },
       },
     );
-    const foundRoles = searchRes.data; // array of role objects
+    const foundRoles = searchRes.data;
     if (!Array.isArray(foundRoles) || foundRoles.length === 0) {
       return res.status(404).json({ error: `Role "${roleName}" not found.` });
     }
 
-    // We'll assume we want the first match
     const roleId = foundRoles[0].id;
 
     // 5) Add or remove the role from user

@@ -1,0 +1,17 @@
+{
+  "name": "Collabify Dev Container",
+  "dockerFile": "Dockerfile",
+  "context": "..",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "extensions": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-azuretools.vscode-docker",
+    "eamodio.gitlens"
+  ],
+  "postCreateCommand": "npm install",
+  "remoteUser": "node",
+  "runArgs": ["--init"]
+}
