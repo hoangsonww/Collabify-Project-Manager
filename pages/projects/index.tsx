@@ -139,9 +139,8 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
       >
-        {/* Title and Buttons Side by Side */}
         <motion.div
-          className="flex justify-between items-center"
+          className="flex flex-col md:flex-row justify-between items-center gap-4"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}

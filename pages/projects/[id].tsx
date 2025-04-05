@@ -396,7 +396,7 @@ function ProjectDetailPageInternal({
                   <LogOut className="h-4 w-4" /> {t("btnLeave")}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-black border border-white text-white">
+              <DialogContent className="bg-none border border-white text-white">
                 <DialogHeader>
                   <DialogTitle>{t("confirmLeaveTitle")}</DialogTitle>
                   <DialogDescription>{t("confirmLeaveDesc")}</DialogDescription>
@@ -437,7 +437,7 @@ function ProjectDetailPageInternal({
                     <Plus className="h-4 w-4" /> {t("btnNewTask")}
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-black border border-white text-white">
+                <DialogContent className="bg-none border border-white text-white">
                   <DialogHeader>
                     <DialogTitle>{t("addTaskModalTitle")}</DialogTitle>
                   </DialogHeader>
@@ -448,18 +448,18 @@ function ProjectDetailPageInternal({
                         value={newTask}
                         onChange={(e) => setNewTask(e.target.value)}
                         required
-                        className="bg-black text-white border border-white"
+                        className="bg-none text-white border border-white"
                       />
                     </div>
                     <div>
                       <Label className="mb-2">{t("assignToLabel")}</Label>
                       <Select onValueChange={(v) => setAssignee(v)}>
-                        <SelectTrigger className="bg-black text-white border border-white">
+                        <SelectTrigger className="bg-none text-white border border-white">
                           <SelectValue
                             placeholder={t("selectMemberOptional") || ""}
                           />
                         </SelectTrigger>
-                        <SelectContent className="bg-black text-white border border-white">
+                        <SelectContent className="bg-none text-white border border-white">
                           {localProject.members.map((sub) => {
                             const info = memberInfo[sub];
                             const label = info?.name || info?.email || sub;
@@ -486,7 +486,7 @@ function ProjectDetailPageInternal({
                     <Users className="h-4 w-4" /> {t("inviteBtn")}
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-black border border-white text-white">
+                <DialogContent className="bg-none border border-white text-white">
                   <DialogHeader>
                     <DialogTitle>{t("inviteTitle")}</DialogTitle>
                     <DialogDescription>{t("inviteDesc")}</DialogDescription>
@@ -494,7 +494,7 @@ function ProjectDetailPageInternal({
                   <Input
                     value={localProject.projectId}
                     readOnly
-                    className="bg-black border border-white text-white"
+                    className="bg-none border border-white text-white"
                   />
                   <Button
                     onClick={() => {
@@ -522,7 +522,7 @@ function ProjectDetailPageInternal({
               {/* Bar Chart */}
               <motion.div
                 variants={cardVariants}
-                className="bg-black border border-white p-4 rounded shadow transition-transform duration-300 hover:scale-101"
+                className="bg-none border border-white p-4 rounded shadow transition-transform duration-300 hover:scale-101"
               >
                 <h2 className="text-lg font-semibold mb-4 text-white">
                   {t("taskProgressOverview")}
@@ -533,7 +533,7 @@ function ProjectDetailPageInternal({
               {/* Pie Chart */}
               <motion.div
                 variants={cardVariants}
-                className="bg-black border border-white p-4 rounded shadow transition-transform duration-300 hover:scale-101"
+                className="bg-none border border-white p-4 rounded shadow transition-transform duration-300 hover:scale-101"
               >
                 <h2 className="text-lg font-semibold mb-4 text-white">
                   {t("taskStatusDistribution")}
@@ -544,7 +544,7 @@ function ProjectDetailPageInternal({
 
             {/* Task Table */}
             <motion.div
-              className="bg-black border border-white p-4 rounded shadow transition-transform duration-300"
+              className="bg-none border border-white p-4 rounded shadow transition-transform duration-300"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -639,7 +639,7 @@ function ProjectDetailPageInternal({
 
         {/* Confirm Delete Task Dialog */}
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <DialogContent className="bg-black border border-white text-white">
+          <DialogContent className="bg-none border border-white text-white">
             <DialogHeader>
               <DialogTitle>{t("deleteTaskConfirmTitle")}</DialogTitle>
               <DialogDescription>
@@ -669,7 +669,7 @@ function ProjectDetailPageInternal({
 
         {/* Edit Task Dialog */}
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent className="bg-black border border-white text-white">
+          <DialogContent className="bg-none border border-white text-white">
             <DialogHeader>
               <DialogTitle>{t("editTask")}</DialogTitle>
             </DialogHeader>
@@ -680,7 +680,7 @@ function ProjectDetailPageInternal({
                   value={taskTitleEdit}
                   onChange={(e) => setTaskTitleEdit(e.target.value)}
                   required
-                  className="bg-black text-white border border-white"
+                  className="bg-none text-white border border-white"
                 />
               </div>
               <div>
@@ -689,12 +689,12 @@ function ProjectDetailPageInternal({
                   value={taskAssigneeEdit || ""}
                   onValueChange={(v) => setTaskAssigneeEdit(v)}
                 >
-                  <SelectTrigger className="bg-black text-white border border-white">
+                  <SelectTrigger className="bg-none text-white border border-white">
                     <SelectValue
                       placeholder={t("selectMemberOptional") || ""}
                     />
                   </SelectTrigger>
-                  <SelectContent className="bg-black text-white border border-white">
+                  <SelectContent className="bg-none text-white border border-white">
                     {localProject?.members.map((sub) => {
                       const info = memberInfo[sub];
                       const label = info?.name || info?.email || sub;

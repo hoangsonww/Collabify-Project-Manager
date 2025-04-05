@@ -3,6 +3,7 @@
   "dashboardPageTitle": "Collabify | Dashboard",
   "dashboardMetaDesc": "View your project statistics, task completion rates, and more with Collabify.",
   "dashboardTitle": "Dashboard",
+  "dashboardSubtitle": "Overview of your projects",
   "yourProjects": "Your Projects",
   "totalTasks": "Total Tasks",
   "completedTasks": "Completed Tasks",

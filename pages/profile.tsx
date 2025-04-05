@@ -41,7 +41,7 @@ function ProfilePageInternal() {
 
   if (isLoading)
     return (
-      <div className="bg-black min-h-screen flex items-center justify-center p-6 font-sans">
+      <div className="bg-none min-h-screen flex items-center justify-center p-6 font-sans">
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -53,7 +53,7 @@ function ProfilePageInternal() {
     );
   if (error)
     return (
-      <div className="bg-black min-h-screen flex items-center justify-center p-6 font-sans">
+      <div className="bg-none min-h-screen flex items-center justify-center p-6 font-sans">
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -65,7 +65,7 @@ function ProfilePageInternal() {
     );
   if (!user)
     return (
-      <div className="bg-black min-h-screen flex items-center justify-center p-6 font-sans">
+      <div className="bg-none min-h-screen flex items-center justify-center p-6 font-sans">
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -82,7 +82,7 @@ function ProfilePageInternal() {
         <title>{t("pageTitle")}</title>
         <meta name="description" content={t("metaDesc")} />
       </Head>
-      <div className="bg-black min-h-screen text-white p-6 font-sans">
+      <div className="bg-none min-h-screen text-white p-6 font-sans">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -96,7 +96,7 @@ function ProfilePageInternal() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
-          className="bg-black border border-white p-6 rounded-md max-w-lg mx-auto shadow-lg hover:shadow-2xl transition-shadow duration-300"
+          className="bg-none border border-white p-6 rounded-md max-w-lg mx-auto shadow-lg hover:shadow-2xl transition-shadow duration-300"
         >
           <div className="flex items-center gap-6">
             {user.picture && (

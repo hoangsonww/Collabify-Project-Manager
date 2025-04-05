@@ -180,7 +180,7 @@ function AdminPageInternal() {
   // Loading and permission checks
   if (isLoading || loadingRoles) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black text-white">
+      <div className="flex items-center justify-center min-h-screen bg-none text-white">
         <Loader2 className="animate-spin w-6 h-6 mr-2" />
         {t("loading")}
       </div>
@@ -193,7 +193,7 @@ function AdminPageInternal() {
   }
   if (!user) {
     return (
-      <p className="text-center text-white bg-black min-h-screen flex items-center justify-center">
+      <p className="text-center text-white bg-none min-h-screen flex items-center justify-center">
         {t("pleaseLoginViewPage")}
       </p>
     );
@@ -201,7 +201,7 @@ function AdminPageInternal() {
   const isAdmin = roleList.includes(roles.admin);
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-none text-white flex items-center justify-center">
         <p>
           <Trans i18nKey="noPermission">
             You do not have permission to view this page. Only users with the
@@ -228,7 +228,7 @@ function AdminPageInternal() {
         <meta name="description" content={t("adminMetaDesc")} />
       </Head>
       <motion.div
-        className="min-h-screen bg-black text-white p-6 font-sans space-y-8"
+        className="min-h-screen bg-none text-white p-6 font-sans space-y-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
@@ -259,7 +259,7 @@ function AdminPageInternal() {
           {/* User Management Section */}
           <motion.div
             variants={cardVariants}
-            className="bg-black border border-white p-6 rounded shadow transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl"
+            className="bg-none border border-white p-6 rounded shadow transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl"
           >
             <h2 className="text-xl font-semibold mb-2">
               {t("userManagement")}
@@ -274,7 +274,7 @@ function AdminPageInternal() {
                   type="text"
                   value={userSub}
                   onChange={(e) => setUserSub(e.target.value)}
-                  className="w-full p-2 bg-black border border-gray-600 rounded"
+                  className="w-full p-2 bg-none border border-gray-600 rounded"
                   required
                 />
               </div>
@@ -286,7 +286,7 @@ function AdminPageInternal() {
                   type="text"
                   value={roleName}
                   onChange={(e) => setRoleName(e.target.value)}
-                  className="w-full p-2 bg-black border border-gray-600 rounded"
+                  className="w-full p-2 bg-none border border-gray-600 rounded"
                   required
                 />
               </div>
@@ -297,7 +297,7 @@ function AdminPageInternal() {
                 <select
                   value={action}
                   onChange={(e) => setAction(e.target.value)}
-                  className="w-full p-2 bg-black border border-gray-600 rounded"
+                  className="w-full p-2 bg-none border border-gray-600 rounded"
                 >
                   <option value="add">{t("addRole")}</option>
                   <option value="remove">{t("removeRole")}</option>
@@ -318,7 +318,7 @@ function AdminPageInternal() {
           {/* System Logs List */}
           <motion.div
             variants={cardVariants}
-            className="bg-black border border-white p-6 rounded shadow transition-transform duration-300 hover:scale-102"
+            className="bg-none border border-white p-6 rounded shadow transition-transform duration-300 hover:scale-102"
           >
             <h2 className="text-xl font-semibold mb-2">{t("systemLogs")}</h2>
             <p className="text-gray-400 text-sm mb-4">
@@ -359,7 +359,7 @@ function AdminPageInternal() {
           {/* Logs by Type Chart */}
           <motion.div
             variants={cardVariants}
-            className="bg-black border border-white p-6 rounded shadow transition-transform duration-300 hover:scale-102"
+            className="bg-none border border-white p-6 rounded shadow transition-transform duration-300 hover:scale-102"
           >
             <h2 className="text-xl font-semibold mb-2">{t("logsByType")}</h2>
             <Bar
@@ -371,7 +371,7 @@ function AdminPageInternal() {
           {/* Logs Over Time Chart */}
           <motion.div
             variants={cardVariants}
-            className="bg-black border border-white p-6 rounded shadow transition-transform duration-300 hover:scale-102"
+            className="bg-none border border-white p-6 rounded shadow transition-transform duration-300 hover:scale-102"
           >
             <h2 className="text-xl font-semibold mb-2">{t("logsOverTime")}</h2>
             <Line

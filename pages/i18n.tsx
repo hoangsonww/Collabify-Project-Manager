@@ -1,16 +1,14 @@
-// pages/index.tsx
 import dynamic from "next/dynamic";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
+import { Button } from "@/components/ui/button";
 
-// ✅ Block SSR for this page to avoid hydration mismatch
 const ClientOnlyPage = dynamic(() => Promise.resolve(HomePage), { ssr: false });
 
 export default function Index() {
   return <ClientOnlyPage />;
 }
 
-// ✅ Real page content, runs only on client so i18n works right
 function HomePage() {
   const { t } = useTranslation();
 
@@ -19,18 +17,18 @@ function HomePage() {
   };
 
   return (
-    <main style={{ padding: "2rem" }}>
-      <h1>{t("title")}</h1>
-      <p>{t("subtitle")}</p>
-
-      <div style={{ marginTop: "2rem" }}>
-        <button
-          onClick={() => handleLanguageChange("en")}
-          style={{ marginRight: "1rem" }}
-        >
-          English
-        </button>
-        <button onClick={() => handleLanguageChange("vi")}>Vietnamese</button>
+    <main className="min-h-screen flex items-center justify-center bg-none p-6">
+      <div className="w-full max-w-2xl space-y-6 rounded-lg bg-none p-8 shadow">
+        <h1 className="text-4xl font-bold text-foreground">{t("title")}</h1>
+        <p className="text-lg text-muted-foreground">{t("subtitle")}</p>
+        <div className="mt-8 flex gap-4">
+          <Button variant="outline" onClick={() => handleLanguageChange("en")}>
+            English
+          </Button>
+          <Button variant="outline" onClick={() => handleLanguageChange("vi")}>
+            Vietnamese
+          </Button>
+        </div>
       </div>
     </main>
   );

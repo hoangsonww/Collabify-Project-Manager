@@ -239,15 +239,23 @@ function DashboardPageInternal({
         <title>{t("dashboardPageTitle")}</title>
         <meta name="description" content={t("dashboardMetaDesc")} />
       </Head>
-      <div className="min-h-screen bg-black text-white font-sans p-6 space-y-8">
+      <div className="min-h-screen bg-none text-white font-sans p-6 space-y-8">
         <motion.h1
-          className="text-3xl font-bold"
+          className="text-3xl font-bold mb-4"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
           {t("dashboardTitle")}
         </motion.h1>
+        <motion.p
+          className="text-gray-400"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          {t("dashboardSubtitle")}
+        </motion.p>
 
         {/* 8 Stat Cards */}
         <motion.div
@@ -297,7 +305,7 @@ function DashboardPageInternal({
             <motion.div
               key={index}
               variants={cardVariants}
-              className="bg-black border border-white p-4 rounded shadow-md transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl"
+              className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
               <p className="text-sm text-gray-400">{card.label}</p>
               <p className={`${card.textSize} font-bold`}>{card.value}</p>
@@ -315,7 +323,7 @@ function DashboardPageInternal({
           {/* 1) Bar Chart */}
           <motion.div
             variants={chartVariants}
-            className="bg-black border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
+            className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
           >
             <h2 className="text-lg font-semibold mb-4">{t("tasksByStatus")}</h2>
             <Bar data={barData} options={chartOptions} />
@@ -323,7 +331,7 @@ function DashboardPageInternal({
           {/* 2) Pie Chart */}
           <motion.div
             variants={chartVariants}
-            className="bg-black border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
+            className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
           >
             <h2 className="text-lg font-semibold mb-4">{t("doneVsNotDone")}</h2>
             <Pie data={pieData} options={chartOptions} />
@@ -331,7 +339,7 @@ function DashboardPageInternal({
           {/* 3) Line Chart */}
           <motion.div
             variants={chartVariants}
-            className="bg-black border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
+            className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
           >
             <h2 className="text-lg font-semibold mb-4">
               {t("tasksCreatedVsCompleted")}
@@ -341,7 +349,7 @@ function DashboardPageInternal({
           {/* 4) Doughnut Chart */}
           <motion.div
             variants={chartVariants}
-            className="bg-black border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
+            className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
           >
             <h2 className="text-lg font-semibold mb-4">
               {t("statusDistribution")}
@@ -351,7 +359,7 @@ function DashboardPageInternal({
           {/* 5) Radar Chart */}
           <motion.div
             variants={chartVariants}
-            className="bg-black border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
+            className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
           >
             <h2 className="text-lg font-semibold mb-4">
               {t("statusDistribution")}
@@ -361,7 +369,7 @@ function DashboardPageInternal({
           {/* 6) Polar Area Chart */}
           <motion.div
             variants={chartVariants}
-            className="bg-black border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
+            className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
           >
             <h2 className="text-lg font-semibold mb-4">{t("status")}</h2>
             <PolarArea data={polarData} options={chartOptions} />
@@ -370,7 +378,7 @@ function DashboardPageInternal({
 
         {/* Table of Top 5 Projects by tasks */}
         <motion.div
-          className="bg-black border border-white p-4 rounded shadow-md space-y-4"
+          className="bg-none border border-white p-4 rounded shadow-md space-y-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}

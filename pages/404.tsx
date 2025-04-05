@@ -1,16 +1,17 @@
+import dynamic from "next/dynamic";
 import Head from "next/head";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
-export default function Custom404() {
+function Real404() {
+  const { t } = useTranslation("404");
+
   return (
     <>
       <Head>
-        <title>404 - Page Not Found | Collabify</title>
-        <meta
-          name="description"
-          content="The page you are looking for does not exist."
-        />
+        <title>{t("title")}</title>
+        <meta name="description" content={t("metaDesc")} />
       </Head>
       <div className="relative min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-6 overflow-hidden">
         <motion.div
@@ -32,7 +33,7 @@ export default function Custom404() {
             transition={{ delay: 0.4, duration: 0.6 }}
             className="text-2xl md:text-3xl mt-4 font-semibold"
           >
-            Oops! Page Not Found.
+            {t("oops")}
           </motion.p>
           <motion.p
             initial={{ opacity: 0 }}
@@ -40,7 +41,7 @@ export default function Custom404() {
             transition={{ delay: 0.6, duration: 0.6 }}
             className="mt-4 text-lg text-muted-foreground"
           >
-            The page you are looking for doesn&apos;t exist.
+            {t("notFound")}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -52,10 +53,11 @@ export default function Custom404() {
               href="/"
               className="inline-block px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300"
             >
-              Go Home
+              {t("goHome")}
             </Link>
           </motion.div>
         </motion.div>
+
         <style jsx global>{`
           @keyframes gradient-x {
             0% {
@@ -77,3 +79,5 @@ export default function Custom404() {
     </>
   );
 }
+
+export default dynamic(() => Promise.resolve(Real404), { ssr: false });
