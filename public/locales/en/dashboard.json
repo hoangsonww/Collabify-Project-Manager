@@ -18,5 +18,7 @@
   "status": "Status",
   "noProjectsFound": "No projects found.",
   "top5Projects": "Top 5 Projects (by total tasks)",
-  "adminNote": "You are an admin and can see all projects. (Just a note.)"
+  "adminNote": "You are an admin and can see all projects. (Just a note.)",
+  "projectName": "Project Name",
+  "tasksCreated": "Tasks Created"
 }

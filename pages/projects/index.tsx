@@ -254,10 +254,10 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
               >
                 <Card className="transition-shadow hover:shadow-lg border border-border bg-card">
                   <CardContent className="p-5">
-                    <h2 className="text-xl font-semibold text-card-foreground">
+                    <h2 className="text-xl font-semibold text-card-foreground truncate">
                       {p.name}
                     </h2>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground truncate">
                       {p.description}
                     </p>
                   </CardContent>

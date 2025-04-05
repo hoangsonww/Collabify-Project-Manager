@@ -18,7 +18,7 @@ import { motion } from "framer-motion";
 import Head from "next/head";
 
 // (1) Import react-i18next + dynamic
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import dynamic from "next/dynamic";
 
 // Register Chart.js components
@@ -202,7 +202,21 @@ function AdminPageInternal() {
   if (!isAdmin) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p>{t("noPermission")}</p>
+        <p>
+          <Trans i18nKey="noPermission">
+            You do not have permission to view this page. Only users with the
+            admin role can access this page. Please{" "}
+            <a
+              href="https://sonnguyenhoang.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-blue-500"
+            >
+              contact the admin
+            </a>{" "}
+            for assistance.
+          </Trans>
+        </p>
       </div>
     );
   }

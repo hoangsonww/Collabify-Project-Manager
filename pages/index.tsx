@@ -1,5 +1,3 @@
-// pages/index.tsx
-
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { motion } from "framer-motion";
@@ -164,7 +162,7 @@ function RealHome() {
           }
           .animate-gradient {
             background-size: 200% 200%;
-            animation: gradient-x 5s ease infinite;
+            animation: gradient-x 4s ease infinite;
           }
         `}</style>
       </div>

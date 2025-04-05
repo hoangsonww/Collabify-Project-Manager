@@ -9,13 +9,13 @@
   "cancel": "Hủy",
   "taskAdded": "Đã thêm nhiệm vụ",
   "taskCreationFailed": "Không thể thêm nhiệm vụ",
-  "toggle": "Chuyển",
+  "toggle": "Chuyển Trạng Thái",
   "taskProgressOverview": "Tổng Quan Tiến Độ",
   "taskStatusDistribution": "Phân Bố Trạng Thái",
   "tasks": "Nhiệm Vụ",
   "title": "Tiêu Đề",
   "status": "Trạng Thái",
-  "assignee": "Người Giao Nhiệm Vụ",
+  "assignee": "Người Nhận Nhiệm Vụ",
   "action": "Hành Động",
 
   "btnLeave": "Rời",
@@ -31,5 +31,24 @@
   "inviteTitle": "Chia sẻ Mã Dự Án",
   "inviteDesc": "Gửi mã này cho đồng đội để mời họ vào dự án.",
   "copiedIdMsg": "Đã sao chép mã",
-  "copyBtn": "Sao Chép"
+  "copyBtn": "Sao Chép",
+  "toDo": "Cần Làm",
+  "inProgress": "Đang Thực Hiện",
+  "done": "Đã Hoàn Thành",
+  "tasksLabel": "Nhiệm Vụ",
+  "editTask": "Chỉnh Sửa Nhiệm Vụ",
+  "deleteTask": "Xóa Nhiệm Vụ",
+  "saveChanges": "Lưu Thay Đổi",
+  "deleteTaskConfirmTitle": "Xác Nhận Xóa Nhiệm Vụ",
+  "deleteTaskConfirmDesc": "Bạn có chắc muốn xóa nhiệm vụ này không?",
+  "deleteTaskBtn": "Xóa Nhiệm Vụ",
+  "statuses": {
+    "todo": "Cần Làm",
+    "in-progress": "Đang Thực Hiện",
+    "done": "Đã Hoàn Thành"
+  },
+  "taskUpdated": "Nhiệm vụ đã được cập nhật",
+  "taskUpdateFailed": "Cập nhật nhiệm vụ không thành công",
+  "taskDeleted": "Nhiệm vụ đã được xóa",
+  "taskDeleteFailed": "Xóa nhiệm vụ không thành công"
 }

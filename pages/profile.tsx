@@ -110,12 +110,12 @@ function ProfilePageInternal() {
                 />
               </motion.div>
             )}
-            <div className="space-y-2">
+            <div className="space-y-2 flex-1 min-w-0">
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-xl font-semibold"
+                className="text-xl font-semibold truncate"
               >
                 {user.name}
               </motion.p>
@@ -123,7 +123,7 @@ function ProfilePageInternal() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="text-gray-400"
+                className="text-gray-400 truncate"
               >
                 {user.email}
               </motion.p>
@@ -131,7 +131,7 @@ function ProfilePageInternal() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-sm"
+                className="text-sm truncate"
               >
                 <span className="font-semibold">{t("rolesLabel")}</span>{" "}
                 {loadingRoles

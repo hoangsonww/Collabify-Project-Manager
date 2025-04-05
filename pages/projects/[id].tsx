@@ -1,4 +1,3 @@
-// pages/projects/[id].tsx
 import { getSession } from "@auth0/nextjs-auth0";
 import { GetServerSideProps } from "next";
 import { dbConnect } from "@/lib/mongodb";
@@ -46,6 +45,8 @@ import {
   LogIn,
   Users,
   CircleCheck,
+  Edit,
+  Trash,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Head from "next/head";
@@ -63,7 +64,6 @@ ChartJS.register(
   Legend,
 );
 
-// The main component that uses translations
 function ProjectDetailPageInternal({
   userSub,
   isAdmin,
@@ -81,6 +81,17 @@ function ProjectDetailPageInternal({
   const [assignee, setAssignee] = useState("");
   const [open, setOpen] = useState(false);
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
+
+  // ---------- State for editing a task -----------
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [taskTitleEdit, setTaskTitleEdit] = useState("");
+  const [taskAssigneeEdit, setTaskAssigneeEdit] = useState("");
 
   const [memberInfo, setMemberInfo] = useState<
     Record<string, { name?: string; email?: string }>
@@ -129,6 +140,7 @@ function ProjectDetailPageInternal({
 
   const isMember = localProject.members.includes(userSub) || isAdmin;
 
+  // Additional states for requests
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isJoining, setIsJoining] = useState(false);
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -138,6 +150,7 @@ function ProjectDetailPageInternal({
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [togglingTaskId, setTogglingTaskId] = useState<string | null>(null);
 
+  // -------------- Join / Leave -------------
   const handleJoin = async () => {
     if (isJoining) return;
     setIsJoining(true);
@@ -174,6 +187,7 @@ function ProjectDetailPageInternal({
     setIsLeaving(false);
   };
 
+  // ------------- Create Task ----------------
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isAddingTask) return;
@@ -199,6 +213,7 @@ function ProjectDetailPageInternal({
     setIsAddingTask(false);
   };
 
+  // ------------- Toggle Task Status -----------
   const handleToggleStatus = async (taskId: string) => {
     if (togglingTaskId === taskId) return;
     setTogglingTaskId(taskId);
@@ -213,6 +228,79 @@ function ProjectDetailPageInternal({
     }
 
     setTogglingTaskId(null);
+  };
+
+  // ------------- Delete Task + Dialog -------------
+  // 1) Open confirm dialog
+  const openDeleteDialog = (taskId: string, title: string) => {
+    setTaskToDelete({ id: taskId, title });
+    setDeleteDialogOpen(true);
+  };
+
+  // 2) Confirmed -> delete
+  const handleDeleteTask = async () => {
+    if (!taskToDelete) return;
+    const { id: taskId } = taskToDelete;
+
+    const res = await fetch(
+      `/api/projects/${localProject.projectId}/tasks/${taskId}`,
+      {
+        method: "DELETE",
+      },
+    );
+    if (res.ok) {
+      const updatedProject = await res.json();
+      setLocalProject(updatedProject);
+      toast.success(t("taskDeleted"));
+    } else {
+      toast.error(t("errorDeletingTask"));
+    }
+
+    // Close dialog + reset
+    setDeleteDialogOpen(false);
+    setTaskToDelete(null);
+  };
+
+  // ------------- Edit Task -------------
+  const openEditDialog = (
+    taskId: string,
+    currentTitle: string,
+    currentAssignee: string | null,
+  ) => {
+    setEditingTaskId(taskId);
+    setTaskTitleEdit(currentTitle);
+    setTaskAssigneeEdit(currentAssignee ?? "");
+    setEditDialogOpen(true);
+  };
+
+  const handleSaveTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTaskId) return;
+
+    const res = await fetch(
+      `/api/projects/${localProject.projectId}/tasks/${editingTaskId}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: taskTitleEdit,
+          assignedTo: taskAssigneeEdit || null,
+        }),
+      },
+    );
+
+    if (res.ok) {
+      const updatedProject = await res.json();
+      setLocalProject(updatedProject);
+      toast.success(t("taskUpdated"));
+      setEditDialogOpen(false);
+      // Clear editing states
+      setEditingTaskId(null);
+      setTaskTitleEdit("");
+      setTaskAssigneeEdit("");
+    } else {
+      toast.error(t("errorUpdatingTask"));
+    }
   };
 
   // Count tasks by status
@@ -243,10 +331,10 @@ function ProjectDetailPageInternal({
 
   // Bar & Pie Data
   const barData = {
-    labels: ["To Do", "In Progress", "Done"],
+    labels: [t("toDo"), t("inProgress"), t("done")],
     datasets: [
       {
-        label: "Tasks",
+        label: t("tasksLabel"),
         data: [
           statusCounts.todo,
           statusCounts["in-progress"],
@@ -258,7 +346,7 @@ function ProjectDetailPageInternal({
   };
 
   const pieData = {
-    labels: ["To Do", "In Progress", "Done"],
+    labels: [t("toDo"), t("inProgress"), t("done")],
     datasets: [
       {
         data: [
@@ -288,8 +376,10 @@ function ProjectDetailPageInternal({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-3xl font-bold">{localProject.name}</h1>
-          <span className="text-gray-400">{localProject.description}</span>
+          <h1 className="text-3xl font-bold truncate">{localProject.name}</h1>
+          <span className="text-gray-400 truncate">
+            {localProject.description}
+          </span>
         </motion.div>
 
         {/* Action Buttons */}
@@ -462,62 +552,172 @@ function ProjectDetailPageInternal({
               <h2 className="text-xl font-semibold mb-4 text-white">
                 {t("tasks")}
               </h2>
-              <table className="w-full text-sm">
-                <thead className="bg-gray-800 text-gray-300">
-                  <tr>
-                    <th className="text-left p-2">{t("title")}</th>
-                    <th className="text-left p-2">{t("status")}</th>
-                    <th className="text-left p-2">{t("assignee")}</th>
-                    <th className="text-left p-2">{t("action")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {localProject.tasks.map((task) => (
-                    <tr key={task._id} className="border-t border-gray-700">
-                      <td className="p-2 text-white">{task.title}</td>
-                      <td className="p-2 capitalize text-white">
-                        {task.status}
-                      </td>
-                      <td className="p-2 text-xs text-white">
-                        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                        {/*@ts-ignore*/}
-                        {task.assignedTo
-                          ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            // @ts-ignore
-                            memberInfo[task.assignedTo]?.name ||
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            // @ts-ignore
-                            memberInfo[task.assignedTo]?.email ||
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            // @ts-ignore
-                            task.assignedTo
-                          : "-"}
-                      </td>
-                      <td className="p-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleToggleStatus(task._id)}
-                          className="text-white border-white cursor-pointer"
-                        >
-                          <CircleCheck className="mr-2 h-4 w-4" /> {t("toggle")}
-                        </Button>
-                      </td>
+              <div className="overflow-x-auto rounded-[8px] overflow-hidden">
+                <table className="min-w-[600px] w-full text-sm">
+                  <thead className="bg-gray-800 text-gray-300">
+                    <tr>
+                      <th className="text-left p-2">{t("title")}</th>
+                      <th className="text-left p-2">{t("status")}</th>
+                      <th className="text-left p-2">{t("assignee")}</th>
+                      <th className="text-left p-2">{t("action")}</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {localProject.tasks.map((task) => (
+                      <tr key={task._id} className="border-t border-gray-700">
+                        <td className="p-2 text-white">{task.title}</td>
+                        <td className="p-2 capitalize text-white">
+                          {t(`statuses.${task.status}`)}
+                        </td>
+                        <td className="p-2 text-white">
+                          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                          {/* @ts-ignore */}
+                          {task.assignedTo
+                            ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              // @ts-ignore
+                              memberInfo[task.assignedTo]?.name ||
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              // @ts-ignore
+                              memberInfo[task.assignedTo]?.email ||
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              // @ts-ignore
+                              task.assignedTo
+                            : "-"}
+                        </td>
+                        <td className="p-2 flex gap-2 items-center">
+                          {/* Toggle Button */}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleToggleStatus(task._id)}
+                            className="text-white border-white cursor-pointer"
+                          >
+                            <CircleCheck className="mr-2 h-4 w-4" />{" "}
+                            {t("toggle")}
+                          </Button>
+
+                          {/* Edit Button */}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              // @ts-ignore
+                              openEditDialog(
+                                task._id,
+                                task.title,
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
+                                task.assignedTo,
+                              )
+                            }
+                            className="text-white border-white cursor-pointer"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+
+                          {/* Delete Button => opens confirm dialog */}
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() =>
+                              openDeleteDialog(task._id, task.title)
+                            }
+                            className="text-white cursor-pointer"
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </motion.div>
           </>
         )}
+
+        {/* Confirm Delete Task Dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent className="bg-black border border-white text-white">
+            <DialogHeader>
+              <DialogTitle>{t("deleteTaskConfirmTitle")}</DialogTitle>
+              <DialogDescription>
+                {taskToDelete
+                  ? t("deleteTaskConfirmDesc", { task: taskToDelete.title })
+                  : t("deleteTaskConfirmDescGeneric")}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-4 mt-4">
+              <Button
+                variant="destructive"
+                onClick={handleDeleteTask}
+                className="cursor-pointer"
+              >
+                {t("deleteTaskBtn")}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteDialogOpen(false)}
+                className="cursor-pointer"
+              >
+                {t("cancel")}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Task Dialog */}
+        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+          <DialogContent className="bg-black border border-white text-white">
+            <DialogHeader>
+              <DialogTitle>{t("editTask")}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSaveTask} className="space-y-4">
+              <div>
+                <Label className="mb-2">{t("taskTitleLabel")}</Label>
+                <Input
+                  value={taskTitleEdit}
+                  onChange={(e) => setTaskTitleEdit(e.target.value)}
+                  required
+                  className="bg-black text-white border border-white"
+                />
+              </div>
+              <div>
+                <Label className="mb-2">{t("assignToLabel")}</Label>
+                <Select
+                  value={taskAssigneeEdit || ""}
+                  onValueChange={(v) => setTaskAssigneeEdit(v)}
+                >
+                  <SelectTrigger className="bg-black text-white border border-white">
+                    <SelectValue
+                      placeholder={t("selectMemberOptional") || ""}
+                    />
+                  </SelectTrigger>
+                  <SelectContent className="bg-black text-white border border-white">
+                    {localProject?.members.map((sub) => {
+                      const info = memberInfo[sub];
+                      const label = info?.name || info?.email || sub;
+                      return (
+                        <SelectItem key={sub} value={sub}>
+                          {label}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button type="submit" className="w-full cursor-pointer">
+                {t("saveChanges")}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );
 }
 
-// =======================================
-// SERVER-SIDE PROPS (unchanged)
-// =======================================
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
@@ -558,7 +758,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   return { props: { userSub, isAdmin, project: serialized } };
 };
 
-// (2) Export a dynamic, client-only version
 export default dynamic(() => Promise.resolve(ProjectDetailPageInternal), {
   ssr: false,
 });

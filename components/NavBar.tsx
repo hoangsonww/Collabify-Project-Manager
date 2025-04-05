@@ -138,7 +138,7 @@ function NavBarInternal() {
 
           {/* Language Selector (Desktop) */}
           <Select value={lang} onValueChange={handleLanguageChange}>
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-auto truncate">
               <SelectValue placeholder={t("language")} />
             </SelectTrigger>
             <SelectContent>
@@ -226,7 +226,7 @@ function NavBarInternal() {
 
               {/* Language Selector (Mobile) */}
               <Select value={lang} onValueChange={handleLanguageChange}>
-                <SelectTrigger className="w-[120px]">
+                <SelectTrigger className="w-auto">
                   <SelectValue placeholder={t("language")} />
                 </SelectTrigger>
                 <SelectContent>

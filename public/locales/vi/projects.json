@@ -18,5 +18,5 @@
   "projectCreatedJoined": "Dự án đã được tạo và tham gia!",
   "couldNotCreateJoin": "Không thể tạo và tham gia dự án",
   "joinedProject": "Đã tham gia dự án!",
-  "couldNotJoin": "Không thể tham gia dự án. Có thể bạn đã tham gia?"
+  "couldNotJoin": "Không thể tham gia dự án. Có thể bạn đã tham gia, hoặc mã không hợp lệ."
 }

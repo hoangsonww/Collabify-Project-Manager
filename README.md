@@ -18,7 +18,7 @@
 One of the key features is secure authentication using [Auth0](https://auth0.com/), which is integrated using both Regular Web Applications (RWA) and Machine-to-Machine (M2M) credentials, with Role-Based Access Control (RBAC) for enhanced security. The application also utilizes [MongoDB](https://www.mongodb.com/) for data storage, ensuring reliable and scalable data management. Internationalization (i18n) support is provided through the [i18next](https://www.i18next.com/) library, allowing for easy localization of the application.
 
 <p align="center">
-  <img src="img/collabify.png" alt="Collabify Logo" width="60%" style="border-radius: 8px">
+  <img src="img/collabify.png" alt="Collabify Logo" width="50%" style="border-radius: 8px">
 </p>
 
 ## Table of Contents
@@ -95,6 +95,8 @@ Collabify is built using a modern tech stack that ensures a great user experienc
 
 ## User Interface
 
+Collabify features a modern and user-friendly interface designed to enhance productivity and collaboration. The UI is built using Next.js, Tailwind CSS, and Shadcn UI components, providing a responsive and polished experience. Below are some screenshots of the application:
+
 ### Landing Page
 
 <p align="center">
@@ -131,7 +133,11 @@ Collabify is built using a modern tech stack that ensures a great user experienc
   <img src="img/swagger.png" alt="Swagger API Documentation" width="100%" style="border-radius: 8px">
 </p>
 
-**and more!**
+**and more...**
+
+The UI is designed to be intuitive and easy to navigate, making it accessible for users of all skill levels. The use of Tailwind CSS ensures that the application is responsive and looks great on all devices.
+
+The UI may be updated in the future to include more features and improvements. Feel free to explore the codebase and customize the UI components as needed.
 
 ## API Endpoints
 

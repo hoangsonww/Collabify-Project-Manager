@@ -18,5 +18,7 @@
   "status": "Trạng Thái",
   "noProjectsFound": "Không có dự án nào.",
   "top5Projects": "Top 5 Dự Án (theo tổng nhiệm vụ)",
-  "adminNote": "Bạn là quản trị viên và có thể xem tất cả dự án. (Chỉ là ghi chú.)"
+  "adminNote": "Bạn là quản trị viên và có thể xem tất cả dự án. (Chỉ là ghi chú.)",
+  "projectName": "Tên Dự Án",
+  "tasks": "Nhiệm Vụ"
 }

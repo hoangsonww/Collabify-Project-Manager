@@ -1,4 +1,3 @@
-// pages/dashboard.tsx
 import { getSession } from "@auth0/nextjs-auth0";
 import { GetServerSideProps } from "next";
 import { dbConnect } from "@/lib/mongodb";
@@ -37,11 +36,14 @@ ChartJS.register(
   RadialLinearScale,
 );
 
-// Keep your data types exactly as is
+// Update the ProjectStats type to include counts for all statuses
 type ProjectStats = {
   projectId: string;
   name: string;
   totalTasks: number;
+  doneTasks: number;
+  todoTasks: number;
+  inProgressTasks: number;
 };
 
 type DashboardProps = {
@@ -55,6 +57,7 @@ type DashboardProps = {
   topProjects: ProjectStats[];
   largestProjectName: string;
   smallestProjectName: string;
+  projectStats?: ProjectStats[];
 };
 
 // === (2) The REAL component that uses react-i18next ===
@@ -69,8 +72,8 @@ function DashboardPageInternal({
   topProjects,
   largestProjectName,
   smallestProjectName,
+  projectStats = [], // Default to empty array if undefined
 }: DashboardProps) {
-  // Pull strings from the "dashboard" namespace
   const { t } = useTranslation("dashboard");
 
   if (!userSub) {
@@ -113,7 +116,7 @@ function DashboardPageInternal({
       labels: [t("toDo"), t("inProgress"), t("completedTasks")],
       datasets: [
         {
-          label: "Tasks",
+          label: t("tasks"),
           data: [todoTasks, inProgressTasks, doneTasks],
           backgroundColor: ["#6b7280", "#facc15", "#10b981"],
         },
@@ -136,24 +139,35 @@ function DashboardPageInternal({
     };
   }, [doneTasks, totalTasks, t]);
 
-  // 3) Line chart (dummy data for weeks)
+  // 3) Line chart using real data: tasks by project by status
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const lineData = useMemo(() => {
-    const weeks = ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"];
+    const labels = projectStats.map((p) => p.name);
+    const todoData = projectStats.map((p) => p.todoTasks);
+    const inProgressData = projectStats.map((p) => p.inProgressTasks);
+    const completedData = projectStats.map((p) => p.doneTasks);
     return {
-      labels: weeks,
+      labels,
       datasets: [
         {
-          label: "Tasks Created",
-          data: [12, 20, 7, 13, 9],
+          label: t("toDo"),
+          data: todoData,
+          borderColor: "#6b7280",
+          backgroundColor: "rgba(107,114,128,0.4)",
+          tension: 0.3,
+          fill: true,
+        },
+        {
+          label: t("inProgress"),
+          data: inProgressData,
           borderColor: "#facc15",
           backgroundColor: "rgba(250,204,21,0.4)",
           tension: 0.3,
           fill: true,
         },
         {
-          label: "Tasks Completed",
-          data: [5, 14, 10, 12, 8],
+          label: t("completedTasks"),
+          data: completedData,
           borderColor: "#10b981",
           backgroundColor: "rgba(16,185,129,0.4)",
           tension: 0.3,
@@ -161,7 +175,7 @@ function DashboardPageInternal({
         },
       ],
     };
-  }, []);
+  }, [projectStats]);
 
   // 4) Doughnut chart
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -184,7 +198,7 @@ function DashboardPageInternal({
       labels: [t("toDo"), t("inProgress"), t("completedTasks")],
       datasets: [
         {
-          label: "Status",
+          label: t("status"),
           data: [todoTasks, inProgressTasks, doneTasks],
           backgroundColor: "rgba(250,204,21,0.4)",
           borderColor: "#facc15",
@@ -365,22 +379,30 @@ function DashboardPageInternal({
           {topProjects.length === 0 ? (
             <p className="text-gray-400">{t("noProjectsFound")}</p>
           ) : (
-            <table className="w-full text-sm">
-              <thead className="bg-gray-800 text-gray-300">
-                <tr>
-                  <th className="p-2 text-left">Project Name</th>
-                  <th className="p-2 text-left">Total Tasks</th>
-                </tr>
-              </thead>
-              <tbody>
-                {topProjects.map((p) => (
-                  <tr key={p.projectId} className="border-t border-gray-700">
-                    <td className="p-2">{p.name}</td>
-                    <td className="p-2">{p.totalTasks}</td>
+            <div className="overflow-x-auto rounded-[8px] overflow-hidden">
+              <table className="min-w-full text-sm">
+                <thead className="bg-gray-800 text-gray-300">
+                  <tr>
+                    <th className="p-2 text-left max-w-[200px] truncate">
+                      {t("projectName")}
+                    </th>
+                    <th className="p-2 text-left truncate">
+                      {t("totalTasks")}
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {topProjects.map((p) => (
+                    <tr key={p.projectId} className="border-t border-gray-700">
+                      <td className="p-2 max-w-[200px] overflow-x-auto truncate">
+                        {p.name}
+                      </td>
+                      <td className="p-2 truncate">{p.totalTasks}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </motion.div>
 
@@ -417,6 +439,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
         topProjects: [],
         largestProjectName: "",
         smallestProjectName: "",
+        projectStats: [],
       },
     };
   }
@@ -438,22 +461,27 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   let todoTasks = 0;
   let inProgressTasks = 0;
 
-  // Build array with project-level stats
-  const projectStats = allProjects.map((p) => {
-    let count = 0;
-    (p.tasks as Array<{ status: string }>).forEach((t) => {
-      count++;
-      console.log(t);
-    });
+  // Build array with project-level stats including counts for all statuses
+  const projectStats: ProjectStats[] = allProjects.map((p) => {
+    const tasksArray = p.tasks as Array<{ status: string }>;
+    const total = tasksArray.length;
+    const done = tasksArray.filter((t) => t.status === "done").length;
+    const todo = tasksArray.filter((t) => t.status === "todo").length;
+    const inProgress = tasksArray.filter(
+      (t) => t.status === "in-progress",
+    ).length;
     return {
       projectId: p.projectId,
       name: p.name,
-      totalTasks: count,
+      totalTasks: total,
+      doneTasks: done,
+      todoTasks: todo,
+      inProgressTasks: inProgress,
     };
   });
 
   // Sort descending by totalTasks to find top 5
-  const topProjects = projectStats
+  const topProjects = [...projectStats]
     .sort((a, b) => b.totalTasks - a.totalTasks)
     .slice(0, 5);
 
@@ -490,6 +518,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       topProjects,
       largestProjectName,
       smallestProjectName,
+      projectStats, // pass the project-level stats for the line chart
     },
   };
 };

@@ -9,7 +9,7 @@
   "cancel": "Cancel",
   "taskAdded": "Task added",
   "taskCreationFailed": "Task creation failed",
-  "toggle": "Toggle",
+  "toggle": "Toggle Status",
   "taskProgressOverview": "Task Progress Overview",
   "taskStatusDistribution": "Task Status Distribution",
   "tasks": "Tasks",
@@ -31,5 +31,24 @@
   "inviteTitle": "Share this Project ID",
   "inviteDesc": "Share this ID with your teammates to invite them to this project.",
   "copiedIdMsg": "Copied ID",
-  "copyBtn": "Copy"
+  "copyBtn": "Copy",
+  "toDo": "To Do",
+  "inProgress": "In Progress",
+  "done": "Done",
+  "tasksLabel": "Tasks",
+  "editTask": "Edit Task",
+  "deleteTask": "Delete Task",
+  "saveChanges": "Save Changes",
+  "deleteTaskConfirmTitle": "Confirm Delete Task",
+  "deleteTaskConfirmDesc": "Are you sure you want to delete this task?",
+  "deleteTaskBtn": "Delete Task",
+  "statuses": {
+    "todo": "To Do",
+    "in-progress": "In Progress",
+    "done": "Done"
+  },
+  "taskUpdated": "Task updated",
+  "taskUpdateFailed": "Task update failed",
+  "taskDeleted": "Task deleted",
+  "taskDeleteFailed": "Task deletion failed"
 }

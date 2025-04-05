@@ -23,10 +23,39 @@ export default async function handler(
   if (!session?.user) {
     return res.status(401).json({ error: "Not authenticated" });
   }
+  const currentUserSub = session.user.sub;
 
-  const userRoles: string[] =
-    session.user["http://myapp.example.com/roles"] || [];
-  const isAdmin = userRoles.includes(roles.admin);
+  // Replace the direct session claim with a call to Auth0 Management API
+  const domain = process.env.AUTH0_TENANT_DOMAIN;
+  const clientId = process.env.AUTH0_M2M_CLIENT_ID;
+  const clientSecret = process.env.AUTH0_M2M_CLIENT_SECRET;
+  if (!domain || !clientId || !clientSecret) {
+    return res.status(500).json({
+      error: "Auth0 M2M environment variables not configured properly.",
+    });
+  }
+
+  // Obtain a Management API token using client_credentials
+  const tokenRes = await axios.post(`https://${domain}/oauth/token`, {
+    grant_type: "client_credentials",
+    client_id: clientId,
+    client_secret: clientSecret,
+    audience: `https://${domain}/api/v2/`,
+  });
+  const mgmtToken = tokenRes.data.access_token;
+
+  // Get current user's roles from Auth0 Management API
+  const rolesRes = await axios.get(
+    `https://${domain}/api/v2/users/${encodeURIComponent(currentUserSub)}/roles`,
+    {
+      headers: { Authorization: `Bearer ${mgmtToken}` },
+    },
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const currentUserRoles = rolesRes.data.map((r: any) => r.name);
+  console.log(currentUserRoles);
+  const isAdmin = currentUserRoles.includes(roles.admin);
   if (!isAdmin) {
     return res.status(403).json({ error: "Forbidden" });
   }
@@ -44,28 +73,7 @@ export default async function handler(
 
   try {
     // 3) Obtain a Management API token using M2M credentials
-    const domain = process.env.AUTH0_ISSUER_BASE_URL?.replace(
-      /^https?:\/\//,
-      "",
-    );
-    if (
-      !domain ||
-      !process.env.AUTH0_M2M_CLIENT_ID ||
-      !process.env.AUTH0_M2M_CLIENT_SECRET
-    ) {
-      throw new Error(
-        "Auth0 M2M environment variables not configured properly.",
-      );
-    }
-
-    const tokenRes = await axios.post(`https://${domain}/oauth/token`, {
-      grant_type: "client_credentials",
-      client_id: process.env.AUTH0_M2M_CLIENT_ID,
-      client_secret: process.env.AUTH0_M2M_CLIENT_SECRET,
-      audience: `https://${domain}/api/v2/`,
-    });
-
-    const mgmtToken = tokenRes.data.access_token;
+    // (We already obtained mgmtToken above.)
 
     // 4) Find the role by name
     // e.g. GET /api/v2/roles?name_filter=admin
@@ -108,7 +116,6 @@ export default async function handler(
       success: true,
       message: `Successfully ${action}ed role "${roleName}" for user ${userSub}.`,
     });
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     console.error("Admin roles API error:", err.response?.data || err.message);
