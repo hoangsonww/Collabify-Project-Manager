@@ -11,27 +11,28 @@ export default async function handler(
     return res.status(400).json({ error: "Missing user" });
   }
 
-  const domain = process.env.AUTH0_ISSUER_BASE_URL?.replace(/^https?:\/\//, "");
-  const clientId = process.env.AUTH0_CLIENT_ID;
-  const clientSecret = process.env.AUTH0_CLIENT_SECRET;
-
   try {
-    // 1. Get Auth0 Management API token
+    // Use your M2M variables
+    const domain = process.env.AUTH0_TENANT_DOMAIN;
+    const clientId = process.env.AUTH0_M2M_CLIENT_ID;
+    const clientSecret = process.env.AUTH0_M2M_CLIENT_SECRET;
+
+    // 1) Obtain a Management API token using M2M credentials
     const tokenRes = await axios.post(`https://${domain}/oauth/token`, {
+      grant_type: "client_credentials",
       client_id: clientId,
       client_secret: clientSecret,
       audience: `https://${domain}/api/v2/`,
-      grant_type: "client_credentials",
     });
 
-    const accessToken = tokenRes.data.access_token;
+    const mgmtToken = tokenRes.data.access_token;
 
-    // 2. Fetch user info
+    // 2) Fetch user info using the M2M token
     const userRes = await axios.get(
       `https://${domain}/api/v2/users/${encodeURIComponent(user)}`,
       {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${mgmtToken}`,
         },
       },
     );
@@ -40,10 +41,7 @@ export default async function handler(
     res.status(200).json({ name, email });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    console.error(
-      "Auth0 user fetch error:",
-      err?.response?.data || err.message,
-    );
+    console.error("Management API error:", err?.response?.data || err.message);
     res.status(500).json({ error: "Failed to fetch user info" });
   }
 }

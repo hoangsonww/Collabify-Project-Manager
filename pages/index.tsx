@@ -14,7 +14,6 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-// We import i18n in _app.tsx anyway, but do it again just in case:
 import { useTranslation } from "react-i18next";
 
 // 1) We create a "RealHome" component that uses react-i18next for translations

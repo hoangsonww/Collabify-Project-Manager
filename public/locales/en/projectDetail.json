@@ -50,5 +50,6 @@
   "taskUpdated": "Task updated",
   "taskUpdateFailed": "Task update failed",
   "taskDeleted": "Task deleted",
-  "taskDeleteFailed": "Task deletion failed"
+  "taskDeleteFailed": "Task deletion failed",
+  "pleaseWait": "Please wait..."
 }

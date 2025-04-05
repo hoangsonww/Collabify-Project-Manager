@@ -53,13 +53,15 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
   const [localProjects, setLocalProjects] = useState(projects);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [joinDialogOpen, setJoinDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // loading state for CREATE
+  const [isJoining, setIsJoining] = useState(false); // loading state for JOIN
+
   const router = useRouter();
 
   // Use the "projects" namespace
   const { t } = useTranslation("projects");
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+  // -------- Create Project --------
   async function handleCreateProject(formData: FormData) {
     if (isSubmitting) return;
 
@@ -73,6 +75,7 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
     setIsSubmitting(true);
 
     try {
+      // 1. Create project
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -82,6 +85,7 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
 
       const project = await res.json();
 
+      // 2. Join the newly created project
       const joinRes = await fetch(`/api/projects/${project.projectId}/join`, {
         method: "POST",
       });
@@ -90,6 +94,7 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
       setLocalProjects((prev) => [...prev, project]);
       toast.success(t("projectCreatedJoined"));
       setCreateDialogOpen(false);
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error(t("couldNotCreateJoin"));
@@ -98,8 +103,7 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
     }
   }
 
-  const [isJoining, setIsJoining] = useState(false);
-
+  // -------- Join Project --------
   async function handleJoinProject(formData: FormData) {
     if (isJoining) return;
 
@@ -147,6 +151,7 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
         >
           <h1 className="text-3xl font-bold text-foreground">{t("title")}</h1>
           <div className="flex gap-4">
+            {/* Join Project Dialog */}
             <Dialog open={joinDialogOpen} onOpenChange={setJoinDialogOpen}>
               <DialogTrigger asChild>
                 <Button
@@ -175,13 +180,15 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
                   <Button
                     type="submit"
                     className="w-full hover:scale-102 transition-transform cursor-pointer"
+                    disabled={isJoining}
                   >
-                    {t("submitJoin")}
+                    {isJoining ? t("pleaseWait") : t("submitJoin")}
                   </Button>
                 </form>
               </DialogContent>
             </Dialog>
 
+            {/* Create Project Dialog */}
             <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="hover:scale-102 transition-transform cursor-pointer">
@@ -215,8 +222,9 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
                   <Button
                     type="submit"
                     className="w-full hover:scale-101 transition-transform cursor-pointer"
+                    disabled={isSubmitting}
                   >
-                    {t("submitCreate")}
+                    {isSubmitting ? t("pleaseWait") : t("submitCreate")}
                   </Button>
                 </form>
               </DialogContent>
@@ -224,6 +232,7 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
           </div>
         </motion.div>
 
+        {/* List of Projects */}
         {localProjects.length === 0 ? (
           <motion.p
             className="text-muted-foreground"
@@ -266,6 +275,7 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
           </motion.div>
         )}
 
+        {/* Footer note */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

@@ -50,5 +50,6 @@
   "taskUpdated": "Nhiệm vụ đã được cập nhật",
   "taskUpdateFailed": "Cập nhật nhiệm vụ không thành công",
   "taskDeleted": "Nhiệm vụ đã được xóa",
-  "taskDeleteFailed": "Xóa nhiệm vụ không thành công"
+  "taskDeleteFailed": "Xóa nhiệm vụ không thành công",
+  "pleaseWait": "Vui lòng đợi..."
 }

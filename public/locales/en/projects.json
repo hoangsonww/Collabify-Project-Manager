@@ -18,5 +18,6 @@
   "projectCreatedJoined": "Project created and joined!",
   "couldNotCreateJoin": "Could not create and join project",
   "joinedProject": "Joined project!",
-  "couldNotJoin": "Could not join project. Maybe you've already joined, or the ID is invalid."
+  "couldNotJoin": "Could not join project. Maybe you've already joined, or the ID is invalid.",
+  "pleaseWait": "Please wait..."
 }

@@ -87,68 +87,83 @@ function ProjectDetailPageInternal({
     title: string;
   } | null>(null);
 
-  // ---------- State for editing a task -----------
+  // State for editing a task
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [taskTitleEdit, setTaskTitleEdit] = useState("");
   const [taskAssigneeEdit, setTaskAssigneeEdit] = useState("");
 
+  const [projectMembers, setProjectMembers] = useState<
+    { sub: string; name?: string; email?: string }[]
+  >([]);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [memberInfo, setMemberInfo] = useState<
     Record<string, { name?: string; email?: string }>
   >({});
 
-  // Animate container and cards with Framer Motion
+  // Additional states for requests
+  const [isJoining, setIsJoining] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const [isAddingTask, setIsAddingTask] = useState(false);
+  const [togglingTaskId, setTogglingTaskId] = useState<string | null>(null);
+
+  // New states for the spinners
+  const [isSavingTask, setIsSavingTask] = useState(false);
+  const [isDeletingTask, setIsDeletingTask] = useState(false);
+
+  // ---------- Charts Animations -----------
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
   };
-
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
 
-  // Fetch user info for each member
+  // ---------- Fetch Project Members -----------
   useEffect(() => {
-    async function fetchInfo() {
+    async function fetchMemberDetails() {
       if (!localProject) return;
-      const results: Record<string, { name?: string; email?: string }> = {};
-      await Promise.all(
-        localProject.members.map(async (sub) => {
-          try {
-            const res = await fetch(
-              `/api/auth/me?user=${encodeURIComponent(sub)}`,
-            );
-            const json = await res.json();
-            results[sub] = { name: json.name, email: json.email };
-          } catch {
-            results[sub] = {};
-          }
-        }),
-      );
-      setMemberInfo(results);
-    }
+      try {
+        const res = await fetch(
+          `/api/projects/${localProject.projectId}/members`,
+        );
+        if (!res.ok) throw new Error("Failed to fetch project members");
+        const data = await res.json();
+        const memberIds: string[] = data.members || [];
+        console.log("Project member IDs:", memberIds);
 
-    if (localProject && localProject.members) {
-      fetchInfo();
+        // Fetch user details for each member ID
+        const memberDetailsPromises = memberIds.map(async (memberId) => {
+          const userRes = await fetch(`/api/users/info?user=${memberId}`);
+          if (!userRes.ok)
+            throw new Error(`Failed to fetch info for ${memberId}`);
+          const memberData = await userRes.json();
+          return { sub: memberId, ...memberData };
+        });
+
+        const memberDetails = await Promise.all(memberDetailsPromises);
+        console.log("Member details:", memberDetails);
+        setProjectMembers(memberDetails);
+      } catch (error) {
+        console.error(
+          "Error fetching project members or member details:",
+          error,
+        );
+      }
     }
-  }, [localProject?.members]);
+    if (localProject) {
+      fetchMemberDetails();
+    }
+  }, [localProject?.projectId]);
 
   if (!userSub || !localProject) {
     return <p className="text-white">{t("invalidProjectOrLogin")}</p>;
   }
 
   const isMember = localProject.members.includes(userSub) || isAdmin;
-
-  // Additional states for requests
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [isJoining, setIsJoining] = useState(false);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [isLeaving, setIsLeaving] = useState(false);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [isAddingTask, setIsAddingTask] = useState(false);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [togglingTaskId, setTogglingTaskId] = useState<string | null>(null);
 
   // -------------- Join / Leave -------------
   const handleJoin = async () => {
@@ -181,7 +196,10 @@ function ProjectDetailPageInternal({
     });
     if (res.ok) {
       toast.success(t("leftProject"));
-      router.replace(router.asPath);
+      // Redirect to the projects index page
+      router.push("/projects");
+    } else {
+      toast.error(t("errorLeavingProject"));
     }
 
     setIsLeaving(false);
@@ -220,7 +238,9 @@ function ProjectDetailPageInternal({
 
     const res = await fetch(
       `/api/projects/${localProject.projectId}/tasks/${taskId}/toggle`,
-      { method: "PATCH" },
+      {
+        method: "PATCH",
+      },
     );
     if (res.ok) {
       const updated = await res.json();
@@ -230,18 +250,18 @@ function ProjectDetailPageInternal({
     setTogglingTaskId(null);
   };
 
-  // ------------- Delete Task + Dialog -------------
-  // 1) Open confirm dialog
+  // ------------- Delete Task -------------
   const openDeleteDialog = (taskId: string, title: string) => {
     setTaskToDelete({ id: taskId, title });
     setDeleteDialogOpen(true);
   };
 
-  // 2) Confirmed -> delete
   const handleDeleteTask = async () => {
     if (!taskToDelete) return;
-    const { id: taskId } = taskToDelete;
 
+    setIsDeletingTask(true); // Show spinner
+
+    const { id: taskId } = taskToDelete;
     const res = await fetch(
       `/api/projects/${localProject.projectId}/tasks/${taskId}`,
       {
@@ -256,9 +276,10 @@ function ProjectDetailPageInternal({
       toast.error(t("errorDeletingTask"));
     }
 
-    // Close dialog + reset
     setDeleteDialogOpen(false);
     setTaskToDelete(null);
+
+    setIsDeletingTask(false);
   };
 
   // ------------- Edit Task -------------
@@ -277,6 +298,8 @@ function ProjectDetailPageInternal({
     e.preventDefault();
     if (!editingTaskId) return;
 
+    setIsSavingTask(true); // Show spinner
+
     const res = await fetch(
       `/api/projects/${localProject.projectId}/tasks/${editingTaskId}`,
       {
@@ -294,16 +317,17 @@ function ProjectDetailPageInternal({
       setLocalProject(updatedProject);
       toast.success(t("taskUpdated"));
       setEditDialogOpen(false);
-      // Clear editing states
       setEditingTaskId(null);
       setTaskTitleEdit("");
       setTaskAssigneeEdit("");
     } else {
       toast.error(t("errorUpdatingTask"));
     }
+
+    setIsSavingTask(false);
   };
 
-  // Count tasks by status
+  // ------------- Chart Data -------------
   const statusCounts = { todo: 0, "in-progress": 0, done: 0 };
   localProject.tasks.forEach((t) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -311,7 +335,6 @@ function ProjectDetailPageInternal({
     statusCounts[t.status] = (statusCounts[t.status] || 0) + 1;
   });
 
-  // Chart options
   const chartOptions = {
     plugins: {
       legend: { labels: { color: "#ffffff" } },
@@ -329,7 +352,6 @@ function ProjectDetailPageInternal({
     },
   };
 
-  // Bar & Pie Data
   const barData = {
     labels: [t("toDo"), t("inProgress"), t("done")],
     datasets: [
@@ -359,6 +381,7 @@ function ProjectDetailPageInternal({
     ],
   };
 
+  // ------------- Rendering -------------
   return (
     <>
       <Head>
@@ -368,6 +391,7 @@ function ProjectDetailPageInternal({
           content="Manage system-wide settings, user roles, and view system logs with Collabify."
         />
       </Head>
+
       <div className="text-white font-sans space-y-6 p-6">
         {/* Header Section */}
         <motion.div
@@ -393,7 +417,13 @@ function ProjectDetailPageInternal({
             <Dialog open={leaveDialogOpen} onOpenChange={setLeaveDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="destructive" className="cursor-pointer">
-                  <LogOut className="h-4 w-4" /> {t("btnLeave")}
+                  {isLeaving ? (
+                    // A simple spinner, or replace with your own spinner component
+                    <div className="loader" aria-label="Loading..." />
+                  ) : (
+                    <LogOut className="h-4 w-4" />
+                  )}
+                  &nbsp;{t("btnLeave")}
                 </Button>
               </DialogTrigger>
               <DialogContent className="bg-none border border-white text-white">
@@ -408,13 +438,15 @@ function ProjectDetailPageInternal({
                       handleLeave();
                       setLeaveDialogOpen(false);
                     }}
+                    disabled={isLeaving}
                     className="cursor-pointer"
                   >
-                    {t("yesLeave")}
+                    {isLeaving ? t("pleaseWait") : t("yesLeave")}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => setLeaveDialogOpen(false)}
+                    disabled={isLeaving}
                     className="cursor-pointer"
                   >
                     {t("cancel")}
@@ -423,8 +455,13 @@ function ProjectDetailPageInternal({
               </DialogContent>
             </Dialog>
           ) : (
-            <Button className="cursor-pointer" onClick={handleJoin}>
-              <LogIn className="h-4 w-4" /> {t("btnJoin")}
+            <Button
+              className="cursor-pointer"
+              onClick={handleJoin}
+              disabled={isJoining}
+            >
+              {isJoining ? t("pleaseWait") : <LogIn className="h-4 w-4" />}
+              &nbsp;{t("btnJoin")}
             </Button>
           )}
 
@@ -434,7 +471,12 @@ function ProjectDetailPageInternal({
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                   <Button variant="outline" className="cursor-pointer">
-                    <Plus className="h-4 w-4" /> {t("btnNewTask")}
+                    {isAddingTask ? (
+                      <div className="loader" aria-label="Loading..." />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
+                    &nbsp;{t("btnNewTask")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-none border border-white text-white">
@@ -460,11 +502,15 @@ function ProjectDetailPageInternal({
                           />
                         </SelectTrigger>
                         <SelectContent className="bg-none text-white border border-white">
-                          {localProject.members.map((sub) => {
-                            const info = memberInfo[sub];
-                            const label = info?.name || info?.email || sub;
+                          {projectMembers.map((member) => {
+                            const label =
+                              member.name || member.email || member.sub;
                             return (
-                              <SelectItem key={sub} value={sub}>
+                              <SelectItem
+                                key={member.sub}
+                                value={member.sub}
+                                className="text-black"
+                              >
                                 {label}
                               </SelectItem>
                             );
@@ -472,8 +518,12 @@ function ProjectDetailPageInternal({
                         </SelectContent>
                       </Select>
                     </div>
-                    <Button type="submit" className="w-full cursor-pointer">
-                      {t("createTaskBtn")}
+                    <Button
+                      type="submit"
+                      className="w-full cursor-pointer"
+                      disabled={isAddingTask}
+                    >
+                      {isAddingTask ? t("pleaseWait") : t("createTaskBtn")}
                     </Button>
                   </form>
                 </DialogContent>
@@ -511,6 +561,7 @@ function ProjectDetailPageInternal({
           )}
         </motion.div>
 
+        {/* Main content if user is member */}
         {isMember && (
           <>
             <motion.div
@@ -573,15 +624,13 @@ function ProjectDetailPageInternal({
                           {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                           {/* @ts-ignore */}
                           {task.assignedTo
-                            ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              // @ts-ignore
-                              memberInfo[task.assignedTo]?.name ||
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              // @ts-ignore
-                              memberInfo[task.assignedTo]?.email ||
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              // @ts-ignore
-                              task.assignedTo
+                            ? projectMembers.find(
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
+                                (m) => m.sub === task.assignedTo,
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
+                              )?.email || task.assignedTo
                             : "-"}
                         </td>
                         <td className="p-2 flex gap-2 items-center">
@@ -591,8 +640,9 @@ function ProjectDetailPageInternal({
                             variant="outline"
                             onClick={() => handleToggleStatus(task._id)}
                             className="text-white border-white cursor-pointer"
+                            disabled={togglingTaskId === task._id}
                           >
-                            <CircleCheck className="mr-2 h-4 w-4" />{" "}
+                            <CircleCheck className="mr-2 h-4 w-4" />
                             {t("toggle")}
                           </Button>
 
@@ -601,8 +651,6 @@ function ProjectDetailPageInternal({
                             size="sm"
                             variant="outline"
                             onClick={() =>
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              // @ts-ignore
                               openEditDialog(
                                 task._id,
                                 task.title,
@@ -624,8 +672,13 @@ function ProjectDetailPageInternal({
                               openDeleteDialog(task._id, task.title)
                             }
                             className="text-white cursor-pointer"
+                            disabled={isDeletingTask}
                           >
-                            <Trash className="h-4 w-4" />
+                            {isDeletingTask ? (
+                              <div className="loader" aria-label="Loading..." />
+                            ) : (
+                              <Trash className="h-4 w-4" />
+                            )}
                           </Button>
                         </td>
                       </tr>
@@ -653,13 +706,15 @@ function ProjectDetailPageInternal({
                 variant="destructive"
                 onClick={handleDeleteTask}
                 className="cursor-pointer"
+                disabled={isDeletingTask}
               >
-                {t("deleteTaskBtn")}
+                {isDeletingTask ? t("pleaseWait") : t("deleteTaskBtn")}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setDeleteDialogOpen(false)}
                 className="cursor-pointer"
+                disabled={isDeletingTask}
               >
                 {t("cancel")}
               </Button>
@@ -695,11 +750,14 @@ function ProjectDetailPageInternal({
                     />
                   </SelectTrigger>
                   <SelectContent className="bg-none text-white border border-white">
-                    {localProject?.members.map((sub) => {
-                      const info = memberInfo[sub];
-                      const label = info?.name || info?.email || sub;
+                    {projectMembers.map((member) => {
+                      const label = member.name || member.email || member.sub;
                       return (
-                        <SelectItem key={sub} value={sub}>
+                        <SelectItem
+                          key={member.sub}
+                          value={member.sub}
+                          className="text-black"
+                        >
                           {label}
                         </SelectItem>
                       );
@@ -707,8 +765,12 @@ function ProjectDetailPageInternal({
                   </SelectContent>
                 </Select>
               </div>
-              <Button type="submit" className="w-full cursor-pointer">
-                {t("saveChanges")}
+              <Button
+                type="submit"
+                className="w-full cursor-pointer"
+                disabled={isSavingTask}
+              >
+                {isSavingTask ? t("pleaseWait") : t("saveChanges")}
               </Button>
             </form>
           </DialogContent>
@@ -718,6 +780,7 @@ function ProjectDetailPageInternal({
   );
 }
 
+// ------------- Server-Side -------------
 export const getServerSideProps: GetServerSideProps = async ({
   req,
   res,
