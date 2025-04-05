@@ -307,8 +307,10 @@ function DashboardPageInternal({
               variants={cardVariants}
               className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              <p className="text-sm text-gray-400">{card.label}</p>
-              <p className={`${card.textSize} font-bold`}>{card.value}</p>
+              <p className="text-sm text-gray-400 truncate">{card.label}</p>
+              <p className={`${card.textSize} font-bold truncate`}>
+                {card.value}
+              </p>
             </motion.div>
           ))}
         </motion.div>
