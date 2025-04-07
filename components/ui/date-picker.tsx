@@ -39,6 +39,7 @@ export function DatePicker({
     ? format(value, "PPP", { locale })
     : "Pick a date";
   const displayDate =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     locale && (locale as any).code === "vi"
       ? formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)
       : formattedDate;
