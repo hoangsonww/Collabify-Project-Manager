@@ -11,56 +11,61 @@ export default async function handler(
   if (!session?.user) {
     return res.status(401).json({ error: "Not authenticated" });
   }
-
-  const { id } = req.query;
   const userSub = session.user.sub;
 
   await dbConnect();
 
+  const { id } = req.query;
   const project = await Project.findOne({ projectId: id });
   if (!project) {
     return res.status(404).json({ error: "Project not found" });
   }
 
-  if (!project.members.includes(userSub)) {
-    return res
-      .status(403)
-      .json({ error: "You must be a project member to add tasks" });
+  // Find membership entry
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const membershipEntry = project.membership.find((m) => m.userSub === userSub);
+  if (!membershipEntry) {
+    return res.status(403).json({ error: "Not a project member" });
+  }
+
+  // If user is viewer, forbid
+  if (membershipEntry.role === "viewer") {
+    return res.status(403).json({ error: "Viewers cannot add tasks" });
   }
 
   if (req.method === "POST") {
-    const { title, assignedTo } = req.body;
-    if (!title || typeof title !== "string") {
-      return res.status(400).json({ error: "Invalid task title" });
+    const { _id, title, assignedTo, priority } = req.body;
+    if (!title) {
+      return res.status(400).json({ error: "Task title is required" });
     }
 
-    const newTask = {
-      _id: new Date().getTime().toString(), // or use uuid if you want
+    project.tasks.push({
+      _id,
       title,
       status: "todo",
       assignedTo: assignedTo || null,
-    };
+      priority: priority || "medium", // if you want to allow specifying priority
+    });
 
-    project.tasks.push(newTask);
     await project.save();
 
-    const updated = {
+    // Return updated
+    return res.status(201).json({
+      ...project.toObject(),
       _id: project._id.toString(),
-      projectId: project.projectId,
-      name: project.name,
-      description: project.description,
-      members: project.members,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      tasks: project.tasks.map((t: any) => ({
-        _id: t._id.toString(),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      tasks: project.tasks.map((t) => ({
+        _id: t._id,
         title: t.title,
         status: t.status,
-        assignedTo: t.assignedTo || null,
+        assignedTo: t.assignedTo,
+        priority: t.priority,
       })),
-    };
-
-    return res.status(201).json(updated);
+    });
   }
 
+  // ...
   return res.status(405).json({ error: "Method not allowed" });
 }

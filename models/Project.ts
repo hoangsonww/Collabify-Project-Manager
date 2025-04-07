@@ -5,6 +5,12 @@ export interface ITask {
   title: string;
   status: "todo" | "in-progress" | "done";
   assignedTo?: string | null;
+  priority?: "low" | "medium" | "high"; // NEW
+}
+
+export interface IMembership {
+  userSub: string;
+  role: "manager" | "editor" | "viewer";
 }
 
 export interface IProject {
@@ -13,6 +19,7 @@ export interface IProject {
   name: string;
   description: string;
   members: string[];
+  membership: IMembership[];
   tasks: ITask[];
 }
 
@@ -26,6 +33,23 @@ const TaskSchema = new Schema<ITask>(
       default: "todo",
     },
     assignedTo: { type: String, default: null },
+    priority: {
+      type: String,
+      enum: ["low", "medium", "high"],
+      default: "medium",
+    },
+  },
+  { _id: false },
+);
+
+const MembershipSchema = new Schema<IMembership>(
+  {
+    userSub: { type: String, required: true },
+    role: {
+      type: String,
+      enum: ["manager", "editor", "viewer"],
+      default: "editor",
+    },
   },
   { _id: false },
 );
@@ -35,6 +59,7 @@ const ProjectSchema = new Schema<IProject>({
   name: { type: String, required: true },
   description: String,
   members: { type: [String], default: [] },
+  membership: { type: [MembershipSchema], default: [] },
   tasks: { type: [TaskSchema], default: [] },
 });
 

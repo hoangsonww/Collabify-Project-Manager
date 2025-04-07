@@ -7,37 +7,66 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  if (req.method !== "PATCH") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
+  // Check authentication
   const session = await getSession(req, res);
-  if (!session?.user)
+  if (!session?.user) {
     return res.status(401).json({ error: "Not authenticated" });
-
-  const { id, taskId } = req.query;
+  }
   const userSub = session.user.sub;
 
+  // Connect to DB
   await dbConnect();
 
-  const project = await Project.findOne({ projectId: id });
-  if (!project) return res.status(404).json({ error: "Project not found" });
-
-  if (!project.members.includes(userSub)) {
-    return res.status(403).json({ error: "Forbidden" });
+  const { id, taskId } = req.query;
+  if (!id || !taskId) {
+    return res.status(400).json({ error: "Missing project or task ID" });
   }
 
-  const task = project.tasks.id(taskId);
-  if (!task) return res.status(404).json({ error: "Task not found" });
+  // Find the project
+  const project = await Project.findOne({ projectId: id });
+  if (!project) {
+    return res.status(404).json({ error: "Project not found" });
+  }
 
-  const nextStatus =
-    task.status === "todo"
-      ? "in-progress"
-      : task.status === "in-progress"
-        ? "done"
-        : "todo";
+  // Check membership using the new membership array
+  const membership = project.membership?.find(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (m: any) => m.userSub === userSub,
+  );
+  if (!membership) {
+    return res
+      .status(403)
+      .json({ error: "You must be a project member to modify tasks" });
+  }
 
-  task.status = nextStatus;
+  // Find the task to toggle
+  const taskIndex = project.tasks.findIndex(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (t: any) => t._id.toString() === taskId,
+  );
+  if (taskIndex === -1) {
+    return res.status(404).json({ error: "Task not found" });
+  }
+
+  const task = project.tasks[taskIndex];
+
+  // Toggle logic: cycle through statuses: "todo" -> "in-progress" -> "done" -> "todo"
+  let newStatus;
+  switch (task.status) {
+    case "todo":
+      newStatus = "in-progress";
+      break;
+    case "in-progress":
+      newStatus = "done";
+      break;
+    case "done":
+      newStatus = "todo";
+      break;
+    default:
+      newStatus = "todo";
+  }
+  task.status = newStatus;
+
   await project.save();
 
   const updated = {
@@ -45,13 +74,14 @@ export default async function handler(
     projectId: project.projectId,
     name: project.name,
     description: project.description,
-    members: project.members,
+    membership: project.membership,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     tasks: project.tasks.map((t: any) => ({
       _id: t._id.toString(),
       title: t.title,
       status: t.status,
       assignedTo: t.assignedTo || null,
+      priority: t.priority || "medium",
     })),
   };
 

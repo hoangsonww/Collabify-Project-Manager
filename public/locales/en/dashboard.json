@@ -21,5 +21,9 @@
   "top5Projects": "Top 5 Projects (by total tasks)",
   "adminNote": "You are an admin and can see all projects. (Just a note.)",
   "projectName": "Project Name",
-  "tasksCreated": "Tasks Created"
+  "tasksCreated": "Tasks Created",
+  "tasksByPriority": "Tasks by Priority",
+  "high": "High",
+  "medium": "Medium",
+  "low": "Low"
 }

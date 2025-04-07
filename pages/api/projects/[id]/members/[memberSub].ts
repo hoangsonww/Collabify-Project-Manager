@@ -7,15 +7,16 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  if (req.method !== "POST") {
+  if (req.method !== "DELETE") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
   const session = await getSession(req, res);
   if (!session?.user) {
     return res.status(401).json({ error: "Not authenticated" });
   }
   const userSub = session.user.sub;
-  const { id } = req.query;
+  const { id, memberSub } = req.query;
 
   await dbConnect();
   const project = await Project.findOne({ projectId: id });
@@ -23,22 +24,26 @@ export default async function handler(
     return res.status(404).json({ error: "Project not found" });
   }
 
-  // If not already in membership, push as editor
-  const alreadyInMembership = project.membership.some(
+  // only manager can remove members
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const membershipEntry = project.membership.find((m) => m.userSub === userSub);
+  if (!membershipEntry || membershipEntry.role !== "manager") {
+    return res.status(403).json({ error: "Only managers can remove members" });
+  }
+
+  // remove from membership
+  project.membership = project.membership.filter(
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    (m) => m.userSub === userSub,
+    (m) => m.userSub !== memberSub,
   );
-  if (!alreadyInMembership) {
-    project.membership.push({ userSub, role: "editor" });
-  }
 
-  // If not already in the old members array, push it
-  if (!project.members.includes(userSub)) {
-    project.members.push(userSub);
-  }
+  // optional: remove from old members array if you still use it
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  project.members = project.members.filter((m) => m !== memberSub);
 
   await project.save();
-
-  return res.json({ success: true });
+  return res.json({ success: true, message: "Member removed" });
 }

@@ -1,7 +1,7 @@
 import { getSession } from "@auth0/nextjs-auth0";
 import { GetServerSideProps } from "next";
 import { dbConnect } from "@/lib/mongodb";
-import { Project } from "@/models/Project";
+import { ITask, Project } from "@/models/Project";
 import { roles } from "@/lib/roles";
 import { Bar, Pie, Line, Doughnut, Radar, PolarArea } from "react-chartjs-2";
 import {
@@ -58,6 +58,8 @@ type DashboardProps = {
   largestProjectName: string;
   smallestProjectName: string;
   projectStats?: ProjectStats[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  allProjects: any[];
 };
 
 // === (2) The REAL component that uses react-i18next ===
@@ -72,7 +74,8 @@ function DashboardPageInternal({
   topProjects,
   largestProjectName,
   smallestProjectName,
-  projectStats = [], // Default to empty array if undefined
+  projectStats = [],
+  allProjects, // <-- add this
 }: DashboardProps) {
   const { t } = useTranslation("dashboard");
 
@@ -221,6 +224,56 @@ function DashboardPageInternal({
       ],
     };
   }, [todoTasks, inProgressTasks, doneTasks, t]);
+
+  // Aggregate all tasks from all projects
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const allTasks = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return allProjects.flatMap((project: any) => project.tasks || []);
+  }, [allProjects]);
+
+  // Chart: Tasks by Priority using real data
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const tasksByPriorityData = useMemo(() => {
+    const counts = { low: 0, medium: 0, high: 0 };
+    allTasks.forEach((task: ITask) => {
+      const prio = task.priority || "medium";
+      counts[prio]++;
+    });
+    return {
+      labels: [t("low"), t("medium"), t("high")],
+      datasets: [
+        {
+          label: t("tasksByPriority"),
+          data: [counts.low, counts.medium, counts.high],
+          backgroundColor: ["#4ade80", "#facc15", "#f87171"],
+        },
+      ],
+    };
+  }, [allTasks, t]);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const lineTasksByPriorityData = useMemo(() => {
+    const counts = { low: 0, medium: 0, high: 0 };
+    allTasks.forEach((task: ITask) => {
+      const prio = task.priority || "medium";
+      counts[prio]++;
+    });
+    return {
+      labels: [t("low"), t("medium"), t("high")],
+      datasets: [
+        {
+          label: t("tasksByPriority"),
+          data: [counts.low, counts.medium, counts.high],
+          borderColor: "#4ade80", // Sets the line color
+          backgroundColor: "rgba(74,222,128,0.5)", // Color for points if any fill is shown
+          fill: false, // Disables fill below the line
+          tension: 0.4, // Smooths the line curves
+          pointRadius: 5, // Sets a larger point radius if desired
+        },
+      ],
+    };
+  }, [allTasks, t]);
 
   // Animation variants
   const cardVariants = {
@@ -376,6 +429,27 @@ function DashboardPageInternal({
             <h2 className="text-lg font-semibold mb-4">{t("status")}</h2>
             <PolarArea data={polarData} options={chartOptions} />
           </motion.div>
+          {/* Tasks by Priority Chart */}
+          <motion.div
+            variants={chartVariants}
+            className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
+          >
+            <h2 className="text-lg font-semibold mb-4">
+              {t("tasksByPriority")}
+            </h2>
+            <Bar data={tasksByPriorityData} options={chartOptions} />
+          </motion.div>
+
+          {/* Tasks by Priority Line Chart */}
+          <motion.div
+            variants={chartVariants}
+            className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
+          >
+            <h2 className="text-lg font-semibold mb-4">
+              {t("tasksByPriority")}
+            </h2>
+            <Line data={lineTasksByPriorityData} options={chartOptions} />
+          </motion.div>
         </motion.div>
 
         {/* Table of Top 5 Projects by tasks */}
@@ -450,6 +524,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
         largestProjectName: "",
         smallestProjectName: "",
         projectStats: [],
+        allProjects: [],
+        project: null,
       },
     };
   }
@@ -461,24 +537,60 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   await dbConnect();
 
-  // If admin, see all projects; otherwise, only projects where user is a member
-  const query = isAdmin ? {} : { members: userSub };
+  // Use new membership field to query projects for non-admins
+  const query = isAdmin ? {} : { "membership.userSub": userSub };
   const allProjects = await Project.find(query);
 
-  // Overall counters
+  // Serialize allProjects for use in charts (with tasks and membership)
+  // Serialize allProjects for use in charts (with tasks and membership)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const allProjectsSerialized = allProjects.map((p: any) => ({
+    _id: p._id.toString(),
+    projectId: p.projectId,
+    name: p.name,
+    description: p.description || "",
+    // Convert membership array entries to plain objects
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    membership: (p.membership || []).map((m: any) => ({
+      userSub: m.userSub,
+      role: m.role,
+    })),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    tasks: (p.tasks || []).map((t: any) => ({
+      _id: t._id.toString(),
+      title: t.title,
+      status: t.status,
+      assignedTo: t.assignedTo || null,
+      priority: t.priority || "medium",
+    })),
+  }));
+
+  // Overall counters and project-level stats
   let totalTasks = 0;
   let doneTasks = 0;
   let todoTasks = 0;
   let inProgressTasks = 0;
 
-  // Build array with project-level stats including counts for all statuses
-  const projectStats: ProjectStats[] = allProjects.map((p) => {
-    const tasksArray = p.tasks as Array<{ status: string }>;
+  type ProjectStats = {
+    projectId: string;
+    name: string;
+    totalTasks: number;
+    doneTasks: number;
+    todoTasks: number;
+    inProgressTasks: number;
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const projectStats: ProjectStats[] = allProjectsSerialized.map((p: any) => {
+    const tasksArray = p.tasks || [];
     const total = tasksArray.length;
-    const done = tasksArray.filter((t) => t.status === "done").length;
-    const todo = tasksArray.filter((t) => t.status === "todo").length;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const done = tasksArray.filter((t: any) => t.status === "done").length;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const todo = tasksArray.filter((t: any) => t.status === "todo").length;
     const inProgress = tasksArray.filter(
-      (t) => t.status === "in-progress",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (t: any) => t.status === "in-progress",
     ).length;
     return {
       projectId: p.projectId,
@@ -490,12 +602,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     };
   });
 
-  // Sort descending by totalTasks to find top 5
+  // Sort descending by totalTasks to get top 5 projects
   const topProjects = [...projectStats]
     .sort((a, b) => b.totalTasks - a.totalTasks)
     .slice(0, 5);
 
-  // Find largest/smallest project
+  // Determine largest/smallest project names
   let largestProjectName = "";
   let smallestProjectName = "";
   if (projectStats.length > 0) {
@@ -507,8 +619,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   }
 
   // Count tasks overall
-  allProjects.forEach((project) => {
-    (project.tasks as Array<{ status: string }>).forEach((t) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  allProjectsSerialized.forEach((project: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (project.tasks || []).forEach((t: any) => {
       totalTasks++;
       if (t.status === "done") doneTasks++;
       else if (t.status === "in-progress") inProgressTasks++;
@@ -516,11 +630,48 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     });
   });
 
+  // If a specific project is requested in the URL, load it.
+  let project = null;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const { id } = req.params || {};
+  if (id && typeof id === "string") {
+    const found = await Project.findOne({ projectId: id }).lean();
+    if (found) {
+      project = {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        _id: found._id.toString(),
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        projectId: found.projectId,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        name: found.name,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        description: found.description || "",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        membership: found.membership || [],
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        tasks: (found.tasks || []).map((t) => ({
+          _id: t._id.toString(),
+          title: t.title,
+          status: t.status,
+          assignedTo: t.assignedTo || null,
+          priority: t.priority || "medium",
+        })),
+      };
+    }
+  }
+
   return {
     props: {
       userSub,
       isAdmin,
-      totalProjects: allProjects.length,
+      totalProjects: allProjectsSerialized.length,
       totalTasks,
       doneTasks,
       todoTasks,
@@ -528,7 +679,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       topProjects,
       largestProjectName,
       smallestProjectName,
-      projectStats, // pass the project-level stats for the line chart
+      projectStats,
+      allProjects: allProjectsSerialized,
+      project,
     },
   };
 };

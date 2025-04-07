@@ -7,36 +7,40 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  // Check auth
+  // Check authentication
   const session = await getSession(req, res);
   if (!session?.user) {
     return res.status(401).json({ error: "Not authenticated" });
   }
   const userSub = session.user.sub;
 
-  // Connect DB
+  // Connect to the DB
   await dbConnect();
 
-  // Extract the project ID and task ID
+  // Get project ID and task ID from query
   const { id, taskId } = req.query;
   if (!id || !taskId) {
     return res.status(400).json({ error: "Missing project or task ID" });
   }
 
-  // Find the project
+  // Find the project by projectId
   const project = await Project.findOne({ projectId: id });
   if (!project) {
     return res.status(404).json({ error: "Project not found" });
   }
 
-  // Must be a member or an admin to proceed
-  if (!project.members.includes(userSub)) {
+  // Use the new membership field to check if the user is a member
+  const membership = project.membership?.find(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (m: any) => m.userSub === userSub,
+  );
+  if (!membership) {
     return res
       .status(403)
       .json({ error: "You must be a project member to modify tasks" });
   }
 
-  // -------- GET (optional) --------
+  // -------- GET: Return task details --------
   if (req.method === "GET") {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const task = project.tasks.find((t: any) => t._id.toString() === taskId);
@@ -48,14 +52,18 @@ export default async function handler(
       title: task.title,
       status: task.status,
       assignedTo: task.assignedTo || null,
+      priority: task.priority || "medium",
     });
   }
 
-  // -------- PUT (Update) --------
+  // -------- PUT: Update a task --------
   if (req.method === "PUT") {
-    const { title, assignedTo } = req.body;
+    const { title, assignedTo, priority } = req.body;
     if (!title || typeof title !== "string") {
       return res.status(400).json({ error: "Invalid task title" });
+    }
+    if (priority && !["low", "medium", "high"].includes(priority)) {
+      return res.status(400).json({ error: "Invalid task priority" });
     }
 
     const taskIndex = project.tasks.findIndex(
@@ -66,64 +74,64 @@ export default async function handler(
       return res.status(404).json({ error: "Task not found" });
     }
 
-    // Update the task
+    // Update the task fields
     project.tasks[taskIndex].title = title;
     project.tasks[taskIndex].assignedTo = assignedTo || null;
-    // (Status could also be updated here, if you wanted)
+    project.tasks[taskIndex].priority = priority || "medium";
 
     await project.save();
 
-    // Return updated project
+    // Return the updated project (with tasks mapped)
     const updated = {
       _id: project._id.toString(),
       projectId: project.projectId,
       name: project.name,
       description: project.description,
-      members: project.members,
+      membership: project.membership,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       tasks: project.tasks.map((t: any) => ({
         _id: t._id.toString(),
         title: t.title,
         status: t.status,
         assignedTo: t.assignedTo || null,
+        priority: t.priority || "medium",
       })),
     };
 
     return res.status(200).json(updated);
   }
 
-  // -------- DELETE --------
+  // -------- DELETE: Delete a task --------
   if (req.method === "DELETE") {
-    const existingTaskIndex = project.tasks.findIndex(
+    const taskIndex = project.tasks.findIndex(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (t: any) => t._id.toString() === taskId,
     );
-    if (existingTaskIndex === -1) {
+    if (taskIndex === -1) {
       return res.status(404).json({ error: "Task not found" });
     }
-
-    // Remove that one task
-    project.tasks.splice(existingTaskIndex, 1);
+    project.tasks.splice(taskIndex, 1);
     await project.save();
 
-    // Return updated project
     const updated = {
       _id: project._id.toString(),
       projectId: project.projectId,
       name: project.name,
       description: project.description,
-      members: project.members,
+      membership: project.membership,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       tasks: project.tasks.map((t: any) => ({
         _id: t._id.toString(),
         title: t.title,
         status: t.status,
         assignedTo: t.assignedTo || null,
+        priority: t.priority || "medium",
       })),
     };
+
     return res.status(200).json(updated);
   }
 
-  // Fallback for disallowed methods
+  // Fallback
   return res.status(405).json({ error: "Method not allowed" });
 }

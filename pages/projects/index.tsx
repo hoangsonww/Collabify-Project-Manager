@@ -34,13 +34,14 @@ const cardVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-// Local types
+// Local types – note: we're using the new schema (membership is stored in the project)
 type ProjectType = {
   _id: string;
   projectId: string;
   name: string;
   description: string;
-  members: string[];
+  // membership is available but not used on the client listing
+  membership?: { userSub: string; role: "manager" | "editor" | "viewer" }[];
 };
 
 type ProjectsPageProps = {
@@ -57,8 +58,6 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
   const [isJoining, setIsJoining] = useState(false); // loading state for JOIN
 
   const router = useRouter();
-
-  // Use the "projects" namespace
   const { t } = useTranslation("projects");
 
   // -------- Create Project --------
@@ -75,7 +74,7 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
     setIsSubmitting(true);
 
     try {
-      // 1. Create project
+      // 1. Create project – API auto-assigns creator as manager
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -85,16 +84,10 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
 
       const project = await res.json();
 
-      // 2. Join the newly created project
-      const joinRes = await fetch(`/api/projects/${project.projectId}/join`, {
-        method: "POST",
-      });
-      if (!joinRes.ok) throw new Error("Failed to join project");
-
+      // No need to join since creator is already manager.
       setLocalProjects((prev) => [...prev, project]);
       toast.success(t("projectCreatedJoined"));
       setCreateDialogOpen(false);
-
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error(t("couldNotCreateJoin"));
@@ -290,7 +283,7 @@ function ProjectsPageInternal({ projects }: ProjectsPageProps) {
   );
 }
 
-// (3) Server-side data fetching (unchanged)
+// (3) Server-side data fetching updated to use the new membership model
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session = await getSession(req, res);
   if (!session?.user)
@@ -298,15 +291,17 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   const userSub = session.user.sub;
   await dbConnect();
-  const userProjects = await Project.find({ members: userSub });
+  // Query projects where the current user is in the membership array
+  const userProjects = await Project.find({ "membership.userSub": userSub });
 
+  // Serialize projects – no legacy members field assumed
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const serialized = userProjects.map((p: any) => ({
     _id: p._id.toString(),
     projectId: p.projectId,
     name: p.name,
     description: p.description,
-    members: p.members,
+    // Optionally include membership if needed on the client
   }));
 
   return { props: { userSub, projects: serialized } };
