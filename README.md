@@ -70,7 +70,7 @@ Currently live at: [https://collabify-pm.vercel.app/](https://collabify-pm.verce
 
 - **Database Integration:** MongoDB is used for data storage, ensuring reliable and scalable data management.
 
-- **User Roles:** Role-Based Access Control (RBAC) allows for different permissions based on user roles, enhancing security and collaboration.
+- **User Roles:** Role-Based Access Control (RBAC) allows for different permissions based on user roles, enhancing security and collaboration within teams.
 
 - **User-Friendly Interface:** The application is designed to be intuitive and easy to navigate, making it accessible for users of all skill levels.
 
@@ -223,6 +223,8 @@ Collabify uses Auth0 for secure authentication and authorization. Auth0 provides
 - **Integration:** Auth0 integrates easily with various platforms and technologies, allowing for quick setup and configuration.
 - **Customizability:** Auth0 allows for custom login pages, user flows, and branding, enabling you to create a unique authentication experience for your users.
 - **Role-Based Access Control (RBAC):** Auth0 supports RBAC, allowing you to define user roles and permissions easily. This is crucial for applications like Collabify, where different users may have different levels of access to projects and tasks.
+  - A project may have a project manager who can create and manage tasks, while team members may only have permission to view and comment on tasks. Meanwhile, project members can only add/edit tasks, while viewers can only view tasks and cannot make any changes.
+  - Users with the `admin` role can manage all aspects of the application, including user management and project settings, as well as view the application logs in the admin panel.
 - **Social Login:** Auth0 supports social login options (e.g., Google, Facebook, GitHub), making it easier for users to sign up and log in without creating a new account.
 - **User Management:** Auth0 provides a comprehensive user management system, allowing you to view user profiles, roles, and activity logs.
 - **API Security:** Auth0 can secure your APIs by issuing access tokens and validating them, ensuring that only authorized users can access your backend services.

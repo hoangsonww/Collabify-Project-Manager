@@ -432,7 +432,7 @@ function ProjectDetailPageInternal({
         },
       );
       if (!res.ok) throw new Error("Failed to update role");
-      toast.success("Role updated");
+      toast.success(t("roleUpdated"));
       // update membership in local state
       setMemberships((old) =>
         old.map((m) => (m.userSub === roleUser ? { ...m, role: newRole } : m)),

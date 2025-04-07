@@ -19,5 +19,7 @@
   "recentLoginActivity": "Xem hoạt động đăng nhập gần đây, nhật ký kiểm toán và thông báo.",
   "noLogsAvailable": "Không có nhật ký nào.",
   "logsByType": "Nhật Ký Theo Loại",
-  "logsOverTime": "Nhật Ký Theo Thời Gian"
+  "logsOverTime": "Nhật Ký Theo Thời Gian",
+  "roleChangeError": "Có lỗi xảy ra khi thay đổi vai trò. Vui lòng kiểm tra lại thông tin và thử lại.",
+  "roleChangeSuccess": "Thay đổi vai trò thành công."
 }

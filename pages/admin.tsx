@@ -16,6 +16,7 @@ import {
 import { Bar, Line } from "react-chartjs-2";
 import { motion } from "framer-motion";
 import Head from "next/head";
+import { toast } from "sonner";
 
 // (1) Import react-i18next + dynamic
 import { Trans, useTranslation } from "react-i18next";
@@ -168,10 +169,11 @@ function AdminPageInternal() {
       if (!res.ok) {
         throw new Error(data.error || "Unknown error");
       }
-      setFeedback(data.message);
+      toast.success(t("roleChangeSuccess"));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      setFeedbackError(err.message);
+      console.log(err);
+      toast.error(t("roleChangeError"));
     } finally {
       setSubmitLoading(false);
     }

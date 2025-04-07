@@ -19,5 +19,7 @@
   "recentLoginActivity": "View recent login activity, audit logs, and alerts.",
   "noLogsAvailable": "No logs available.",
   "logsByType": "Logs by Type",
-  "logsOverTime": "Logs Over Time"
+  "logsOverTime": "Logs Over Time",
+  "roleChangeError": "An error occurred while changing the role. Please check the information and try again.",
+  "roleChangeSuccess": "Role changed successfully."
 }
