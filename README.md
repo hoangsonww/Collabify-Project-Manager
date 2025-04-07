@@ -198,14 +198,14 @@ Before starting, make sure you have:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/collabify.git
+   git clone https://github.com/hoangsonww/Collabify-Project-Manager.git
    cd collabify
    ```
 
 2. **Install dependencies:**
 
    ```bash
-   npm install
+   npm install # or npm install --legacy-peer-deps if you encounter issues
    # or
    yarn install
    ```

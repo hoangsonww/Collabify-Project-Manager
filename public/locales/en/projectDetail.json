@@ -106,5 +106,7 @@
   "deleteProjectConfirmDesc": "Are you sure you want to delete this project? This action cannot be undone.",
   "deleteProjectBtn": "Delete Project",
   "dueDate": "Due Date",
-  "dueTime": "Due Time"
+  "dueTime": "Due Time (24h format)",
+  "confirmRemoveMemberTitle": "Confirm Remove Member",
+  "confirmRemoveMemberDesc": "Are you sure you want to remove this member from the project?"
 }

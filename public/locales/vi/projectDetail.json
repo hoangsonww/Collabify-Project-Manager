@@ -105,5 +105,7 @@
   "deleteProjectConfirmDesc": "Bạn có chắc muốn xóa dự án này không? Tất cả dữ liệu sẽ bị mất.",
   "deleteProjectBtn": "Xóa Dự Án",
   "dueDate": "Ngày Hết Hạn",
-  "dueTime": "Thời Gian Hết Hạn"
+  "dueTime": "Thời Gian Hết Hạn (24 giờ)",
+  "confirmRemoveMemberTitle": "Xác Nhận Xóa Thành Viên",
+  "confirmRemoveMemberDesc": "Bạn có chắc muốn xóa thành viên này khỏi dự án không?"
 }

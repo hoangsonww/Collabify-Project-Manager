@@ -26,40 +26,66 @@ export function DatePicker({
   className,
   locale,
 }: DatePickerProps) {
-  // Format the date using date-fns; if a locale is provided and it is Vietnamese, capitalize the first letter.
+  // Local state for controlling popover open state.
+  const [open, setOpen] = React.useState(false);
+
+  // Debug: log when open state changes.
+  React.useEffect(() => {
+    console.log("Popover open state changed:", open);
+  }, [open]);
+
+  // Format the date using date-fns; if a locale is provided and it's Vietnamese, capitalize the first letter.
   const formattedDate = value
     ? format(value, "PPP", { locale })
     : "Pick a date";
   const displayDate =
-    locale && locale.code === "vi" // assuming the Vietnamese locale has a code property set to "vi"
+    locale && (locale as any).code === "vi"
       ? formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)
       : formattedDate;
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className={cn(
-            "w-[280px] justify-start text-left font-normal",
-            !value && "text-muted-foreground",
-            className,
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {value ? displayDate : <span>Pick a date</span>}
-        </Button>
+    <Popover
+      open={open}
+      onOpenChange={(newState) => {
+        console.log("Popover onOpenChange called with:", newState);
+        setOpen(newState);
+      }}
+    >
+      <PopoverTrigger asChild className="cursor-pointer">
+        {/* Added a wrapping div for additional logging */}
+        <div onClick={() => console.log("PopoverTrigger wrapper clicked")}>
+          <Button
+            type="button"
+            variant="outline"
+            className={cn(
+              "w-full justify-start text-left cursor-pointer",
+              !value && "text-muted-foreground",
+              className,
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {value ? displayDate : "Pick a date"}
+          </Button>
+        </div>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 bg-black text-white rounded-2xl">
+      <PopoverContent
+        side="bottom"
+        align="start"
+        className="w-auto p-0 z-50 bg-black text-white rounded-md"
+      >
         <Calendar
           mode="single"
           selected={value}
           onSelect={(d) => {
-            if (d) onChange(d);
+            console.log("Calendar date selected:", d);
+            if (d) {
+              onChange(d);
+              console.log("Date changed. Closing popover.");
+              setOpen(false);
+            }
           }}
-          initialFocus
-          className="w-auto bg-black text-white rounded-2xl"
-          locale={locale} // Pass the locale down if Calendar supports it
+          // Removed initialFocus to prevent focus issues on Safari
+          className="bg-black text-white rounded-md"
         />
       </PopoverContent>
     </Popover>

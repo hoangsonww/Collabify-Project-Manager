@@ -8,10 +8,10 @@ import { ArrowUp } from "lucide-react";
 function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
 
-  // Show button when page is scrolled down 300px
+  // Show button when page is scrolled down 50px
   useEffect(() => {
     const toggleVisibility = () => {
-      setIsVisible(window.pageYOffset > 300);
+      setIsVisible(window.pageYOffset > 50);
     };
 
     window.addEventListener("scroll", toggleVisibility);
@@ -36,11 +36,11 @@ function BackToTop() {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           as={motion.button}
-          whileHover={{ scale: 1.1, transition: { duration: 0.2 } }}
+          whileHover={{ scale: 1.2 }}
           whileTap={{ scale: 0.95 }}
-          className="cursor-pointer p-3 rounded-full shadow-xl bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition-all duration-300"
+          className="cursor-pointer p-3 rounded-full shadow-xl bg-blue-500 hover:bg-blue-600 transition-colors duration-200"
         >
-          <ArrowUp className="h-5 w-5 text-white" />
+          <ArrowUp className="h-6 w-6 text-white" />
         </Button>
       )}
     </motion.div>

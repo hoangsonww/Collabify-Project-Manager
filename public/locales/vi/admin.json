@@ -3,7 +3,7 @@
   "adminTitle": "Collabify | Bảng Quản Trị",
   "adminMetaDesc": "Quản lý cài đặt hệ thống, vai trò người dùng và xem nhật ký hệ thống với Collabify.",
   "pleaseLoginViewPage": "Vui lòng đăng nhập để xem trang này.",
-  "noPermission": "Bạn không có quyền truy cập trang này. Chỉ quản trị viên mới có thể truy cập.",
+  "noPermission": "Bạn không có quyền truy cập trang này. Chỉ những người dùng có vai trò quản trị viên mới có thể truy cập trang này. Vui lòng <1>liên hệ với quản trị viên</1> để được cấp quyền.",
   "adminPanel": "Bảng Quản Trị",
   "manageSystemWide": "Quản lý cài đặt toàn hệ thống, vai trò người dùng và xem nhật ký hệ thống.",
   "userManagement": "Quản Lý Người Dùng",

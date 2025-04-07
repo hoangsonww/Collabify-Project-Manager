@@ -203,9 +203,11 @@ function AdminPageInternal() {
   const isAdmin = roleList.includes(roles.admin);
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-none text-white flex items-center justify-center">
+      <div className="min-h-screen bg-none text-white flex flex-col items-center justify-center">
         <p>
           <Trans i18nKey="noPermission">
+            {/* The content inside <Trans> is used as a default only if the key is missing */}
+            {/* Otherwise, the key's translation will be rendered */}
             You do not have permission to view this page. Only users with the
             admin role can access this page. Please{" "}
             <a

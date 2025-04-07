@@ -39,6 +39,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
+import { CustomTimePicker } from "@/components/ui/time-picker";
 import { format } from "date-fns";
 import { enUS, vi } from "date-fns/locale";
 
@@ -717,6 +718,11 @@ function ProjectDetailPageInternal({
     };
   }, [allTasks, t, currentLocale]);
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [removeMemberDialogOpen, setRemoveMemberDialogOpen] = useState(false);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
+
   // ====================================
   //   RENDER
   // ====================================
@@ -748,6 +754,7 @@ function ProjectDetailPageInternal({
               variant="destructive"
               onClick={() => setDeleteDialogOpen(true)}
               disabled={isDeletingProject}
+              className="cursor-pointer"
             >
               {isDeletingProject ? t("pleaseWait") : t("deleteProject")}
             </Button>
@@ -766,6 +773,7 @@ function ProjectDetailPageInternal({
                 variant="destructive"
                 onClick={handleDeleteProject}
                 disabled={isDeletingProject}
+                className="cursor-pointer"
               >
                 {isDeletingProject ? t("pleaseWait") : t("deleteProjectBtn")}
               </Button>
@@ -773,6 +781,7 @@ function ProjectDetailPageInternal({
                 variant="outline"
                 onClick={() => setDeleteDialogOpen(false)}
                 disabled={isDeletingProject}
+                className="cursor-pointer"
               >
                 {t("cancel")}
               </Button>
@@ -809,6 +818,7 @@ function ProjectDetailPageInternal({
                 <div className="flex gap-4 mt-4">
                   <Button
                     variant="destructive"
+                    className="cursor-pointer"
                     onClick={() => {
                       handleLeave();
                       setLeaveDialogOpen(false);
@@ -819,6 +829,7 @@ function ProjectDetailPageInternal({
                   </Button>
                   <Button
                     variant="outline"
+                    className="cursor-pointer"
                     onClick={() => setLeaveDialogOpen(false)}
                     disabled={isLeaving}
                   >
@@ -828,7 +839,11 @@ function ProjectDetailPageInternal({
               </DialogContent>
             </Dialog>
           ) : (
-            <Button onClick={handleJoin} disabled={isJoining}>
+            <Button
+              onClick={handleJoin}
+              disabled={isJoining}
+              className="cursor-pointer"
+            >
               {isJoining ? t("pleaseWait") : <LogIn className="h-4 w-4" />}
               &nbsp;{t("btnJoin")}
             </Button>
@@ -867,7 +882,7 @@ function ProjectDetailPageInternal({
                         value={assignee}
                         onValueChange={(v) => setAssignee(v)}
                       >
-                        <SelectTrigger className="bg-black text-white border border-white">
+                        <SelectTrigger className="bg-black text-white border border-white cursor-pointer">
                           <SelectValue
                             placeholder={t("selectMemberOptional") || ""}
                           />
@@ -877,7 +892,7 @@ function ProjectDetailPageInternal({
                             <SelectItem
                               key={m.userSub}
                               value={m.userSub}
-                              className="text-white"
+                              className="text-white cursor-pointer"
                             >
                               {m.displayName}
                             </SelectItem>
@@ -893,13 +908,19 @@ function ProjectDetailPageInternal({
                           setNewPriority(v as "low" | "medium" | "high")
                         }
                       >
-                        <SelectTrigger className="bg-black text-white border border-white">
+                        <SelectTrigger className="bg-black text-white border border-white cursor-pointer">
                           <SelectValue placeholder="medium" />
                         </SelectTrigger>
                         <SelectContent className="bg-black text-white border border-white">
-                          <SelectItem value="low">{t("low")}</SelectItem>
-                          <SelectItem value="medium">{t("medium")}</SelectItem>
-                          <SelectItem value="high">{t("high")}</SelectItem>
+                          <SelectItem className="cursor-pointer" value="low">
+                            {t("low")}
+                          </SelectItem>
+                          <SelectItem className="cursor-pointer" value="medium">
+                            {t("medium")}
+                          </SelectItem>
+                          <SelectItem className="cursor-pointer" value="high">
+                            {t("high")}
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -915,15 +936,17 @@ function ProjectDetailPageInternal({
                       </div>
                       <div className="flex-1">
                         <Label className="mb-2">{t("dueTime")}</Label>
-                        <Input
-                          type="time"
+                        <CustomTimePicker
                           value={newDueTime}
-                          onChange={(e) => setNewDueTime(e.target.value)}
-                          className="w-full bg-black text-white border border-white"
+                          onChange={setNewDueTime}
                         />
                       </div>
                     </div>
-                    <Button type="submit" disabled={isAddingTask}>
+                    <Button
+                      type="submit"
+                      className="cursor-pointer"
+                      disabled={isAddingTask}
+                    >
                       {isAddingTask ? t("pleaseWait") : t("createTaskBtn")}
                     </Button>
                   </form>
@@ -948,6 +971,7 @@ function ProjectDetailPageInternal({
                     className="bg-black border border-white text-white"
                   />
                   <Button
+                    className="cursor-pointer"
                     onClick={() => {
                       navigator.clipboard.writeText(localProject.projectId);
                       toast.success(t("copiedIdMsg"));
@@ -1243,7 +1267,7 @@ function ProjectDetailPageInternal({
               open={!!taskToDelete && deleteDialogOpen}
               onOpenChange={setDeleteDialogOpen}
             >
-              <DialogContent className="bg-black border border-white text-white">
+              <DialogContent className="">
                 <DialogHeader>
                   <DialogTitle>{t("deleteTaskConfirmTitle")}</DialogTitle>
                   <DialogDescription>
@@ -1257,6 +1281,7 @@ function ProjectDetailPageInternal({
                     variant="destructive"
                     onClick={handleDeleteTask}
                     disabled={isDeletingTask}
+                    className="cursor-pointer"
                   >
                     {isDeletingTask ? t("pleaseWait") : t("deleteTaskBtn")}
                   </Button>
@@ -1264,6 +1289,7 @@ function ProjectDetailPageInternal({
                     variant="outline"
                     onClick={() => setDeleteDialogOpen(false)}
                     disabled={isDeletingTask}
+                    className="cursor-pointer"
                   >
                     {t("cancel")}
                   </Button>
@@ -1293,7 +1319,7 @@ function ProjectDetailPageInternal({
                       value={taskAssigneeEdit}
                       onValueChange={(v) => setTaskAssigneeEdit(v)}
                     >
-                      <SelectTrigger className="bg-black text-white border border-white">
+                      <SelectTrigger className="bg-black text-white border border-white cursor-pointer">
                         <SelectValue
                           placeholder={t("selectMemberOptional") || ""}
                         />
@@ -1303,7 +1329,7 @@ function ProjectDetailPageInternal({
                           <SelectItem
                             key={m.userSub}
                             value={m.userSub}
-                            className="text-white"
+                            className="text-white cursor-pointer"
                           >
                             {m.displayName}
                           </SelectItem>
@@ -1319,17 +1345,26 @@ function ProjectDetailPageInternal({
                         setTaskPriorityEdit(v as "low" | "medium" | "high")
                       }
                     >
-                      <SelectTrigger className="bg-black text-white border border-white">
+                      <SelectTrigger className="bg-black text-white border border-white cursor-pointer">
                         <SelectValue placeholder="medium" />
                       </SelectTrigger>
                       <SelectContent className="bg-black text-white border border-white">
-                        <SelectItem value="low" className="text-white">
+                        <SelectItem
+                          value="low"
+                          className="text-white cursor-pointer"
+                        >
                           {t("low")}
                         </SelectItem>
-                        <SelectItem value="medium" className="text-white">
+                        <SelectItem
+                          value="medium"
+                          className="text-white cursor-pointer"
+                        >
                           {t("medium")}
                         </SelectItem>
-                        <SelectItem value="high" className="text-white">
+                        <SelectItem
+                          value="high"
+                          className="text-white cursor-pointer"
+                        >
                           {t("high")}
                         </SelectItem>
                       </SelectContent>
@@ -1347,17 +1382,16 @@ function ProjectDetailPageInternal({
                     </div>
                     <div className="flex-1">
                       <Label className="mb-2">{t("dueTime")}</Label>
-                      <Input
-                        type="time"
+                      <CustomTimePicker
                         value={taskDueTimeEdit}
-                        onChange={(e) => setTaskDueTimeEdit(e.target.value)}
-                        className="w-full bg-black text-white border border-white"
+                        onChange={setTaskDueTimeEdit}
+                        className="w-full"
                       />
                     </div>
                   </div>
                   <Button
                     type="submit"
-                    className="w-full"
+                    className="w-full cursor-pointer"
                     disabled={isSavingTask}
                   >
                     {isSavingTask ? t("pleaseWait") : t("saveChanges")}
@@ -1401,15 +1435,18 @@ function ProjectDetailPageInternal({
                               onClick={() =>
                                 handleOpenRoleDialog(m.userSub, m.role)
                               }
-                              className="text-white border-white"
+                              className="text-white border-white cursor-pointer"
                             >
                               {t("editRole")}
                             </Button>
                             <Button
                               size="sm"
                               variant="destructive"
-                              onClick={() => handleRemoveMember(m.userSub)}
-                              className="text-white"
+                              onClick={() => {
+                                setMemberToRemove(m.userSub);
+                                setRemoveMemberDialogOpen(true);
+                              }}
+                              className="text-white cursor-pointer"
                               disabled={m.userSub === userSub} // can't remove yourself
                             >
                               {t("remove")}
@@ -1425,6 +1462,45 @@ function ProjectDetailPageInternal({
           </>
         )}
 
+        <Dialog
+          open={removeMemberDialogOpen}
+          onOpenChange={setRemoveMemberDialogOpen}
+        >
+          <DialogContent className="bg-black border border-white text-white">
+            <DialogHeader>
+              <DialogTitle>{t("confirmRemoveMemberTitle")}</DialogTitle>
+              <DialogDescription>
+                {t("confirmRemoveMemberDesc")}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-4 mt-4">
+              <Button
+                variant="destructive"
+                className="cursor-pointer"
+                onClick={() => {
+                  if (memberToRemove) {
+                    handleRemoveMember(memberToRemove);
+                  }
+                  setRemoveMemberDialogOpen(false);
+                  setMemberToRemove(null);
+                }}
+              >
+                {t("remove")}
+              </Button>
+              <Button
+                variant="outline"
+                className="cursor-pointer"
+                onClick={() => {
+                  setRemoveMemberDialogOpen(false);
+                  setMemberToRemove(null);
+                }}
+              >
+                {t("cancel")}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         {/* ROLE ASSIGNMENT DIALOG */}
         <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
           <DialogContent className="bg-black border border-white text-white">
@@ -1438,17 +1514,26 @@ function ProjectDetailPageInternal({
                 setNewRole(v as "manager" | "editor" | "viewer")
               }
             >
-              <SelectTrigger className="bg-black text-white border border-white">
+              <SelectTrigger className="bg-black text-white border border-white cursor-pointer">
                 <SelectValue placeholder="Role" />
               </SelectTrigger>
               <SelectContent className="bg-black text-white border border-white">
-                <SelectItem value="manager" className="text-white">
+                <SelectItem
+                  value="manager"
+                  className="text-white cursor-pointer"
+                >
                   {t("manager")}
                 </SelectItem>
-                <SelectItem value="editor" className="text-white">
+                <SelectItem
+                  value="editor"
+                  className="text-white cursor-pointer"
+                >
                   {t("editor")}
                 </SelectItem>
-                <SelectItem value="viewer" className="text-white">
+                <SelectItem
+                  value="viewer"
+                  className="text-white cursor-pointer"
+                >
                   {t("viewer")}
                 </SelectItem>
               </SelectContent>
@@ -1456,11 +1541,16 @@ function ProjectDetailPageInternal({
             <div className="flex gap-4 mt-4">
               <Button
                 variant="outline"
+                className="cursor-pointer"
                 onClick={() => setRoleDialogOpen(false)}
               >
                 {t("cancel")}
               </Button>
-              <Button variant="destructive" onClick={handleSaveRole}>
+              <Button
+                variant="destructive"
+                className="cursor-pointer"
+                onClick={handleSaveRole}
+              >
                 {t("saveChanges")}
               </Button>
             </div>
