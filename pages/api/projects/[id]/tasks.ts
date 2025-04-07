@@ -35,7 +35,7 @@ export default async function handler(
   }
 
   if (req.method === "POST") {
-    const { _id, title, assignedTo, priority } = req.body;
+    const { _id, title, assignedTo, priority, dueDate } = req.body;
     if (!title) {
       return res.status(400).json({ error: "Task title is required" });
     }
@@ -45,12 +45,12 @@ export default async function handler(
       title,
       status: "todo",
       assignedTo: assignedTo || null,
-      priority: priority || "medium", // if you want to allow specifying priority
+      priority: priority || "medium",
+      dueDate: dueDate ? new Date(dueDate) : new Date(),
     });
 
     await project.save();
 
-    // Return updated
     return res.status(201).json({
       ...project.toObject(),
       _id: project._id.toString(),
@@ -62,10 +62,10 @@ export default async function handler(
         status: t.status,
         assignedTo: t.assignedTo,
         priority: t.priority,
+        dueDate: t.dueDate,
       })),
     });
   }
 
-  // ...
   return res.status(405).json({ error: "Method not allowed" });
 }

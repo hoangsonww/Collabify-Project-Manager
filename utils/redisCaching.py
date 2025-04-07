@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-redis_cache.py
+redis_caching.py
 
 A detailed Redis caching module for a Collabify‑like application.
 It provides:

@@ -14,8 +14,10 @@ import {
   LinearScale,
   Tooltip,
   Legend,
+  PointElement,
+  LineElement,
 } from "chart.js";
-import { Bar, Pie } from "react-chartjs-2";
+import { Bar, Pie, Line } from "react-chartjs-2";
 import { nanoid } from "nanoid";
 
 import { Button } from "@/components/ui/button";
@@ -36,6 +38,9 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
+import { format } from "date-fns";
+import { enUS, vi } from "date-fns/locale";
 
 import {
   ClipboardCopy,
@@ -64,6 +69,8 @@ ChartJS.register(
   LinearScale,
   Tooltip,
   Legend,
+  LineElement,
+  PointElement,
 );
 
 // ============ Types ============
@@ -111,7 +118,8 @@ function ProjectDetailPageInternal({
   isAdmin: boolean;
 }) {
   const router = useRouter();
-  const { t } = useTranslation("projectDetail");
+  const { t, i18n } = useTranslation("projectDetail");
+  const currentLocale = i18n.language === "vi" ? vi : enUS;
 
   // Local copy of the project (for tasks)
   const [localProject, setLocalProject] = useState<IProject | null>(project);
@@ -156,6 +164,8 @@ function ProjectDetailPageInternal({
   } | null>(null);
   const [isDeletingTask, setIsDeletingTask] = useState(false);
   const [isSavingTask, setIsSavingTask] = useState(false);
+  const [taskDueDateEdit, setTaskDueDateEdit] = useState<Date>(new Date());
+  const [taskDueTimeEdit, setTaskDueTimeEdit] = useState<string>("12:00");
 
   // ============= Join/Leave states =============
   const [isJoining, setIsJoining] = useState(false);
@@ -169,6 +179,41 @@ function ProjectDetailPageInternal({
   const myMembership = memberships.find((m) => m.userSub === userSub);
   const isMember = !!myMembership;
   const isManager = myMembership?.role === "manager" || isAdmin;
+
+  // ============= TIME LEFT FOR TASKS =============
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [timeLeftMap, setTimeLeftMap] = useState<Record<string, string>>({});
+  const [newDueDate, setNewDueDate] = useState(new Date());
+  const [newDueTime, setNewDueTime] = useState<string>("12:00");
+
+  const getTimeLeft = (dueDate: string): string => {
+    const now = Date.now();
+    const due = new Date(dueDate).getTime();
+    const diff = due - now;
+    if (diff < 0) return "overdue";
+    if (diff < 60000) return `${Math.floor(diff / 1000)} seconds left`;
+    if (diff < 3600000) return `${Math.floor(diff / 60000)} minutes left`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)} hours left`;
+    return `${Math.floor(diff / 86400000)} days left`;
+  };
+
+  useEffect(() => {
+    if (!localProject || !localProject.tasks) return;
+    const interval = setInterval(() => {
+      const newMap: Record<string, string> = {};
+      localProject.tasks.forEach((task) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        if (task.dueDate) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          newMap[task._id] = getTimeLeft(task.dueDate);
+        }
+      });
+      setTimeLeftMap(newMap);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [localProject]);
 
   // ============= Fetch Membership & user info =============
   useEffect(() => {
@@ -286,6 +331,11 @@ function ProjectDetailPageInternal({
     setIsAddingTask(true);
     try {
       const taskId = nanoid();
+      // Combine date and time: create a new Date object using the selected date and due time.
+      const [hours, minutes] = newDueTime.split(":").map(Number);
+      const combinedDueDate = new Date(newDueDate);
+      combinedDueDate.setHours(hours, minutes, 0, 0);
+
       const res = await fetch(`/api/projects/${localProject.projectId}/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -294,6 +344,7 @@ function ProjectDetailPageInternal({
           title: newTask,
           assignedTo: assignee || null,
           priority: newPriority,
+          dueDate: combinedDueDate.toISOString(),
         }),
       });
       if (!res.ok) throw new Error("Task creation failed");
@@ -364,6 +415,7 @@ function ProjectDetailPageInternal({
     currentTitle: string,
     currentAssignee: string | null,
     currentPriority: "low" | "medium" | "high" = "medium",
+    currentDueDate?: string,
   ) => {
     if (myMembership?.role === "viewer") {
       toast.error(t("viewerCannotEditTask"));
@@ -373,13 +425,31 @@ function ProjectDetailPageInternal({
     setTaskTitleEdit(currentTitle);
     setTaskAssigneeEdit(currentAssignee || "");
     setTaskPriorityEdit(currentPriority);
+    if (currentDueDate) {
+      const parsedDate = new Date(currentDueDate);
+      setTaskDueDateEdit(parsedDate);
+      const hh = parsedDate.getHours().toString().padStart(2, "0");
+      const mm = parsedDate.getMinutes().toString().padStart(2, "0");
+      setTaskDueTimeEdit(`${hh}:${mm}`);
+    } else {
+      // Default to now:
+      const now = new Date();
+      setTaskDueDateEdit(now);
+      const hh = now.getHours().toString().padStart(2, "0");
+      const mm = now.getMinutes().toString().padStart(2, "0");
+      setTaskDueTimeEdit(`${hh}:${mm}`);
+    }
     setEditDialogOpen(true);
   };
+
   const handleSaveTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingTaskId) return;
     setIsSavingTask(true);
     try {
+      const [hours, minutes] = taskDueTimeEdit.split(":").map(Number);
+      const combinedDueDate = new Date(taskDueDateEdit);
+      combinedDueDate.setHours(hours, minutes, 0, 0);
       const res = await fetch(
         `/api/projects/${localProject.projectId}/tasks/${editingTaskId}`,
         {
@@ -389,6 +459,7 @@ function ProjectDetailPageInternal({
             title: taskTitleEdit,
             assignedTo: taskAssigneeEdit || null,
             priority: taskPriorityEdit,
+            dueDate: combinedDueDate.toISOString(),
           }),
         },
       );
@@ -401,6 +472,8 @@ function ProjectDetailPageInternal({
       setTaskTitleEdit("");
       setTaskAssigneeEdit("");
       setTaskPriorityEdit("medium");
+      setTaskDueDateEdit(new Date());
+      setTaskDueTimeEdit("12:00");
     } catch {
       toast.error(t("errorUpdatingTask"));
     }
@@ -572,6 +645,78 @@ function ProjectDetailPageInternal({
     };
   }, [localProject, memberships, t]);
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const allTasks = useMemo(() => {
+    return localProject ? localProject.tasks || [] : [];
+  }, [localProject]);
+
+  // NEW: Chart Data – Tasks by Due Date (Line Chart)
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const tasksByDueDateLineData = useMemo(() => {
+    const groups: Record<string, number> = {};
+    allTasks.forEach((task: ITask) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (task.dueDate) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const d = new Date(task.dueDate);
+        // Format date using date-fns with dynamic locale
+        const dateStr = format(d, "PP", { locale: currentLocale });
+        groups[dateStr] = (groups[dateStr] || 0) + 1;
+      }
+    });
+    // Sort labels chronologically
+    const labels = Object.keys(groups).sort(
+      (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+    );
+    const data = labels.map((label) => groups[label]);
+    return {
+      labels,
+      datasets: [
+        {
+          label: t("tasksByDueDateLine"),
+          data,
+          borderColor: "#10b981",
+          backgroundColor: "rgba(16,185,129,0.4)",
+          tension: 0.3,
+          fill: true,
+        },
+      ],
+    };
+  }, [allTasks, t, currentLocale]);
+
+  // NEW: Chart Data – Tasks by Due Date (Horizontal Bar Chart)
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const tasksByDueDateBarData = useMemo(() => {
+    const groups: Record<string, number> = {};
+    allTasks.forEach((task: ITask) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (task.dueDate) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const d = new Date(task.dueDate);
+        const dateStr = format(d, "PP", { locale: currentLocale });
+        groups[dateStr] = (groups[dateStr] || 0) + 1;
+      }
+    });
+    const labels = Object.keys(groups).sort(
+      (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+    );
+    const data = labels.map((label) => groups[label]);
+    return {
+      labels,
+      datasets: [
+        {
+          label: t("tasksByDueDateBar"),
+          data,
+          backgroundColor: "#facc15",
+        },
+      ],
+    };
+  }, [allTasks, t, currentLocale]);
+
   // ====================================
   //   RENDER
   // ====================================
@@ -604,16 +749,16 @@ function ProjectDetailPageInternal({
               onClick={() => setDeleteDialogOpen(true)}
               disabled={isDeletingProject}
             >
-              {isDeletingProject ? t("pleaseWait") : "Delete Project"}
+              {isDeletingProject ? t("pleaseWait") : t("deleteProject")}
             </Button>
           </motion.div>
         )}
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <DialogContent className="bg-black border border-white text-white">
             <DialogHeader>
-              <DialogTitle>Confirm Project Deletion</DialogTitle>
+              <DialogTitle>{t("deleteProjectConfirmTitle")}</DialogTitle>
               <DialogDescription>
-                Are you sure you want to delete this entire project?
+                {t("deleteProjectConfirmDesc")}
               </DialogDescription>
             </DialogHeader>
             <div className="flex gap-4 mt-4">
@@ -622,7 +767,7 @@ function ProjectDetailPageInternal({
                 onClick={handleDeleteProject}
                 disabled={isDeletingProject}
               >
-                {isDeletingProject ? t("pleaseWait") : "Delete"}
+                {isDeletingProject ? t("pleaseWait") : t("deleteProjectBtn")}
               </Button>
               <Button
                 variant="outline"
@@ -691,7 +836,6 @@ function ProjectDetailPageInternal({
 
           {isMember && myMembership?.role !== "viewer" && (
             <>
-              {/* Add Task Dialog */}
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                   <Button variant="outline" className="cursor-pointer">
@@ -742,7 +886,7 @@ function ProjectDetailPageInternal({
                       </Select>
                     </div>
                     <div>
-                      <Label className="mb-2">Priority</Label>
+                      <Label className="mb-2">{t("priority")}</Label>
                       <Select
                         value={newPriority}
                         onValueChange={(v) =>
@@ -758,6 +902,26 @@ function ProjectDetailPageInternal({
                           <SelectItem value="high">{t("high")}</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+                    <div className="flex flex-col md:flex-row md:items-center md:gap-2 space-y-2 md:space-y-0">
+                      <div className="flex-1">
+                        <Label className="mb-2">{t("dueDate")}</Label>
+                        <DatePicker
+                          value={newDueDate}
+                          onChange={(date) => setNewDueDate(date)}
+                          className="w-full"
+                          locale={currentLocale}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <Label className="mb-2">{t("dueTime")}</Label>
+                        <Input
+                          type="time"
+                          value={newDueTime}
+                          onChange={(e) => setNewDueTime(e.target.value)}
+                          className="w-full bg-black text-white border border-white"
+                        />
+                      </div>
                     </div>
                     <Button type="submit" disabled={isAddingTask}>
                       {isAddingTask ? t("pleaseWait") : t("createTaskBtn")}
@@ -859,6 +1023,37 @@ function ProjectDetailPageInternal({
                 </h2>
                 <Bar data={tasksByAssigneeData} options={chartOptions} />
               </motion.div>
+
+              {/* New: Tasks by Due Date (Line Chart) */}
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+                className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
+              >
+                <h2 className="text-lg font-semibold mb-4 text-white">
+                  {t("tasksByDueDateLine")}
+                </h2>
+                <Line data={tasksByDueDateLineData} options={chartOptions} />
+              </motion.div>
+
+              {/* New: Tasks by Due Date (Horizontal Bar Chart) */}
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+                className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
+              >
+                <h2 className="text-lg font-semibold mb-4 text-white">
+                  {t("tasksByDueDateBar")}
+                </h2>
+                <Bar
+                  data={tasksByDueDateBarData}
+                  options={{ ...chartOptions, indexAxis: "y" }}
+                />
+              </motion.div>
             </motion.div>
 
             {/* TASKS TABLE */}
@@ -877,6 +1072,7 @@ function ProjectDetailPageInternal({
                       <th className="p-2 text-left">{t("title")}</th>
                       <th className="p-2 text-left">{t("status")}</th>
                       <th className="p-2 text-left">{t("priority")}</th>
+                      <th className="p-2 text-left">Due</th>
                       <th className="p-2 text-left">{t("assignee")}</th>
                       <th className="p-2 text-left">{t("action")}</th>
                     </tr>
@@ -917,8 +1113,50 @@ function ProjectDetailPageInternal({
                               {t(`statuses.${task.status}`)}
                             </span>
                           </td>
+
                           <td className={`p-2 capitalize ${colorByPriority}`}>
                             {t(`priorities.${task.priority}`)}
+                          </td>
+
+                          <td className="p-2">
+                            {(() => {
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              // @ts-ignore
+                              const dueDate = task.dueDate
+                                ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                  // @ts-ignore
+                                  new Date(task.dueDate)
+                                : new Date();
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              // @ts-ignore
+                              const timeLeftText = task.dueDate
+                                ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                  // @ts-ignore
+                                  getTimeLeft(task.dueDate)
+                                : getTimeLeft(new Date().toISOString());
+                              const isOverdue =
+                                timeLeftText.toLowerCase() === "overdue";
+                              const currentLocale =
+                                i18n.language === "vi" ? vi : enUS;
+                              return (
+                                <span>
+                                  {format(dueDate, "PP", {
+                                    locale: currentLocale,
+                                  })}{" "}
+                                  (
+                                  <span
+                                    className={
+                                      isOverdue
+                                        ? "text-red-500"
+                                        : "text-green-500"
+                                    }
+                                  >
+                                    {timeLeftText}
+                                  </span>
+                                  )
+                                </span>
+                              );
+                            })()}
                           </td>
 
                           <td className="p-2 text-white">
@@ -932,6 +1170,7 @@ function ProjectDetailPageInternal({
                                 )?.displayName || task.assignedTo
                               : "-"}
                           </td>
+
                           <td className="p-2 flex gap-2 items-center">
                             {/* Toggle Button */}
                             <Button
@@ -1096,6 +1335,26 @@ function ProjectDetailPageInternal({
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="flex flex-col md:flex-row md:items-center md:gap-2 space-y-2 md:space-y-0">
+                    <div className="flex-1">
+                      <Label className="mb-2">{t("dueDate")}</Label>
+                      <DatePicker
+                        value={taskDueDateEdit}
+                        onChange={setTaskDueDateEdit}
+                        className="w-full"
+                        locale={currentLocale}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Label className="mb-2">{t("dueTime")}</Label>
+                      <Input
+                        type="time"
+                        value={taskDueTimeEdit}
+                        onChange={(e) => setTaskDueTimeEdit(e.target.value)}
+                        className="w-full bg-black text-white border border-white"
+                      />
+                    </div>
+                  </div>
                   <Button
                     type="submit"
                     className="w-full"
@@ -1238,7 +1497,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const found = await Project.findOne({ projectId }).lean();
   if (!found) return { props: { userSub, isAdmin, project: null } };
 
-  // Convert to plain object
+  // Convert to plain object and serialize the dueDate field as a string
   const project: IProject = {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -1263,6 +1522,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       status: t.status,
       assignedTo: t.assignedTo || null,
       priority: t.priority || "medium",
+      dueDate: t.dueDate ? new Date(t.dueDate).toISOString() : null,
     })),
   };
 

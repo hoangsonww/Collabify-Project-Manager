@@ -109,6 +109,12 @@ Collabify features a modern and user-friendly interface designed to enhance prod
   <img src="img/dashboard.png" alt="Dashboard Page" width="100%" style="border-radius: 8px">
 </p>
 
+### Dashboard - Vietnamese
+
+<p align="center">
+  <img src="img/dashboard-viet.png" alt="Dashboard Page - Vietnamese" width="100%" style="border-radius: 8px">
+</p>
+
 ### Project List Page
 
 <p align="center">
@@ -119,6 +125,18 @@ Collabify features a modern and user-friendly interface designed to enhance prod
 
 <p align="center">
   <img src="img/project-details.png" alt="Project Detail Page" width="100%" style="border-radius: 8px">
+</p>
+
+### Project Details Page - Vietnamese
+
+<p align="center">
+  <img src="img/project-details-viet.png" alt="Project Detail Page - Vietnamese" width="100%" style="border-radius: 8px">
+</p>
+
+### Tasks Table
+
+<p align="center">
+  <img src="img/tasks-table.png" alt="Tasks Page" width="100%" style="border-radius: 8px">
 </p>
 
 ### Admin Panel

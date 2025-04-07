@@ -19,6 +19,8 @@ import {
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import Head from "next/head";
+import { format } from "date-fns";
+import { enUS, vi } from "date-fns/locale";
 
 // === (1) IMPORT i18next + dynamic ===
 import { useTranslation } from "react-i18next";
@@ -75,9 +77,10 @@ function DashboardPageInternal({
   largestProjectName,
   smallestProjectName,
   projectStats = [],
-  allProjects, // <-- add this
+  allProjects,
 }: DashboardProps) {
-  const { t } = useTranslation("dashboard");
+  const { t, i18n } = useTranslation("dashboard");
+  const currentLocale = i18n.language === "vi" ? vi : enUS;
 
   if (!userSub) {
     return (
@@ -279,6 +282,72 @@ function DashboardPageInternal({
     };
   }, [allTasks, t]);
 
+  // Aggregate tasks by due date (if missing, default to today)
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const tasksByDueDateCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    const today = new Date();
+    allTasks.forEach((task: ITask) => {
+      const due = task.dueDate ? new Date(task.dueDate) : today;
+      // Format the date using date-fns with dynamic locale
+      const formatted = format(due, "PP", { locale: currentLocale });
+      counts[formatted] = (counts[formatted] || 0) + 1;
+    });
+    return counts;
+  }, [allTasks, currentLocale]);
+
+  // Line Chart: Tasks by Due Date
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const lineTasksByDueDateData = useMemo(() => {
+    const labels = Object.keys(tasksByDueDateCounts).sort(
+      (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+    );
+    const data = labels.map((label) => tasksByDueDateCounts[label]);
+    return {
+      labels,
+      datasets: [
+        {
+          label: t("tasksByDueDateLine"),
+          data,
+          borderColor: "#4ade80",
+          backgroundColor: "rgba(74,222,128,0.5)",
+          tension: 0.4,
+          fill: false,
+          pointRadius: 4,
+        },
+      ],
+    };
+  }, [tasksByDueDateCounts, t]);
+
+  // Horizontal Bar Chart: Tasks by Due Date
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const horizontalBarTasksByDueDateData = useMemo(() => {
+    const labels = Object.keys(tasksByDueDateCounts).sort(
+      (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+    );
+    const data = labels.map((label) => tasksByDueDateCounts[label]);
+    return {
+      labels,
+      datasets: [
+        {
+          label: t("tasksByDueDateBar"),
+          data,
+          backgroundColor: "#facc15",
+        },
+      ],
+    };
+  }, [tasksByDueDateCounts, t]);
+
+  // Horizontal Bar Chart Options (for y-axis)
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const horizontalBarChartOptions = useMemo(
+    () => ({
+      ...chartOptions,
+      indexAxis: "y" as const,
+    }),
+    [chartOptions],
+  );
+
   // Animation variants
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -454,6 +523,32 @@ function DashboardPageInternal({
             </h2>
             <Line data={lineTasksByPriorityData} options={chartOptions} />
           </motion.div>
+
+          {/* New: Line Chart for Tasks by Due Date */}
+          {/* New: Line Chart for Tasks by Due Date */}
+          <motion.div
+            variants={chartVariants}
+            className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
+          >
+            <h2 className="text-lg font-semibold mb-4 text-white">
+              {t("tasksByDueDate")}
+            </h2>
+            <Line data={lineTasksByDueDateData} options={chartOptions} />
+          </motion.div>
+
+          {/* New: Horizontal Bar Chart for Tasks by Due Date */}
+          <motion.div
+            variants={chartVariants}
+            className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
+          >
+            <h2 className="text-lg font-semibold mb-4 text-white">
+              {t("tasksByDueDate")}
+            </h2>
+            <Bar
+              data={horizontalBarTasksByDueDateData}
+              options={horizontalBarChartOptions}
+            />
+          </motion.div>
         </motion.div>
 
         {/* Table of Top 5 Projects by tasks */}
@@ -512,7 +607,11 @@ function DashboardPageInternal({
 // =============================================================
 // SERVER-SIDE PROPS
 // =============================================================
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+  params,
+}) => {
   const session = await getSession(req, res);
   if (!session?.user) {
     return {
@@ -546,14 +645,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const allProjects = await Project.find(query);
 
   // Serialize allProjects for use in charts (with tasks and membership)
-  // Serialize allProjects for use in charts (with tasks and membership)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const allProjectsSerialized = allProjects.map((p: any) => ({
     _id: p._id.toString(),
     projectId: p.projectId,
     name: p.name,
     description: p.description || "",
-    // Convert membership array entries to plain objects
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     membership: (p.membership || []).map((m: any) => ({
       userSub: m.userSub,
@@ -566,6 +663,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       status: t.status,
       assignedTo: t.assignedTo || null,
       priority: t.priority || "medium",
+      dueDate: t.dueDate
+        ? new Date(t.dueDate).toISOString()
+        : new Date().toISOString(),
     })),
   }));
 
@@ -606,12 +706,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     };
   });
 
-  // Sort descending by totalTasks to get top 5 projects
   const topProjects = [...projectStats]
     .sort((a, b) => b.totalTasks - a.totalTasks)
     .slice(0, 5);
 
-  // Determine largest/smallest project names
   let largestProjectName = "";
   let smallestProjectName = "";
   if (projectStats.length > 0) {
@@ -622,7 +720,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     smallestProjectName = sorted[sorted.length - 1].name;
   }
 
-  // Count tasks overall
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   allProjectsSerialized.forEach((project: any) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -634,13 +731,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     });
   });
 
-  // If a specific project is requested in the URL, load it.
+  // Use params for the dynamic route
+  const projectIdParam = params?.id;
   let project = null;
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const { id } = req.params || {};
-  if (id && typeof id === "string") {
-    const found = await Project.findOne({ projectId: id }).lean();
+  if (projectIdParam && typeof projectIdParam === "string") {
+    const found = await Project.findOne({ projectId: projectIdParam }).lean();
     if (found) {
       project = {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -666,6 +761,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
           status: t.status,
           assignedTo: t.assignedTo || null,
           priority: t.priority || "medium",
+          dueDate: t.dueDate
+            ? new Date(t.dueDate).toISOString()
+            : new Date().toISOString(),
         })),
       };
     }

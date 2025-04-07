@@ -97,5 +97,13 @@
   "onlyManagerCanRemoveMembers": "Chỉ người quản lý mới có thể xóa thành viên này",
   "cannotRemoveYourself": "Bạn không thể xóa chính mình khỏi dự án này",
   "memberRemoved": "Thành viên đã được xóa",
-  "errorRemovingMember": "Không thể xóa thành viên này"
+  "errorRemovingMember": "Không thể xóa thành viên này",
+  "tasksByDueDateBar": "Nhiệm Vụ Theo Ngày Hết Hạn",
+  "tasksByDueDateLine": "Nhiệm Vụ Theo Ngày Hết Hạn",
+  "deleteProject": "Xóa Dự Án",
+  "deleteProjectConfirmTitle": "Xác Nhận Xóa Dự Án",
+  "deleteProjectConfirmDesc": "Bạn có chắc muốn xóa dự án này không? Tất cả dữ liệu sẽ bị mất.",
+  "deleteProjectBtn": "Xóa Dự Án",
+  "dueDate": "Ngày Hết Hạn",
+  "dueTime": "Thời Gian Hết Hạn"
 }

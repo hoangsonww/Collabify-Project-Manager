@@ -1,3 +1,5 @@
+"use client";
+
 import type { AppProps } from "next/app";
 import { UserProvider } from "@auth0/nextjs-auth0/client";
 import "@/styles/globals.css";
@@ -7,6 +9,7 @@ import { Toaster } from "sonner";
 import "../i18n";
 import { Suspense } from "react";
 import Head from "next/head";
+import BackToTop from "@/components/BackToTop";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -24,15 +27,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <UserProvider>
           <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors">
             <NavBar />
-
             <main className="flex-grow container mx-auto p-4">
               <Component {...pageProps} />
             </main>
-
             <Footer />
-
             {/* Sonner Toast Portal */}
             <Toaster position="bottom-right" richColors closeButton />
+            {/* Back to Top Button */}
+            <BackToTop />
           </div>
         </UserProvider>
       </Suspense>

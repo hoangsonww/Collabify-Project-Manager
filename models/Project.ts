@@ -5,7 +5,8 @@ export interface ITask {
   title: string;
   status: "todo" | "in-progress" | "done";
   assignedTo?: string | null;
-  priority?: "low" | "medium" | "high"; // NEW
+  priority?: "low" | "medium" | "high";
+  dueDate?: Date;
 }
 
 export interface IMembership {
@@ -38,6 +39,7 @@ const TaskSchema = new Schema<ITask>(
       enum: ["low", "medium", "high"],
       default: "medium",
     },
+    dueDate: { type: Date }, // NEW
   },
   { _id: false },
 );

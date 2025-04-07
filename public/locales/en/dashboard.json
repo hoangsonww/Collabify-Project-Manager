@@ -23,6 +23,9 @@
   "projectName": "Project Name",
   "tasksCreated": "Tasks Created",
   "tasksByPriority": "Tasks by Priority",
+  "tasksByDueDate": "Tasks by Due Date",
+  "tasksByDueDateBar": "Tasks by Due Date",
+  "tasksByDueDateLine": "Tasks by Due Date",
   "high": "High",
   "medium": "Medium",
   "low": "Low"

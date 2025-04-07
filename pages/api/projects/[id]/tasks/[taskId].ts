@@ -53,12 +53,13 @@ export default async function handler(
       status: task.status,
       assignedTo: task.assignedTo || null,
       priority: task.priority || "medium",
+      dueDate: task.dueDate ? task.dueDate.toISOString() : null,
     });
   }
 
   // -------- PUT: Update a task --------
   if (req.method === "PUT") {
-    const { title, assignedTo, priority } = req.body;
+    const { title, assignedTo, priority, dueDate } = req.body;
     if (!title || typeof title !== "string") {
       return res.status(400).json({ error: "Invalid task title" });
     }
@@ -78,10 +79,14 @@ export default async function handler(
     project.tasks[taskIndex].title = title;
     project.tasks[taskIndex].assignedTo = assignedTo || null;
     project.tasks[taskIndex].priority = priority || "medium";
+    if (dueDate) {
+      project.tasks[taskIndex].dueDate = new Date(dueDate);
+    } else {
+      project.tasks[taskIndex].dueDate = undefined;
+    }
 
     await project.save();
 
-    // Return the updated project (with tasks mapped)
     const updated = {
       _id: project._id.toString(),
       projectId: project.projectId,
@@ -95,6 +100,7 @@ export default async function handler(
         status: t.status,
         assignedTo: t.assignedTo || null,
         priority: t.priority || "medium",
+        dueDate: t.dueDate ? t.dueDate.toISOString() : null,
       })),
     };
 
@@ -126,12 +132,13 @@ export default async function handler(
         status: t.status,
         assignedTo: t.assignedTo || null,
         priority: t.priority || "medium",
+        dueDate: t.dueDate ? t.dueDate.toISOString() : null,
       })),
     };
 
     return res.status(200).json(updated);
   }
 
-  // Fallback
+  // Fallback for disallowed methods
   return res.status(405).json({ error: "Method not allowed" });
 }

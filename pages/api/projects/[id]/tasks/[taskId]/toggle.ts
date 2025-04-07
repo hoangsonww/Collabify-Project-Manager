@@ -17,6 +17,7 @@ export default async function handler(
   // Connect to DB
   await dbConnect();
 
+  // Extract project ID and task ID from query
   const { id, taskId } = req.query;
   if (!id || !taskId) {
     return res.status(400).json({ error: "Missing project or task ID" });
@@ -82,6 +83,7 @@ export default async function handler(
       status: t.status,
       assignedTo: t.assignedTo || null,
       priority: t.priority || "medium",
+      dueDate: t.dueDate ? t.dueDate.toISOString() : null,
     })),
   };
 

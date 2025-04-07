@@ -25,6 +25,9 @@
   "projectId": "Mã Dự Án",
   "taskCreated": "Nhiệm Vụ Đã Tạo",
   "tasksByPriority": "Nhiệm Vụ Theo Độ Ưu Tiên",
+  "tasksByDueDate": "Nhiệm Vụ Theo Ngày Hết Hạn",
+  "tasksByDueDateBar": "Nhiệm Vụ Theo Ngày Hết Hạn",
+  "tasksByDueDateLine": "Nhiệm Vụ Theo Ngày Hết Hạn",
   "high": "Cao",
   "medium": "Trung Bình",
   "low": "Thấp"

@@ -98,5 +98,13 @@
   "onlyManagerCanRemoveMembers": "Only project manager can remove members",
   "cannotRemoveYourself": "You cannot remove yourself from the project",
   "memberRemoved": "Member removed",
-  "errorRemovingMember": "Error removing member"
+  "errorRemovingMember": "Error removing member",
+  "tasksByDueDateBar": "Tasks by Due Date",
+  "tasksByDueDateLine": "Tasks by Due Date",
+  "deleteProject": "Delete Project",
+  "deleteProjectConfirmTitle": "Confirm Delete Project",
+  "deleteProjectConfirmDesc": "Are you sure you want to delete this project? This action cannot be undone.",
+  "deleteProjectBtn": "Delete Project",
+  "dueDate": "Due Date",
+  "dueTime": "Due Time"
 }
