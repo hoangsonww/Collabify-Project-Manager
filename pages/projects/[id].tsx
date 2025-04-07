@@ -46,6 +46,9 @@ import {
   CircleCheck,
   Edit,
   Trash,
+  Circle,
+  Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Head from "next/head";
@@ -179,24 +182,20 @@ function ProjectDetailPageInternal({
         );
         if (!resp.ok) throw new Error("Failed to fetch membership");
         const data = await resp.json(); // { membership: [ {userSub, role}, ... ] }
-        const membershipRaw = data.membership || [];
-        const membershipWithInfoPromises = membershipRaw.map(
-          async (entry: IMembership) => {
-            const userInfoResp = await fetch(
-              `/api/users/info?user=${entry.userSub}`,
-            );
-            let userInfo: IUserInfo = {};
-            if (userInfoResp.ok) {
-              userInfo = await userInfoResp.json();
-            }
-            const displayName =
-              userInfo.name || userInfo.email || entry.userSub;
-            return { ...entry, displayName };
-          },
+        const membershipRaw: IMembership[] = data.membership || [];
+        const userSubs = membershipRaw.map((entry) => entry.userSub);
+        const userInfoResp = await fetch(
+          `/api/users/infoBatch?users=${encodeURIComponent(userSubs.join(","))}`,
         );
-        const membershipWithInfo = await Promise.all(
-          membershipWithInfoPromises,
-        );
+        let usersInfo: Record<string, IUserInfo> = {};
+        if (userInfoResp.ok) {
+          usersInfo = await userInfoResp.json();
+        }
+        const membershipWithInfo = membershipRaw.map((entry) => {
+          const info = usersInfo[entry.userSub] || {};
+          const displayName = info.name || info.email || entry.userSub;
+          return { ...entry, displayName };
+        });
         setMemberships(membershipWithInfo);
       } catch (err) {
         console.error("Error fetching membership or user info:", err);
@@ -209,7 +208,11 @@ function ProjectDetailPageInternal({
 
   // ============= If no project or no userSub =============
   if (!userSub || !localProject) {
-    return <p className="text-white">{t("invalidProjectOrLogin")}</p>;
+    return (
+      <p className="text-center text-white bg-none min-h-screen flex items-center justify-center">
+        {t("invalidProjectOrLogin")}
+      </p>
+    );
   }
 
   // ====================================
@@ -885,17 +888,39 @@ function ProjectDetailPageInternal({
                           ? "text-red-400"
                           : task.priority === "low"
                             ? "text-green-400"
-                            : "text-yellow-400"; // medium
+                            : "text-yellow-400";
 
                       return (
                         <tr key={task._id} className="border-t border-gray-700">
                           <td className="p-2 text-white">{task.title}</td>
-                          <td className="p-2 capitalize text-white">
-                            {t(`statuses.${task.status}`)}
+                          <td className="p-2 capitalize">
+                            {task.status === "todo" && (
+                              <Circle className="inline-block mr-1 h-4 w-4 text-gray-400" />
+                            )}
+                            {task.status === "in-progress" && (
+                              <Loader2 className="inline-block mr-1 h-4 w-4 text-yellow-400 animate-spin" />
+                            )}
+                            {task.status === "done" && (
+                              <CheckCircle2 className="inline-block mr-1 h-4 w-4 text-green-400" />
+                            )}
+                            <span
+                              className={`font-bold ${
+                                task.status === "todo"
+                                  ? "text-gray-400"
+                                  : task.status === "in-progress"
+                                    ? "text-yellow-400"
+                                    : task.status === "done"
+                                      ? "text-green-400"
+                                      : "text-white"
+                              }`}
+                            >
+                              {t(`statuses.${task.status}`)}
+                            </span>
                           </td>
                           <td className={`p-2 capitalize ${colorByPriority}`}>
                             {t(`priorities.${task.priority}`)}
                           </td>
+
                           <td className="p-2 text-white">
                             {/*
                               If assignedTo matches one of our membershipWithInfo,

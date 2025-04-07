@@ -10,7 +10,6 @@ RUN npm run build
 FROM node:18-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-
 # Copy only the necessary files from builder
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/next.config.js ./

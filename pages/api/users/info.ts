@@ -12,7 +12,6 @@ export default async function handler(
   }
 
   try {
-    // Use your M2M variables
     const domain = process.env.AUTH0_TENANT_DOMAIN;
     const clientId = process.env.AUTH0_M2M_CLIENT_ID;
     const clientSecret = process.env.AUTH0_M2M_CLIENT_SECRET;

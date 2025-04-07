@@ -1,5 +1,5 @@
 {
-  "invalidProjectOrLogin": "Please log in or invalid project.",
+  "invalidProjectOrLogin": "Please log in or check your invalid project ID.",
   "joinedProject": "Joined project",
   "errorJoiningProject": "Error joining project",
   "leftProject": "Left project",

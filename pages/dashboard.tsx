@@ -80,7 +80,11 @@ function DashboardPageInternal({
   const { t } = useTranslation("dashboard");
 
   if (!userSub) {
-    return <p className="text-white">{t("pleaseLogIn")}</p>;
+    return (
+      <p className="text-center text-white bg-none min-h-screen flex items-center justify-center">
+        {t("pleaseLogIn")}
+      </p>
+    );
   }
 
   // Completed tasks ratio

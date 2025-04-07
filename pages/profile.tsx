@@ -69,7 +69,7 @@ function ProfilePageInternal() {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-white"
+          className="text-white text-center"
         >
           {t("pleaseLogIn")}
         </motion.p>
