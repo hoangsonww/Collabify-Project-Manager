@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Search, Loader2, Eye } from "lucide-react";
 
 // Shadcn/ui components
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,15 @@ function ProfilePageInternal() {
   const [editProfileDialogOpen, setEditProfileDialogOpen] = useState(false);
   const [resendVerificationDialogOpen, setResendVerificationDialogOpen] =
     useState(false);
+
+  // New state for searching users.
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  // If a profile is selected from the search results,
+  // it will override the current local profile (for display purposes).
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  const profileToDisplay = selectedProfile || localProfile;
+  const [isSearching, setIsSearching] = useState(false);
 
   // Update local profile cache when Auth0's user changes.
   useEffect(() => {
@@ -165,6 +174,39 @@ function ProfilePageInternal() {
     }
   };
 
+  // Handler to search for users
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    // Immediately show the spinner when a query is entered.
+    setIsSearching(true);
+
+    const debounceHandler = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/users/search?q=${encodeURIComponent(searchQuery)}`,
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setSearchResults(data.users);
+        } else {
+          setSearchResults([]);
+        }
+      } catch (error) {
+        console.error("User search error:", error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500); // 500ms debounce delay
+
+    return () => clearTimeout(debounceHandler);
+  }, [searchQuery]);
+
   // Handler to resend verification email.
   const handleResendVerification = async () => {
     setResendLoading(true);
@@ -227,14 +269,97 @@ function ProfilePageInternal() {
         <meta name="description" content={t("metaDesc")} />
       </Head>
       <div className="bg-none min-h-screen text-white font-sans container mx-auto px-4 py-8">
-        <motion.h1
-          initial={{ opacity: 0, y: -40 }}
+        {selectedProfile ? (
+          <motion.h1
+            initial={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="text-3xl font-bold mb-10 text-center tracking-wide flex justify-center items-center space-x-2"
+          >
+            <Eye className="h-6 w-6 text-white" />
+            <span>{t("viewingProfile", { name: selectedProfile.name })}</span>
+          </motion.h1>
+        ) : (
+          <motion.h1
+            initial={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="text-3xl font-bold mb-10 text-center tracking-wide"
+          >
+            {t("header")}
+          </motion.h1>
+        )}
+
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="text-3xl font-bold mb-10 text-center tracking-wide"
+          className="max-w-2xl mx-auto mb-6"
         >
-          {t("header")}
-        </motion.h1>
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+              <Search className="h-5 w-5 text-white" />
+            </span>
+            <Input
+              placeholder={t(
+                "searchPlaceholder",
+                "Search by name or nickname...",
+              )}
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSelectedProfile(null);
+              }}
+              className="w-full pl-10 pr-10 py-2 bg-transparent text-white border border-white focus:border-blue-500 focus:outline-none rounded-md"
+            />
+            {isSearching && (
+              <span className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <Loader2 className="animate-spin h-5 w-5 text-white" />
+              </span>
+            )}
+          </div>
+          {searchResults.length > 0 ? (
+            <motion.ul
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-2 border border-white rounded-md p-2 max-h-60 overflow-y-auto"
+            >
+              {searchResults.map((usr) => (
+                <motion.li
+                  key={usr.userSub}
+                  className="p-2 cursor-pointer text-white flex items-center space-x-3 rounded transition-colors hover:bg-white/10"
+                  onClick={() => {
+                    setSelectedProfile(usr);
+                    setSearchQuery("");
+                    setSearchResults([]);
+                  }}
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={usr.picture} alt={usr.name} />
+                    <AvatarFallback className="bg-black text-lg">
+                      {usr.name?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span>
+                    {usr.name} ({usr.nickname || t("noNickname", "No nickname")}
+                    )
+                  </span>
+                </motion.li>
+              ))}
+            </motion.ul>
+          ) : (
+            // Display a message if no user is found and the query is not empty (and not currently searching)
+            !isSearching &&
+            searchQuery.trim() !== "" && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mt-2 text-white text-center p-2"
+              >
+                {t("noUserFound", { query: searchQuery })}
+              </motion.div>
+            )
+          )}
+        </motion.div>
 
         {/* Profile Card with Reduced Slide-Down Effect & Hover Effects */}
         <motion.div
@@ -247,17 +372,21 @@ function ProfilePageInternal() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1, transition: { duration: 0.6 } }}
           >
-            {localProfile?.picture && (
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="shrink-0 transition-transform duration-300"
-              >
-                <Avatar className="h-16 w-16">
-                  <AvatarImage src={localProfile.picture} alt="User Avatar" />
-                  <AvatarFallback>{localProfile.name?.[0]}</AvatarFallback>
-                </Avatar>
-              </motion.div>
-            )}
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="shrink-0 transition-transform duration-300"
+            >
+              <Avatar className="h-16 w-16">
+                <AvatarFallback className="bg-black text-white border border-white text-2xl">
+                  {profileToDisplay?.name?.[0] || "?"}
+                </AvatarFallback>
+                <AvatarImage
+                  src={profileToDisplay.picture}
+                  alt="User Avatar"
+                  onError={() => setImageError(true)}
+                />
+              </Avatar>
+            </motion.div>
             {/* Staggered Text Container */}
             <motion.div
               className="flex-1 space-y-2"
@@ -269,26 +398,27 @@ function ProfilePageInternal() {
                 variants={itemVariants}
                 className="text-2xl font-semibold truncate"
               >
-                {localProfile?.name}
+                {profileToDisplay?.name}
               </motion.p>
-              {localProfile?.nickname && (
+              {profileToDisplay?.nickname && (
                 <motion.p
                   variants={itemVariants}
                   className="text-base text-white truncate"
                 >
                   <span className="font-semibold">{t("nickname")}:</span>{" "}
-                  {localProfile.nickname}
+                  {profileToDisplay.nickname}
                 </motion.p>
               )}
-              {localProfile?.given_name && localProfile?.family_name && (
-                <motion.p
-                  variants={itemVariants}
-                  className="text-base text-white truncate"
-                >
-                  <span className="font-semibold">{t("fullName")}:</span>{" "}
-                  {localProfile.given_name} {localProfile.family_name}
-                </motion.p>
-              )}
+              {profileToDisplay?.given_name &&
+                profileToDisplay?.family_name && (
+                  <motion.p
+                    variants={itemVariants}
+                    className="text-base text-white truncate"
+                  >
+                    <span className="font-semibold">{t("fullName")}:</span>{" "}
+                    {profileToDisplay.given_name} {profileToDisplay.family_name}
+                  </motion.p>
+                )}
             </motion.div>
           </motion.div>
           <motion.div
@@ -477,6 +607,16 @@ function ProfilePageInternal() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+
+          {selectedProfile && (
+            <Button
+              variant="default"
+              className="hover:scale-105 transition-transform duration-300 cursor-pointer"
+              onClick={() => setSelectedProfile(null)}
+            >
+              {t("backToProfile", "Back to My Profile")}
+            </Button>
+          )}
         </motion.div>
       </div>
     </>

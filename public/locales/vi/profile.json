@@ -25,5 +25,9 @@
   "updateSuccess": "Cập nhật thành công",
   "updateError": "Có lỗi xảy ra khi cập nhật hồ sơ của bạn. Vui lòng thử lại sau.",
   "verificationEmailSent": "Email xác minh đã được gửi. Vui lòng kiểm tra hộp thư đến của bạn.",
-  "verificationEmailError": "Có lỗi xảy ra khi gửi email xác minh. Vui lòng thử lại sau."
+  "verificationEmailError": "Có lỗi xảy ra khi gửi email xác minh. Vui lòng thử lại sau.",
+  "viewingProfile": "Đang xem hồ sơ của {{name}}",
+  "backToProfile": "Quay lại hồ sơ của bạn",
+  "searchPlaceholder": "Tìm kiếm người dùng...",
+  "noUserFound": "Không tìm thấy người dùng có tên hoặc biệt danh là “{{query}}”"
 }

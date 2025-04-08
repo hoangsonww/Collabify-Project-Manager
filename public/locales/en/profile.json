@@ -25,5 +25,9 @@
   "updateSuccess": "Update successful",
   "updateError": "An error occurred while updating your profile. Please try again later.",
   "verificationEmailSent": "Verification email has been sent. Please check your inbox.",
-  "verificationEmailError": "An error occurred while sending the verification email. Please try again later."
+  "verificationEmailError": "An error occurred while sending the verification email. Please try again later.",
+  "viewingProfile": "Viewing profile of {{name}}",
+  "backToProfile": "Back to Your Profile",
+  "searchPlaceholder": "Search for users...",
+  "noUserFound": "Could not find a user with the name or nickname “{{query}}”"
 }
