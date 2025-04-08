@@ -119,5 +119,6 @@
     "daysLeft": "Còn {{count}} ngày",
     "daysLeft_plural": "Còn {{count}} ngày"
   },
-  "you": "(Bạn)"
+  "you": "(Bạn)",
+  "errorFetchingProject": "Có lỗi xảy ra khi tải dự án. Vui lòng thử lại sau."
 }

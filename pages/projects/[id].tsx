@@ -500,11 +500,14 @@ function ProjectDetailPageInternal() {
     if (!isManager) return;
     setIsDeletingProject(true);
     try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const res = await fetch(`/api/projects/${localProject.projectId}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        `/api/projects/${localProject.projectId}/delete`,
+        {
+          method: "DELETE",
+        },
+      );
       if (!res.ok) throw new Error("Delete project failed");
       toast.success(t("projectDeleted"));
       router.push("/projects");

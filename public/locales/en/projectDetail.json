@@ -120,5 +120,6 @@
     "daysLeft": "{{count}} day left",
     "daysLeft_plural": "{{count}} days left"
   },
-  "you": "(You)"
+  "you": "(You)",
+  "errorFetchingProject": "Error fetching project details"
 }
