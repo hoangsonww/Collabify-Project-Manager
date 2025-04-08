@@ -118,5 +118,6 @@
     "hoursLeft_plural": "Còn {{count}} giờ",
     "daysLeft": "Còn {{count}} ngày",
     "daysLeft_plural": "Còn {{count}} ngày"
-  }
+  },
+  "you": "(Bạn)"
 }

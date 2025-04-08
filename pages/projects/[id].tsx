@@ -1461,7 +1461,10 @@ function ProjectDetailPageInternal() {
                             key={m.userSub}
                             className="border-t border-gray-700"
                           >
-                            <td className="p-2 text-white">{m.displayName}</td>
+                            <td className="p-2 text-white">
+                              {m.displayName}{" "}
+                              {m.userSub === userSub ? t("you") : ""}
+                            </td>
                             <td className="p-2 text-white capitalize">
                               {t(`roles.${m.role}`)}
                             </td>

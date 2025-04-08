@@ -21,6 +21,7 @@ import { toast } from "sonner";
 // (1) Import react-i18next + dynamic
 import { Trans, useTranslation } from "react-i18next";
 import dynamic from "next/dynamic";
+import { Button } from "@/components/ui/button";
 
 // Register Chart.js components
 ChartJS.register(
@@ -204,24 +205,17 @@ function AdminPageInternal() {
   const isAdmin = roleList.includes(roles.admin);
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-none text-white flex flex-col items-center justify-center">
-        <p>
-          <Trans i18nKey="noPermission">
-            {/* The content inside <Trans> is used as a default only if the key is missing */}
-            {/* Otherwise, the key's translation will be rendered */}
-            You do not have permission to view this page. Only users with the
-            admin role can access this page. Please{" "}
-            <a
-              href="https://sonnguyenhoang.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline text-blue-500"
-            >
-              contact the general admin
-            </a>{" "}
-            for assistance. 👮‍♂️
-          </Trans>
-        </p>
+      <div className="min-h-screen bg-none text-white flex flex-col text-center items-center justify-center">
+        <p>{t("noPermission")}</p>
+        <Button
+          variant="link"
+          className="mt-4 text-blue-500 cursor-pointer underline hover:text-blue-700"
+          onClick={() =>
+            (window.location.href = "https://sonnguyenhoang.com#contact")
+          }
+        >
+          {t("contactAdmin")}
+        </Button>
       </div>
     );
   }

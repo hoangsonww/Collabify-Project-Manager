@@ -119,5 +119,6 @@
     "hoursLeft_plural": "{{count}} hours left",
     "daysLeft": "{{count}} day left",
     "daysLeft_plural": "{{count}} days left"
-  }
+  },
+  "you": "(You)"
 }
