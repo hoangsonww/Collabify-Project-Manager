@@ -394,10 +394,10 @@ function ProjectDetailPageInternal() {
     });
     // Sort the timestamps in ascending order (earlier dates first)
     const sortedTimestamps = Array.from(groups.keys()).sort((a, b) => a - b);
-    const labels = sortedTimestamps.map(ts =>
+    const labels = sortedTimestamps.map((ts) =>
       format(new Date(ts), "PP", { locale: currentLocale }),
     );
-    const data = sortedTimestamps.map(ts => groups.get(ts) as number);
+    const data = sortedTimestamps.map((ts) => groups.get(ts) as number);
     return {
       labels,
       datasets: [
@@ -413,7 +413,7 @@ function ProjectDetailPageInternal() {
     };
   }, [t, tasks, currentLocale]);
 
-// Chart Data – Tasks by Due Date (Horizontal Bar Chart)
+  // Chart Data – Tasks by Due Date (Horizontal Bar Chart)
   const tasksByDueDateBarData = useMemo(() => {
     const groups = new Map<number, number>();
     tasks.forEach((task: ITask) => {
@@ -431,10 +431,10 @@ function ProjectDetailPageInternal() {
     });
     // Sort the timestamps in ascending order (earlier dates first)
     const sortedTimestamps = Array.from(groups.keys()).sort((a, b) => a - b);
-    const labels = sortedTimestamps.map(ts =>
+    const labels = sortedTimestamps.map((ts) =>
       format(new Date(ts), "PP", { locale: currentLocale }),
     );
-    const data = sortedTimestamps.map(ts => groups.get(ts) as number);
+    const data = sortedTimestamps.map((ts) => groups.get(ts) as number);
     return {
       labels,
       datasets: [

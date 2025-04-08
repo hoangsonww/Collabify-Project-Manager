@@ -78,6 +78,37 @@ function ProfilePageInternal() {
     }
   }, [user]);
 
+  console.log(user);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      if (user) {
+        try {
+          const res = await fetch("/api/users/updateProfile", {
+            method: "GET",
+          });
+          if (!res.ok) {
+            throw new Error("Failed to fetch profile");
+          }
+          const data = await res.json();
+          // Update only name and nickname while preserving the rest of the profile.
+          if (data.user) {
+            setLocalProfile((prev) => ({
+              ...prev,
+              name: data.user.name,
+              nickname: data.user.nickname,
+            }));
+            setName(data.user.name);
+            setNickname(data.user.nickname);
+          }
+        } catch (err) {
+          console.error("Error fetching profile:", err);
+        }
+      }
+    }
+    fetchProfile();
+  }, [user]);
+
   // Fetch additional roles.
   useEffect(() => {
     async function fetchRoles() {
@@ -117,8 +148,13 @@ function ProfilePageInternal() {
       if (!res.ok) {
         throw new Error("Failed to update profile");
       }
-      // Update local profile cache.
-      setLocalProfile({ ...localProfile, name, nickname });
+      const responseData = await res.json();
+      // Merge updated name and nickname with existing profile.
+      setLocalProfile((prev) => ({
+        ...prev,
+        name: responseData.user.name,
+        nickname: responseData.user.nickname,
+      }));
       toast.success(t("updateSuccess", "Profile updated successfully"));
       setEditProfileDialogOpen(false);
     } catch (err) {
