@@ -108,5 +108,16 @@
   "dueDate": "Due Date",
   "dueTime": "Due Time (24h format)",
   "confirmRemoveMemberTitle": "Confirm Remove Member",
-  "confirmRemoveMemberDesc": "Are you sure you want to remove this member from the project?"
+  "confirmRemoveMemberDesc": "Are you sure you want to remove this member from the project?",
+  "timeLeft": {
+    "overdue": "Overdue",
+    "secondsLeft": "{{count}} second left",
+    "secondsLeft_plural": "{{count}} seconds left",
+    "minutesLeft": "{{count}} minute left",
+    "minutesLeft_plural": "{{count}} minutes left",
+    "hoursLeft": "{{count}} hour left",
+    "hoursLeft_plural": "{{count}} hours left",
+    "daysLeft": "{{count}} day left",
+    "daysLeft_plural": "{{count}} days left"
+  }
 }

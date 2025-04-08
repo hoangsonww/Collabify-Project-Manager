@@ -15,7 +15,40 @@ export default async function handler(
   const user = session.user;
   await dbConnect();
 
-  // Create a project
+  // --- GET: Return list of projects that the current user belongs to ---
+  if (req.method === "GET") {
+    try {
+      const userSub = user.sub;
+      // Query projects where the current user is in the membership array
+      const userProjects = await Project.find({
+        "membership.userSub": userSub,
+      }).lean();
+      // Serialize projects – no legacy members field assumed
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const projectsFormatted = userProjects.map((project: any) => ({
+        _id: project._id.toString(),
+        projectId: project.projectId,
+        name: project.name,
+        description: project.description || "",
+        membership: project.membership || [],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        tasks: (project.tasks || []).map((task: any) => ({
+          _id: task._id.toString(),
+          title: task.title,
+          status: task.status,
+          assignedTo: task.assignedTo || null,
+          priority: task.priority || "medium",
+          dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : null,
+        })),
+      }));
+      return res.status(200).json({ projects: projectsFormatted });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Server error" });
+    }
+  }
+
+  // --- POST: Create a project ---
   if (req.method === "POST") {
     const { name, description } = req.body;
     if (!name) {
@@ -25,7 +58,7 @@ export default async function handler(
     // generate a short ID
     const shortId = uuidv4().split("-")[0];
 
-    // The user who creates is manager
+    // The user who creates the project is automatically assigned as manager
     const userSub = user.sub;
 
     const newProject = await Project.create({

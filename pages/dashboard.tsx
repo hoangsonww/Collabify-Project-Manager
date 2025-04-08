@@ -1,8 +1,4 @@
-import { getSession } from "@auth0/nextjs-auth0";
-import { GetServerSideProps } from "next";
-import { dbConnect } from "@/lib/mongodb";
-import { ITask, Project } from "@/models/Project";
-import { roles } from "@/lib/roles";
+import { useEffect, useMemo, useState } from "react";
 import { Bar, Pie, Line, Doughnut, Radar, PolarArea } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -16,7 +12,6 @@ import {
   LineElement,
   RadialLinearScale,
 } from "chart.js";
-import { useMemo } from "react";
 import { motion } from "framer-motion";
 import Head from "next/head";
 import { format } from "date-fns";
@@ -25,7 +20,9 @@ import { enUS, vi } from "date-fns/locale";
 // === (1) IMPORT i18next + dynamic ===
 import { useTranslation } from "react-i18next";
 import dynamic from "next/dynamic";
+import { Loader2 } from "lucide-react";
 
+// Register chart components.
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -38,7 +35,9 @@ ChartJS.register(
   RadialLinearScale,
 );
 
-// Update the ProjectStats type to include counts for all statuses
+// ============================================================
+// Type Definitions
+// ============================================================
 type ProjectStats = {
   projectId: string;
   name: string;
@@ -48,7 +47,7 @@ type ProjectStats = {
   inProgressTasks: number;
 };
 
-type DashboardProps = {
+export type DashboardProps = {
   userSub: string;
   isAdmin: boolean;
   totalProjects: number;
@@ -64,43 +63,63 @@ type DashboardProps = {
   allProjects: any[];
 };
 
-// === (2) The REAL component that uses react-i18next ===
-function DashboardPageInternal({
-  userSub,
-  isAdmin,
-  totalProjects,
-  totalTasks,
-  doneTasks,
-  todoTasks,
-  inProgressTasks,
-  topProjects,
-  largestProjectName,
-  smallestProjectName,
-  projectStats = [],
-  allProjects,
-}: DashboardProps) {
+// ============================================================
+// Dashboard Component – Client Side Data Fetching
+// ============================================================
+function DashboardPageInternal() {
   const { t, i18n } = useTranslation("dashboard");
   const currentLocale = i18n.language === "vi" ? vi : enUS;
 
-  if (!userSub) {
-    return (
-      <p className="text-center text-white bg-none min-h-screen flex items-center justify-center">
-        {t("pleaseLogIn")}
-      </p>
-    );
-  }
+  // Local state to hold dashboard data fetched from the API endpoint.
+  const [dashboardData, setDashboardData] = useState<DashboardProps | null>(
+    null,
+  );
+  const [loading, setLoading] = useState(true);
 
-  // Completed tasks ratio
-  const completionRate =
-    totalTasks === 0 ? 0 : Math.round((doneTasks / totalTasks) * 100);
+  // -----------------------------------------------------------------
+  // Fetch Dashboard Data from API endpoint on the client.
+  // -----------------------------------------------------------------
+  useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        const res = await fetch("/api/dashboard");
+        if (!res.ok) {
+          throw new Error("Failed to fetch dashboard data");
+        }
+        const data: DashboardProps = await res.json();
+        setDashboardData(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchDashboardData();
+  }, []);
 
-  // Common chart options for dark mode
+  // Create a safe default object so that hooks always see a defined object.
+  const safeData: DashboardProps = dashboardData ?? {
+    userSub: "",
+    isAdmin: false,
+    totalProjects: 0,
+    totalTasks: 0,
+    doneTasks: 0,
+    todoTasks: 0,
+    inProgressTasks: 0,
+    topProjects: [],
+    largestProjectName: "",
+    smallestProjectName: "",
+    projectStats: [],
+    allProjects: [],
+  };
+
+  // -----------------------------------------------------------------
+  // Define common chart options for dark mode.
+  // -----------------------------------------------------------------
   const chartOptions = {
     plugins: {
       legend: {
-        labels: {
-          color: "#ffffff",
-        },
+        labels: { color: "#ffffff" },
       },
       tooltip: {
         bodyColor: "#ffffff",
@@ -119,43 +138,49 @@ function DashboardPageInternal({
     },
   };
 
-  // 1) Bar chart for tasks by status
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // -----------------------------------------------------------------
+  // Define all chart data using useMemo.
+  // -----------------------------------------------------------------
+
+  // 1) Bar chart for tasks by status.
   const barData = useMemo(() => {
     return {
       labels: [t("toDo"), t("inProgress"), t("completedTasks")],
       datasets: [
         {
           label: t("tasks"),
-          data: [todoTasks, inProgressTasks, doneTasks],
+          data: [
+            safeData.todoTasks,
+            safeData.inProgressTasks,
+            safeData.doneTasks,
+          ],
           backgroundColor: ["#6b7280", "#facc15", "#10b981"],
         },
       ],
     };
-  }, [todoTasks, inProgressTasks, doneTasks, t]);
+  }, [safeData.todoTasks, safeData.inProgressTasks, safeData.doneTasks, t]);
 
-  // 2) Pie chart for done vs not done
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // 2) Pie chart for completed vs. not completed tasks.
   const pieData = useMemo(() => {
-    const notDone = totalTasks - doneTasks;
+    const notDone = safeData.totalTasks - safeData.doneTasks;
     return {
       labels: [t("completedTasks"), t("toDo")],
       datasets: [
         {
-          data: [doneTasks, notDone],
+          data: [safeData.doneTasks, notDone],
           backgroundColor: ["#10b981", "#6b7280"],
         },
       ],
     };
-  }, [doneTasks, totalTasks, t]);
+  }, [safeData.doneTasks, safeData.totalTasks, t]);
 
-  // 3) Line chart using real data: tasks by project by status
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // 3) Line chart: tasks by project by status using projectStats.
   const lineData = useMemo(() => {
-    const labels = projectStats.map((p) => p.name);
-    const todoData = projectStats.map((p) => p.todoTasks);
-    const inProgressData = projectStats.map((p) => p.inProgressTasks);
-    const completedData = projectStats.map((p) => p.doneTasks);
+    const labels = safeData.projectStats?.map((p) => p.name) || [];
+    const todoData = safeData.projectStats?.map((p) => p.todoTasks) || [];
+    const inProgressData =
+      safeData.projectStats?.map((p) => p.inProgressTasks) || [];
+    const completedData = safeData.projectStats?.map((p) => p.doneTasks) || [];
     return {
       labels,
       datasets: [
@@ -185,66 +210,76 @@ function DashboardPageInternal({
         },
       ],
     };
-  }, [projectStats]);
+  }, [safeData.projectStats, t]);
 
-  // 4) Doughnut chart
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // 4) Doughnut chart.
   const doughnutData = useMemo(() => {
     return {
       labels: [t("toDo"), t("inProgress"), t("completedTasks")],
       datasets: [
         {
-          data: [todoTasks, inProgressTasks, doneTasks],
+          data: [
+            safeData.todoTasks,
+            safeData.inProgressTasks,
+            safeData.doneTasks,
+          ],
           backgroundColor: ["#6b7280", "#facc15", "#10b981"],
         },
       ],
     };
-  }, [todoTasks, inProgressTasks, doneTasks, t]);
+  }, [safeData.todoTasks, safeData.inProgressTasks, safeData.doneTasks, t]);
 
-  // 5) Radar chart
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // 5) Radar chart.
   const radarData = useMemo(() => {
     return {
       labels: [t("toDo"), t("inProgress"), t("completedTasks")],
       datasets: [
         {
           label: t("status"),
-          data: [todoTasks, inProgressTasks, doneTasks],
+          data: [
+            safeData.todoTasks,
+            safeData.inProgressTasks,
+            safeData.doneTasks,
+          ],
           backgroundColor: "rgba(250,204,21,0.4)",
           borderColor: "#facc15",
           pointBackgroundColor: "#facc15",
         },
       ],
     };
-  }, [todoTasks, inProgressTasks, doneTasks, t]);
+  }, [safeData.todoTasks, safeData.inProgressTasks, safeData.doneTasks, t]);
 
-  // 6) PolarArea chart
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // 6) PolarArea chart.
   const polarData = useMemo(() => {
     return {
       labels: [t("toDo"), t("inProgress"), t("completedTasks")],
       datasets: [
         {
-          data: [todoTasks, inProgressTasks, doneTasks],
+          data: [
+            safeData.todoTasks,
+            safeData.inProgressTasks,
+            safeData.doneTasks,
+          ],
           backgroundColor: ["#6b7280", "#facc15", "#10b981"],
         },
       ],
     };
-  }, [todoTasks, inProgressTasks, doneTasks, t]);
+  }, [safeData.todoTasks, safeData.inProgressTasks, safeData.doneTasks, t]);
 
-  // Aggregate all tasks from all projects
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // 7) Aggregate all tasks from all projects.
   const allTasks = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return allProjects.flatMap((project: any) => project.tasks || []);
-  }, [allProjects]);
+    return safeData.allProjects.flatMap((project: any) => project.tasks || []);
+  }, [safeData.allProjects]);
 
-  // Chart: Tasks by Priority using real data
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // 8) Chart: Tasks by Priority (Bar chart).
   const tasksByPriorityData = useMemo(() => {
     const counts = { low: 0, medium: 0, high: 0 };
-    allTasks.forEach((task: ITask) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    allTasks.forEach((task: any) => {
       const prio = task.priority || "medium";
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       counts[prio]++;
     });
     return {
@@ -259,11 +294,14 @@ function DashboardPageInternal({
     };
   }, [allTasks, t]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // 9) Line Chart: Tasks by Priority.
   const lineTasksByPriorityData = useMemo(() => {
     const counts = { low: 0, medium: 0, high: 0 };
-    allTasks.forEach((task: ITask) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    allTasks.forEach((task: any) => {
       const prio = task.priority || "medium";
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       counts[prio]++;
     });
     return {
@@ -272,32 +310,30 @@ function DashboardPageInternal({
         {
           label: t("tasksByPriority"),
           data: [counts.low, counts.medium, counts.high],
-          borderColor: "#4ade80", // Sets the line color
-          backgroundColor: "rgba(74,222,128,0.5)", // Color for points if any fill is shown
-          fill: false, // Disables fill below the line
-          tension: 0.4, // Smooths the line curves
-          pointRadius: 5, // Sets a larger point radius if desired
+          borderColor: "#4ade80",
+          backgroundColor: "rgba(74,222,128,0.5)",
+          fill: false,
+          tension: 0.4,
+          pointRadius: 5,
         },
       ],
     };
   }, [allTasks, t]);
 
-  // Aggregate tasks by due date (if missing, default to today)
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // 10) Aggregate tasks by due date.
   const tasksByDueDateCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     const today = new Date();
-    allTasks.forEach((task: ITask) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    allTasks.forEach((task: any) => {
       const due = task.dueDate ? new Date(task.dueDate) : today;
-      // Format the date using date-fns with dynamic locale
       const formatted = format(due, "PP", { locale: currentLocale });
       counts[formatted] = (counts[formatted] || 0) + 1;
     });
     return counts;
   }, [allTasks, currentLocale]);
 
-  // Line Chart: Tasks by Due Date
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // 11) Line Chart: Tasks by Due Date.
   const lineTasksByDueDateData = useMemo(() => {
     const labels = Object.keys(tasksByDueDateCounts).sort(
       (a, b) => new Date(a).getTime() - new Date(b).getTime(),
@@ -319,8 +355,7 @@ function DashboardPageInternal({
     };
   }, [tasksByDueDateCounts, t]);
 
-  // Horizontal Bar Chart: Tasks by Due Date
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // 12) Horizontal Bar Chart: Tasks by Due Date.
   const horizontalBarTasksByDueDateData = useMemo(() => {
     const labels = Object.keys(tasksByDueDateCounts).sort(
       (a, b) => new Date(a).getTime() - new Date(b).getTime(),
@@ -338,8 +373,7 @@ function DashboardPageInternal({
     };
   }, [tasksByDueDateCounts, t]);
 
-  // Horizontal Bar Chart Options (for y-axis)
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // Horizontal Bar Chart Options.
   const horizontalBarChartOptions = useMemo(
     () => ({
       ...chartOptions,
@@ -348,10 +382,15 @@ function DashboardPageInternal({
     [chartOptions],
   );
 
-  // Animation variants
+  // Animation variants.
   const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { type: "spring", stiffness: 300, damping: 20 },
+    },
   };
 
   const chartVariants = {
@@ -359,6 +398,33 @@ function DashboardPageInternal({
     visible: { opacity: 1, scale: 1 },
   };
 
+  // -----------------------------------------------------------------
+  // Conditional rendering: while loading or if not logged in, display a loader or message.
+  // -----------------------------------------------------------------
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin h-12 w-12 text-white" />
+      </div>
+    );
+  }
+  if (!dashboardData || !dashboardData.userSub) {
+    return (
+      <p className="text-center text-white bg-none min-h-screen flex items-center justify-center">
+        {t("pleaseLogIn")}
+      </p>
+    );
+  }
+
+  // Compute completed tasks ratio.
+  const completionRate =
+    safeData.totalTasks === 0
+      ? 0
+      : Math.round((safeData.doneTasks / safeData.totalTasks) * 100);
+
+  // -----------------------------------------------------------------
+  // Render the Dashboard UI.
+  // -----------------------------------------------------------------
   return (
     <>
       <Head>
@@ -388,18 +454,24 @@ function DashboardPageInternal({
           className="grid grid-cols-1 md:grid-cols-4 gap-4"
           initial="hidden"
           animate="visible"
-          variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+          variants={{
+            visible: { transition: { staggerChildren: 0.1 } },
+          }}
         >
           {[
             {
               label: t("yourProjects"),
-              value: totalProjects,
+              value: safeData.totalProjects,
               textSize: "text-3xl",
             },
-            { label: t("totalTasks"), value: totalTasks, textSize: "text-3xl" },
+            {
+              label: t("totalTasks"),
+              value: safeData.totalTasks,
+              textSize: "text-3xl",
+            },
             {
               label: t("completedTasks"),
-              value: doneTasks,
+              value: safeData.doneTasks,
               textSize: "text-3xl",
             },
             {
@@ -409,22 +481,22 @@ function DashboardPageInternal({
             },
             {
               label: t("inProgress"),
-              value: inProgressTasks,
+              value: safeData.inProgressTasks,
               textSize: "text-3xl",
             },
             {
               label: t("toDo"),
-              value: todoTasks,
+              value: safeData.todoTasks,
               textSize: "text-3xl",
             },
             {
               label: t("largestProject"),
-              value: largestProjectName || "N/A",
+              value: safeData.largestProjectName || "N/A",
               textSize: "text-lg",
             },
             {
               label: t("smallestProject"),
-              value: smallestProjectName || "N/A",
+              value: safeData.smallestProjectName || "N/A",
               textSize: "text-lg",
             },
           ].map((card, index) => (
@@ -502,7 +574,7 @@ function DashboardPageInternal({
             <h2 className="text-lg font-semibold mb-4">{t("status")}</h2>
             <PolarArea data={polarData} options={chartOptions} />
           </motion.div>
-          {/* Tasks by Priority Chart */}
+          {/* 7) Tasks by Priority Chart (Bar) */}
           <motion.div
             variants={chartVariants}
             className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
@@ -512,8 +584,7 @@ function DashboardPageInternal({
             </h2>
             <Bar data={tasksByPriorityData} options={chartOptions} />
           </motion.div>
-
-          {/* Tasks by Priority Line Chart */}
+          {/* 8) Tasks by Priority Chart (Line) */}
           <motion.div
             variants={chartVariants}
             className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
@@ -523,9 +594,7 @@ function DashboardPageInternal({
             </h2>
             <Line data={lineTasksByPriorityData} options={chartOptions} />
           </motion.div>
-
-          {/* New: Line Chart for Tasks by Due Date */}
-          {/* New: Line Chart for Tasks by Due Date */}
+          {/* 9) Line Chart for Tasks by Due Date */}
           <motion.div
             variants={chartVariants}
             className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
@@ -535,8 +604,7 @@ function DashboardPageInternal({
             </h2>
             <Line data={lineTasksByDueDateData} options={chartOptions} />
           </motion.div>
-
-          {/* New: Horizontal Bar Chart for Tasks by Due Date */}
+          {/* 10) Horizontal Bar Chart for Tasks by Due Date */}
           <motion.div
             variants={chartVariants}
             className="bg-none border border-white p-4 rounded shadow-md transition-transform duration-300 hover:scale-102"
@@ -551,7 +619,7 @@ function DashboardPageInternal({
           </motion.div>
         </motion.div>
 
-        {/* Table of Top 5 Projects by tasks */}
+        {/* Table of Top 5 Projects by Tasks */}
         <motion.div
           className="bg-none border border-white p-4 rounded shadow-md space-y-4"
           initial={{ opacity: 0, y: 20 }}
@@ -559,7 +627,7 @@ function DashboardPageInternal({
           transition={{ delay: 0.2 }}
         >
           <h2 className="text-lg font-semibold">{t("top5Projects")}</h2>
-          {topProjects.length === 0 ? (
+          {dashboardData.topProjects.length === 0 ? (
             <p className="text-gray-400">{t("noProjectsFound")}</p>
           ) : (
             <div className="overflow-x-auto rounded-[8px] overflow-hidden">
@@ -575,7 +643,7 @@ function DashboardPageInternal({
                   </tr>
                 </thead>
                 <tbody>
-                  {topProjects.map((p) => (
+                  {dashboardData.topProjects.map((p) => (
                     <tr key={p.projectId} className="border-t border-gray-700">
                       <td className="p-2 max-w-[200px] overflow-x-auto truncate">
                         {p.name}
@@ -589,7 +657,7 @@ function DashboardPageInternal({
           )}
         </motion.div>
 
-        {isAdmin && (
+        {dashboardData.isAdmin && (
           <motion.p
             className="text-gray-400"
             initial={{ opacity: 0 }}
@@ -605,190 +673,8 @@ function DashboardPageInternal({
 }
 
 // =============================================================
-// SERVER-SIDE PROPS
+// Export a dynamic, client‑only version of the page.
 // =============================================================
-export const getServerSideProps: GetServerSideProps = async ({
-  req,
-  res,
-  params,
-}) => {
-  const session = await getSession(req, res);
-  if (!session?.user) {
-    return {
-      props: {
-        userSub: "",
-        isAdmin: false,
-        totalProjects: 0,
-        totalTasks: 0,
-        doneTasks: 0,
-        todoTasks: 0,
-        inProgressTasks: 0,
-        topProjects: [],
-        largestProjectName: "",
-        smallestProjectName: "",
-        projectStats: [],
-        allProjects: [],
-        project: null,
-      },
-    };
-  }
-
-  const user = session.user;
-  const userSub = user.sub || "";
-  const userRoles: string[] = user["http://myapp.example.com/roles"] || [];
-  const isAdmin = userRoles.includes(roles.admin);
-
-  await dbConnect();
-
-  // Use new membership field to query projects for non-admins
-  const query = isAdmin ? {} : { "membership.userSub": userSub };
-  const allProjects = await Project.find(query);
-
-  // Serialize allProjects for use in charts (with tasks and membership)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const allProjectsSerialized = allProjects.map((p: any) => ({
-    _id: p._id.toString(),
-    projectId: p.projectId,
-    name: p.name,
-    description: p.description || "",
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    membership: (p.membership || []).map((m: any) => ({
-      userSub: m.userSub,
-      role: m.role,
-    })),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    tasks: (p.tasks || []).map((t: any) => ({
-      _id: t._id.toString(),
-      title: t.title,
-      status: t.status,
-      assignedTo: t.assignedTo || null,
-      priority: t.priority || "medium",
-      dueDate: t.dueDate
-        ? new Date(t.dueDate).toISOString()
-        : new Date().toISOString(),
-    })),
-  }));
-
-  // Overall counters and project-level stats
-  let totalTasks = 0;
-  let doneTasks = 0;
-  let todoTasks = 0;
-  let inProgressTasks = 0;
-
-  type ProjectStats = {
-    projectId: string;
-    name: string;
-    totalTasks: number;
-    doneTasks: number;
-    todoTasks: number;
-    inProgressTasks: number;
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const projectStats: ProjectStats[] = allProjectsSerialized.map((p: any) => {
-    const tasksArray = p.tasks || [];
-    const total = tasksArray.length;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const done = tasksArray.filter((t: any) => t.status === "done").length;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const todo = tasksArray.filter((t: any) => t.status === "todo").length;
-    const inProgress = tasksArray.filter(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (t: any) => t.status === "in-progress",
-    ).length;
-    return {
-      projectId: p.projectId,
-      name: p.name,
-      totalTasks: total,
-      doneTasks: done,
-      todoTasks: todo,
-      inProgressTasks: inProgress,
-    };
-  });
-
-  const topProjects = [...projectStats]
-    .sort((a, b) => b.totalTasks - a.totalTasks)
-    .slice(0, 5);
-
-  let largestProjectName = "";
-  let smallestProjectName = "";
-  if (projectStats.length > 0) {
-    const sorted = [...projectStats].sort(
-      (a, b) => b.totalTasks - a.totalTasks,
-    );
-    largestProjectName = sorted[0].name;
-    smallestProjectName = sorted[sorted.length - 1].name;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  allProjectsSerialized.forEach((project: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (project.tasks || []).forEach((t: any) => {
-      totalTasks++;
-      if (t.status === "done") doneTasks++;
-      else if (t.status === "in-progress") inProgressTasks++;
-      else if (t.status === "todo") todoTasks++;
-    });
-  });
-
-  // Use params for the dynamic route
-  const projectIdParam = params?.id;
-  let project = null;
-  if (projectIdParam && typeof projectIdParam === "string") {
-    const found = await Project.findOne({ projectId: projectIdParam }).lean();
-    if (found) {
-      project = {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        _id: found._id.toString(),
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        projectId: found.projectId,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        name: found.name,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        description: found.description || "",
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        membership: found.membership || [],
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        tasks: (found.tasks || []).map((t) => ({
-          _id: t._id.toString(),
-          title: t.title,
-          status: t.status,
-          assignedTo: t.assignedTo || null,
-          priority: t.priority || "medium",
-          dueDate: t.dueDate
-            ? new Date(t.dueDate).toISOString()
-            : new Date().toISOString(),
-        })),
-      };
-    }
-  }
-
-  return {
-    props: {
-      userSub,
-      isAdmin,
-      totalProjects: allProjectsSerialized.length,
-      totalTasks,
-      doneTasks,
-      todoTasks,
-      inProgressTasks,
-      topProjects,
-      largestProjectName,
-      smallestProjectName,
-      projectStats,
-      allProjects: allProjectsSerialized,
-      project,
-    },
-  };
-};
-
-// === (3) EXPORT a dynamic, client-only version of the page ===
 const DashboardPage = dynamic(() => Promise.resolve(DashboardPageInternal), {
   ssr: false,
 });

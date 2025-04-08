@@ -200,6 +200,7 @@ function AdminPageInternal() {
       </p>
     );
   }
+
   const isAdmin = roleList.includes(roles.admin);
   if (!isAdmin) {
     return (
@@ -216,9 +217,9 @@ function AdminPageInternal() {
               rel="noopener noreferrer"
               className="underline text-blue-500"
             >
-              contact the admin
+              contact the general admin
             </a>{" "}
-            for assistance.
+            for assistance. 👮‍♂️
           </Trans>
         </p>
       </div>
@@ -341,8 +342,7 @@ function AdminPageInternal() {
                       {new Date(log.date).toLocaleString()}
                     </p>
                     <p className="text-sm">
-                      <strong>{log.type.toUpperCase()}:</strong>{" "}
-                      {log.description || log.message}
+                      <strong>{log.type.toUpperCase()}:</strong> {log.ip}
                     </p>
                   </li>
                 ))}

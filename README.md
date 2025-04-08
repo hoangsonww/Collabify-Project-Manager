@@ -139,6 +139,12 @@ Collabify features a modern and user-friendly interface designed to enhance prod
   <img src="img/tasks-table.png" alt="Tasks Page" width="100%" style="border-radius: 8px">
 </p>
 
+### Profile Page
+
+<p align="center">
+  <img src="img/profile.png" alt="Profile Page" width="100%" style="border-radius: 8px">
+</p>
+
 ### Admin Panel
 
 <p align="center">

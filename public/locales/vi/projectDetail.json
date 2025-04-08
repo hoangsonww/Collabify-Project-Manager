@@ -107,5 +107,16 @@
   "dueDate": "Ngày Hết Hạn",
   "dueTime": "Thời Gian Hết Hạn (24 giờ)",
   "confirmRemoveMemberTitle": "Xác Nhận Xóa Thành Viên",
-  "confirmRemoveMemberDesc": "Bạn có chắc muốn xóa thành viên này khỏi dự án không?"
+  "confirmRemoveMemberDesc": "Bạn có chắc muốn xóa thành viên này khỏi dự án không?",
+  "timeLeft": {
+    "overdue": "Đã quá hạn",
+    "secondsLeft": "Còn {{count}} giây",
+    "secondsLeft_plural": "Còn {{count}} giây",
+    "minutesLeft": "Còn {{count}} phút",
+    "minutesLeft_plural": "Còn {{count}} phút",
+    "hoursLeft": "Còn {{count}} giờ",
+    "hoursLeft_plural": "Còn {{count}} giờ",
+    "daysLeft": "Còn {{count}} ngày",
+    "daysLeft_plural": "Còn {{count}} ngày"
+  }
 }

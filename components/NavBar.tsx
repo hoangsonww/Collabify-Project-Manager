@@ -76,7 +76,7 @@ function NavBarInternal() {
       animate="visible"
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <div className="mx-auto w-[90%] px-4 py-3 flex items-center justify-between">
+      <div className="mx-auto w-[100%] px-4 py-3 flex items-center justify-between">
         <motion.div
           variants={fadeVariants}
           transition={{ delay: 0.1, duration: 0.4 }}

@@ -1,4 +1,3 @@
-// File: /pages/api/projects/[id]/membership.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "@auth0/nextjs-auth0";
 import { dbConnect } from "@/lib/mongodb";
