@@ -19,6 +19,7 @@ import Head from "next/head";
 import { toast } from "sonner";
 
 // (1) Import react-i18next + dynamic
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Trans, useTranslation } from "react-i18next";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";

@@ -30,8 +30,8 @@ export default async function handler(
   project.members = project.members.filter((m: any) => m !== userSub);
 
   // Remove the user from the membership list.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   project.membership = project.membership.filter(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (member: any) => member.userSub !== userSub,
   );
 
