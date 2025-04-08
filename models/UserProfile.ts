@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
 const UserProfileSchema = new mongoose.Schema({
-  userSub: { type: String, required: true, unique: true }, // our local key
-  sub: { type: String }, // Auth0's sub (usually same as userSub)
-  sid: { type: String }, // Auth0's session ID
+  userSub: { type: String, required: true, unique: true },
+  sub: { type: String },
+  sid: { type: String },
   name: { type: String },
   nickname: { type: String },
   email: { type: String },

@@ -44,10 +44,10 @@ export default async function handler(
     );
     return res.status(200).json({ message: "Verification email sent" });
   } catch (error) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     console.error(
       "Resend verification error:",
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       error.response?.data || error.message,
     );
     return res.status(500).json({ error: "Failed to send verification email" });

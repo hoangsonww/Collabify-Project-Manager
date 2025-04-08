@@ -39,7 +39,7 @@ const TaskSchema = new Schema<ITask>(
       enum: ["low", "medium", "high"],
       default: "medium",
     },
-    dueDate: { type: Date }, // NEW
+    dueDate: { type: Date },
   },
   { _id: false },
 );
