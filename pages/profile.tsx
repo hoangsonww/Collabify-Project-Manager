@@ -389,7 +389,7 @@ function ProfilePageInternal() {
             </motion.div>
             {/* Staggered Text Container */}
             <motion.div
-              className="flex-1 space-y-2"
+              className="flex-1 space-y-2 truncate"
               variants={staggerContainerVariants}
               initial="hidden"
               animate="visible"
