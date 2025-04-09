@@ -24,7 +24,6 @@ One of the key features is secure authentication using [Auth0](https://auth0.com
   <img src="img/collabify.png" alt="Collabify Logo" width="50%" style="border-radius: 8px">
 </p>
 
-
 ## Table of Contents
 
 - [Overview](#overview)
