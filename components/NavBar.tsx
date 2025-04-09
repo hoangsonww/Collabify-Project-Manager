@@ -68,7 +68,10 @@ function NavBarInternal() {
       >
         <div className="mx-auto w-[100%] px-4 py-3 flex items-center justify-between">
           <div className="hover:opacity-80">
-            <Link href="/" className="flex items-center space-x-2 font-bold text-xl">
+            <Link
+              href="/"
+              className="flex items-center space-x-2 font-bold text-xl"
+            >
               <span className="bg-gradient-to-r from-pink-600 via-red-600 to-yellow-400 text-transparent bg-clip-text animate-gradient">
                 Collabify
               </span>
