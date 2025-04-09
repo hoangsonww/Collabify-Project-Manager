@@ -1159,7 +1159,10 @@ function ProjectDetailPageInternal() {
                               key={task._id}
                               className="border-t border-gray-700"
                             >
-                              <td className="p-2 text-white">{task.title}</td>
+                              {/* Task Title */}
+                              <td className="p-2 text-white max-w-[150px] whitespace-normal break-all">
+                                {task.title}
+                              </td>
                               <td className="p-2 capitalize">
                                 {task.status === "todo" && (
                                   <Circle className="inline-block mr-1 h-4 w-4 text-gray-400" />
@@ -1181,8 +1184,8 @@ function ProjectDetailPageInternal() {
                                           : "text-white"
                                   }`}
                                 >
-                                  {t(`statuses.${task.status}`)}
-                                </span>
+      {t(`statuses.${task.status}`)}
+    </span>
                               </td>
                               <td
                                 className={`p-2 capitalize ${colorByPriority}`}
@@ -1196,14 +1199,14 @@ function ProjectDetailPageInternal() {
                                   const dueDate = task.dueDate
                                     ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                       // @ts-ignore
-                                      new Date(task.dueDate)
+                                    new Date(task.dueDate)
                                     : new Date();
                                   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                   // @ts-ignore
                                   const timeLeftText = task.dueDate
                                     ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                       // @ts-ignore
-                                      getTimeLeft(task.dueDate, t)
+                                    getTimeLeft(task.dueDate, t)
                                     : getTimeLeft(new Date().toISOString(), t);
                                   const isOverdue = [
                                     "overdue",
@@ -1211,29 +1214,30 @@ function ProjectDetailPageInternal() {
                                   ].includes(timeLeftText.toLowerCase());
                                   return (
                                     <span>
-                                      {format(dueDate, "PP", {
-                                        locale: currentLocale,
-                                      })}{" "}
+          {format(dueDate, "PP", {
+            locale: currentLocale,
+          })}{" "}
                                       (
-                                      <span
-                                        className={
-                                          isOverdue
-                                            ? "text-red-500"
-                                            : "text-green-500"
-                                        }
-                                      >
-                                        {timeLeftText}
-                                      </span>
-                                      )
-                                    </span>
+          <span
+            className={
+              isOverdue
+                ? "text-red-500"
+                : "text-green-500"
+            }
+          >
+            {timeLeftText}
+          </span>
+          )
+        </span>
                                   );
                                 })()}
                               </td>
-                              <td className="p-2 text-white">
+                              {/* Assigned To */}
+                              <td className="p-2 text-white max-w-[150px] whitespace-normal break-all">
                                 {task.assignedTo
                                   ? memberships.find(
-                                      (m) => m.userSub === task.assignedTo,
-                                    )?.displayName || task.assignedTo
+                                  (m) => m.userSub === task.assignedTo,
+                                )?.displayName || task.assignedTo
                                   : "-"}
                               </td>
                               <td className="p-2 flex gap-2 items-center">
