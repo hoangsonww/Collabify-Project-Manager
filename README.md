@@ -8,8 +8,11 @@
 [![React Query](https://img.shields.io/badge/React_Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white)](https://tanstack.com/query/latest)
 [![i18n](https://img.shields.io/badge/i18next-Multilingual-blueviolet?style=for-the-badge&logo=translate)](https://www.i18next.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/)
+[![EsLint](https://img.shields.io/badge/ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)](https://eslint.org/)
+[![Prettier](https://img.shields.io/badge/Prettier-FF69B4?style=for-the-badge&logo=prettier&logoColor=white)](https://prettier.io/)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-29D8DB?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
+[![Chart.js](https://img.shields.io/badge/Chart.js-F38B00?style=for-the-badge&logo=chartdotjs&logoColor=white)](https://www.chartjs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Container-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
@@ -310,7 +313,17 @@ Follow these steps to configure Auth0 for Collabify:
 7. In your M2M application settings (from step 3), grant it the required scopes to interact with this API (e.g., `read:users`, `update:users`, `read:roles`, etc.).
 8. Now your Auth0 setup is complete.
 
-### 5. Testing the Application
+### 5. Adding Roles
+
+1. In the Auth0 Dashboard, navigate to **User Management > Roles**.
+2. Click **Create Role**.
+3. **Name your role:** e.g., "Project Manager".
+4. **Description:** Add a description for the role.
+5. **Assign Permissions:** Assign the necessary permissions to this role (e.g., `read:projects`, `create:tasks`, etc.).
+6. Save the role.
+7. Repeat for other roles as needed (e.g., "Project Member", "Viewer", "Admin"). It is of utmost importance to ensure that the roles are set up correctly, as they will determine what users can and cannot do within the application.
+
+### 6. Testing the Application
 
 1. **Run the development server:**
 
@@ -420,11 +433,13 @@ Contributions are welcome! If you have suggestions for improvements or new featu
 4. Commit your changes (`git commit -m 'Add some feature'`)
 5. Push to the branch (`git push origin feature/YourFeature`)
 6. Open a pull request
-7. Wait for review and feedback
+7. Wait for review and feedback. We'll review your pull request and provide feedback. If everything looks good, we'll merge it into the main branch.
 
 We appreciate your contributions to make Collabify even better!
 
 Also, feel free to open an issue if you find any bugs or have feature requests. We are always looking to improve the application and your feedback is invaluable.
+
+> Note: Please make sure to follow the code style and conventions used in the project. This will help maintain consistency and readability throughout the codebase.
 
 ## Conclusion
 
