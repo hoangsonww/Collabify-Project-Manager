@@ -21,7 +21,7 @@
 One of the key features is secure authentication using [Auth0](https://auth0.com/), which is integrated using both Regular Web Applications (RWA) and Machine-to-Machine (M2M) credentials, with Role-Based Access Control (RBAC) for enhanced security. The application also utilizes [MongoDB](https://www.mongodb.com/) for data storage, ensuring reliable and scalable data management. Internationalization (i18n) support is provided through the [i18next](https://www.i18next.com/) library, allowing for easy localization of the application.
 
 <p align="center">
-  <img src="img/collabify.png" alt="Collabify Logo" width="40%" style="border-radius: 8px">
+  <img src="img/collabify.png" alt="Collabify Logo" width="30%" style="border-radius: 8px">
 </p>
 
 ## Table of Contents
