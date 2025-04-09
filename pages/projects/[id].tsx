@@ -1159,7 +1159,6 @@ function ProjectDetailPageInternal() {
                               key={task._id}
                               className="border-t border-gray-700"
                             >
-                              {/* Task Title */}
                               <td className="p-2 text-white max-w-[150px] whitespace-normal break-all">
                                 {task.title}
                               </td>
@@ -1184,8 +1183,8 @@ function ProjectDetailPageInternal() {
                                           : "text-white"
                                   }`}
                                 >
-      {t(`statuses.${task.status}`)}
-    </span>
+                                  {t(`statuses.${task.status}`)}
+                                </span>
                               </td>
                               <td
                                 className={`p-2 capitalize ${colorByPriority}`}
@@ -1199,14 +1198,14 @@ function ProjectDetailPageInternal() {
                                   const dueDate = task.dueDate
                                     ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                       // @ts-ignore
-                                    new Date(task.dueDate)
+                                      new Date(task.dueDate)
                                     : new Date();
                                   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                   // @ts-ignore
                                   const timeLeftText = task.dueDate
                                     ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                       // @ts-ignore
-                                    getTimeLeft(task.dueDate, t)
+                                      getTimeLeft(task.dueDate, t)
                                     : getTimeLeft(new Date().toISOString(), t);
                                   const isOverdue = [
                                     "overdue",
@@ -1214,88 +1213,90 @@ function ProjectDetailPageInternal() {
                                   ].includes(timeLeftText.toLowerCase());
                                   return (
                                     <span>
-          {format(dueDate, "PP", {
-            locale: currentLocale,
-          })}{" "}
+                                      {format(dueDate, "PP", {
+                                        locale: currentLocale,
+                                      })}{" "}
                                       (
-          <span
-            className={
-              isOverdue
-                ? "text-red-500"
-                : "text-green-500"
-            }
-          >
-            {timeLeftText}
-          </span>
-          )
-        </span>
+                                      <span
+                                        className={
+                                          isOverdue
+                                            ? "text-red-500"
+                                            : "text-green-500"
+                                        }
+                                      >
+                                        {timeLeftText}
+                                      </span>
+                                      )
+                                    </span>
                                   );
                                 })()}
                               </td>
-                              {/* Assigned To */}
                               <td className="p-2 text-white max-w-[150px] whitespace-normal break-all">
                                 {task.assignedTo
                                   ? memberships.find(
-                                  (m) => m.userSub === task.assignedTo,
-                                )?.displayName || task.assignedTo
+                                      (m) => m.userSub === task.assignedTo,
+                                    )?.displayName || task.assignedTo
                                   : "-"}
                               </td>
-                              <td className="p-2 flex gap-2 items-center">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleToggleStatus(task._id)}
-                                  disabled={
-                                    myMembership?.role === "viewer" ||
-                                    togglingTaskId === task._id
-                                  }
-                                  className="text-white border-white cursor-pointer"
-                                >
-                                  <CircleCheck className="mr-2 h-4 w-4" />
-                                  {t("toggle")}
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  disabled={myMembership?.role === "viewer"}
-                                  onClick={() =>
-                                    openEditDialog(
-                                      task._id,
-                                      task.title,
-                                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                      // @ts-ignore
-                                      task.assignedTo,
-                                      task.priority || "medium",
-                                    )
-                                  }
-                                  className="text-white border-white cursor-pointer"
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  onClick={() =>
-                                    openDeleteDialogForTask(
-                                      task._id,
-                                      task.title,
-                                    )
-                                  }
-                                  disabled={
-                                    myMembership?.role === "viewer" ||
-                                    isDeletingTask
-                                  }
-                                  className="text-white cursor-pointer"
-                                >
-                                  {isDeletingTask ? (
-                                    <div
-                                      className="loader"
-                                      aria-label="Loading..."
-                                    />
-                                  ) : (
-                                    <Trash className="h-4 w-4" />
-                                  )}
-                                </Button>
+                              {/* Actions Cell with Vertical Centering */}
+                              <td className="p-2 align-middle">
+                                <div className="flex gap-2 items-center h-full">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleToggleStatus(task._id)}
+                                    disabled={
+                                      myMembership?.role === "viewer" ||
+                                      togglingTaskId === task._id
+                                    }
+                                    className="text-white border-white cursor-pointer"
+                                  >
+                                    <CircleCheck className="mr-2 h-4 w-4" />
+                                    {t("toggle")}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    disabled={myMembership?.role === "viewer"}
+                                    onClick={() =>
+                                      openEditDialog(
+                                        task._id,
+                                        task.title,
+                                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                        // @ts-ignore
+                                        task.assignedTo,
+                                        task.priority || "medium",
+                                      )
+                                    }
+                                    className="text-white border-white cursor-pointer"
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() =>
+                                      openDeleteDialogForTask(
+                                        task._id,
+                                        task.title,
+                                      )
+                                    }
+                                    disabled={
+                                      myMembership?.role === "viewer" ||
+                                      isDeletingTask
+                                    }
+                                    className="text-white cursor-pointer"
+                                  >
+                                    {isDeletingTask ? (
+                                      <div
+                                        className="loader"
+                                        aria-label="Loading..."
+                                      />
+                                    ) : (
+                                      <Trash className="h-4 w-4" />
+                                    )}
+                                  </Button>
+                                </div>
                               </td>
                             </tr>
                           );
