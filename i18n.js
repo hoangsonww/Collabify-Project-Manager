@@ -21,7 +21,7 @@ i18n
 
     react: {
       useSuspense: true,
-      ssr: false, // ❗ disables SSR entirely
+      ssr: false,
     },
   });
 
