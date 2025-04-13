@@ -201,6 +201,7 @@ function formatProjectsContext(projects: any[]): string {
       // Build a member list from the enriched membership data
       const memberList =
         membership && membership.length
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ? membership.map((m: any) => m.displayName || m.userSub).join(", ")
           : "No members";
       // Build task summary including due date and assignee if available
