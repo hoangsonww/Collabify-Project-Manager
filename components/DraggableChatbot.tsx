@@ -226,9 +226,9 @@ function formatProjectsContext(projects: any[]): string {
               .join("; ")
           : "No tasks";
       return `Project Name: ${name}
-Description: ${description}
-Members: ${memberList}
-Tasks: ${tasksSummary}`;
+              Description: ${description}
+              Members: ${memberList}
+              Tasks: ${tasksSummary}`;
     })
     .join("\n\n");
 }
