@@ -77,7 +77,8 @@ function RealHome() {
             >
               {t("howItWorks")}
             </motion.h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Adding items-stretch to ensure all grid items take full available height */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
               <HowItWorksStep
                 title={t("createProjects")}
                 text={t("createProjectsText")}
@@ -223,16 +224,19 @@ function FeatureCard({
 function HowItWorksStep({ title, text }: { title: string; text: string }) {
   return (
     <motion.div
+      className="h-full"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <Card className="bg-white shadow-lg border border-gray-200 transition-transform duration-300 hover:-translate-y-1">
-        <CardContent className="p-6 flex flex-col items-center text-center space-y-3">
+      {/* Add h-full and optionally a min-h class to ensure the card has consistent dimensions */}
+      <Card className="bg-white shadow-lg border border-gray-200 transition-transform duration-300 hover:-translate-y-1 h-full">
+        <CardContent className="p-6 flex flex-col items-center text-center space-y-3 h-full">
           <CheckCircle2 className="w-10 h-10 text-primary mb-2" />
           <h4 className="font-semibold text-lg text-gray-900">{title}</h4>
-          <p className="text-sm text-gray-600 max-w-sm">{text}</p>
+          {/* flex-grow ensures the description area uses available space */}
+          <p className="text-sm text-gray-600 flex-grow">{text}</p>
         </CardContent>
       </Card>
     </motion.div>

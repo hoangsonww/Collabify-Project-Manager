@@ -10,6 +10,7 @@ import "../i18n";
 import { Suspense } from "react";
 import Head from "next/head";
 import BackToTop from "@/components/BackToTop";
+import DraggableChatbot from "@/components/DraggableChatbot";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -31,6 +32,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
               <Component {...pageProps} />
             </main>
             <Footer />
+            <DraggableChatbot />
             {/* Sonner Toast Portal */}
             <Toaster position="bottom-right" richColors closeButton />
             {/* Back to Top Button */}

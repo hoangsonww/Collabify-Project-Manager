@@ -36,11 +36,11 @@ function BackToTop() {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           as={motion.button}
-          whileHover={{ scale: 1.2 }}
+          whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="cursor-pointer p-3 rounded-full shadow-xl bg-blue-500 hover:bg-blue-600 transition-colors duration-200"
+          className="p-3 rounded-full bg-black text-white shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-transform duration-200 hover:scale-110 hover:shadow-[0_0_20px_rgba(255,255,255,0.7)] hover:bg-white hover:text-black cursor-pointer focus:outline-none"
         >
-          <ArrowUp className="h-6 w-6 text-white" />
+          <ArrowUp className="w-6 h-6" />
         </Button>
       )}
     </motion.div>
