@@ -32,7 +32,7 @@ const cardVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-// Local types – note: we're using the new schema (membership is stored in the project)
+// Local types
 type ProjectType = {
   _id: string;
   projectId: string;

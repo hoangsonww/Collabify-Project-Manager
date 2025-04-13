@@ -1,3 +1,4 @@
+// components/DraggableChatbot.tsx
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +9,7 @@ import remarkGfm from "remark-gfm";
 import { chatWithCollabifyAI } from "@/lib/chatWithCollabifyAI";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { useUser } from "@auth0/nextjs-auth0/client"; // Using Auth0
 
 const MotionCard = motion(Card);
 
@@ -108,7 +110,7 @@ const baseMarkdownComponents = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   thead: ({ children, ...props }: any) => (
     <thead className="bg-white border-b border-white text-black" {...props}>
-      {children}
+    {children}
     </thead>
   ),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -199,31 +201,30 @@ function formatProjectsContext(projects: any[]): string {
       // Build a member list from the enriched membership data
       const memberList =
         membership && membership.length
-          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            membership.map((m: any) => m.displayName || m.userSub).join(", ")
+          ? membership.map((m: any) => m.displayName || m.userSub).join(", ")
           : "No members";
       // Build task summary including due date and assignee if available
       const tasksSummary =
         tasks && tasks.length
           ? tasks
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              .map((t: any) => {
-                const dueDateStr = t.dueDate
-                  ? new Date(t.dueDate).toLocaleDateString()
-                  : "No due date";
-                let assigneeName = "Unassigned";
-                if (t.assignedTo) {
-                  const found = membership
-                    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      membership.find((m: any) => m.userSub === t.assignedTo)
-                    : null;
-                  assigneeName = found
-                    ? found.displayName || found.userSub
-                    : t.assignedTo;
-                }
-                return `${t.title} [${t.status}] Due: ${dueDateStr} Assignee: ${assigneeName}`;
-              })
-              .join("; ")
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .map((t: any) => {
+              const dueDateStr = t.dueDate
+                ? new Date(t.dueDate).toLocaleDateString()
+                : "No due date";
+              let assigneeName = "Unassigned";
+              if (t.assignedTo) {
+                const found = membership
+                  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  membership.find((m: any) => m.userSub === t.assignedTo)
+                  : null;
+                assigneeName = found
+                  ? found.displayName || found.userSub
+                  : t.assignedTo;
+              }
+              return `${t.title} [${t.status}] Due: ${dueDateStr} Assignee: ${assigneeName}`;
+            })
+            .join("; ")
           : "No tasks";
       return `Project Name: ${name}
 Description: ${description}
@@ -235,6 +236,10 @@ Tasks: ${tasksSummary}`;
 
 const DraggableChatbot: React.FC = () => {
   const { t } = useTranslation("chatbot");
+  const { user, isLoading: authLoading } = useUser(); // Using Auth0
+
+  // Compute logged-in status (hooks are always called)
+  const isLoggedIn = !authLoading && !!user;
 
   // Modal and conversation state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -256,7 +261,6 @@ const DraggableChatbot: React.FC = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [projects, setProjects] = useState<any[]>([]);
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isProjectsLoading, setIsProjectsLoading] = useState(true);
 
@@ -281,7 +285,7 @@ const DraggableChatbot: React.FC = () => {
             }
             try {
               const resp = await fetch(
-                `/api/projects/${project.projectId}/membership`,
+                `/api/projects/${project.projectId}/membership`
               );
               if (!resp.ok) throw new Error("Failed to fetch membership");
               const membershipData = await resp.json(); // { membership: [...] }
@@ -289,7 +293,7 @@ const DraggableChatbot: React.FC = () => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const userSubs = membershipRaw.map((entry: any) => entry.userSub);
               const userInfoResp = await fetch(
-                `/api/users/infoBatch?users=${encodeURIComponent(userSubs.join(","))}`,
+                `/api/users/infoBatch?users=${encodeURIComponent(userSubs.join(","))}`
               );
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               let usersInfo: Record<string, any> = {};
@@ -307,12 +311,11 @@ const DraggableChatbot: React.FC = () => {
               console.error("Error enriching project", project.projectId, err);
               return project;
             }
-          }),
+          })
         );
         setProjects(projectsFetched);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        toast.error(t("couldNotFetchProjects"));
+        console.log(error);
       } finally {
         setIsProjectsLoading(false);
       }
@@ -320,7 +323,7 @@ const DraggableChatbot: React.FC = () => {
     fetchAndEnrichProjects();
   }, [t]);
 
-  // Ref for the chat messages container to scroll to the newest message
+  // Ref for the chat messages container to scroll to newest message
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (messagesContainerRef.current) {
@@ -366,10 +369,7 @@ const DraggableChatbot: React.FC = () => {
   // Persist conversation messages to localStorage whenever they update.
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "draggableChatbotMessages",
-        JSON.stringify(messages),
-      );
+      localStorage.setItem("draggableChatbotMessages", JSON.stringify(messages));
     }
   }, [messages]);
 
@@ -508,7 +508,7 @@ const DraggableChatbot: React.FC = () => {
     localStorage.removeItem("draggableChatbotMessages");
   };
 
-  return (
+  return !isLoggedIn ? null : (
     <>
       {/* Draggable Chatbot Toggler */}
       <div
@@ -575,9 +575,7 @@ const DraggableChatbot: React.FC = () => {
                           animate="visible"
                           exit={{ opacity: 0, y: -10 }}
                           className={`mb-3 transition-all duration-200 ${
-                            msg.sender === "user"
-                              ? "flex justify-end"
-                              : "flex justify-start"
+                            msg.sender === "user" ? "flex justify-end" : "flex justify-start"
                           }`}
                         >
                           <div
