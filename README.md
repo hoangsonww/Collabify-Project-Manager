@@ -1,6 +1,8 @@
 # Collabify - A Jira & Trello Alternative 🧩
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-blue?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.0.0-blue?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18.16.0-green?style=for-the-badge&logo=node.js)](https://nodejs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Shadcn UI](https://img.shields.io/badge/Shadcn_UI-v1.0-purple?style=for-the-badge)](https://ui.shadcn.com/)
 [![Auth0](https://img.shields.io/badge/Auth0-Security-brightgreen?style=for-the-badge&logo=auth0)](https://auth0.com/)
