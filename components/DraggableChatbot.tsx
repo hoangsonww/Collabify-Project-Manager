@@ -195,7 +195,7 @@ function formatProjectsContext(projects: any[]): string {
             const dueDateStr = t.dueDate ? new Date(t.dueDate).toLocaleDateString() : "No due date";
             let assigneeName = "Unassigned";
             if (t.assignedTo) {
-              // Try to find in membership of the same project for enriched display name
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const found = membership ? membership.find((m: any) => m.userSub === t.assignedTo) : null;
               assigneeName = found ? (found.displayName || found.userSub) : t.assignedTo;
             }
@@ -237,7 +237,7 @@ const DraggableChatbot: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [projects, setProjects] = useState<any[]>([]);
 
-  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isProjectsLoading, setIsProjectsLoading] = useState(true);
 
   // Fetch and enrich all user projects from the API endpoint (combined effect)
@@ -250,6 +250,7 @@ const DraggableChatbot: React.FC = () => {
         let projectsFetched = data.projects || [];
         // Enrich projects: for each project, if membership isn't enriched, fetch membership and user info.
         projectsFetched = await Promise.all(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           projectsFetched.map(async (project: any) => {
             if (project.membership && project.membership.length > 0 && project.membership[0].displayName) {
               return project;
@@ -259,14 +260,17 @@ const DraggableChatbot: React.FC = () => {
               if (!resp.ok) throw new Error("Failed to fetch membership");
               const membershipData = await resp.json(); // { membership: [...] }
               const membershipRaw = membershipData.membership || [];
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const userSubs = membershipRaw.map((entry: any) => entry.userSub);
               const userInfoResp = await fetch(
                 `/api/users/infoBatch?users=${encodeURIComponent(userSubs.join(","))}`
               );
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               let usersInfo: Record<string, any> = {};
               if (userInfoResp.ok) {
                 usersInfo = await userInfoResp.json();
               }
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const membershipWithInfo = membershipRaw.map((entry: any) => {
                 const info = usersInfo[entry.userSub] || {};
                 const displayName = info.name || info.email || entry.userSub;
@@ -280,6 +284,7 @@ const DraggableChatbot: React.FC = () => {
           })
         );
         setProjects(projectsFetched);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error(t("couldNotFetchProjects"));
       } finally {
