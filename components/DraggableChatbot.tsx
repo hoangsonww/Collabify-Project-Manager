@@ -1,4 +1,3 @@
-// components/DraggableChatbot.tsx
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,8 +7,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { chatWithCollabifyAI } from "@/lib/chatWithCollabifyAI";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import { useUser } from "@auth0/nextjs-auth0/client"; // Using Auth0
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 const MotionCard = motion(Card);
 
@@ -110,7 +108,7 @@ const baseMarkdownComponents = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   thead: ({ children, ...props }: any) => (
     <thead className="bg-white border-b border-white text-black" {...props}>
-    {children}
+      {children}
     </thead>
   ),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -201,31 +199,31 @@ function formatProjectsContext(projects: any[]): string {
       // Build a member list from the enriched membership data
       const memberList =
         membership && membership.length
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ? membership.map((m: any) => m.displayName || m.userSub).join(", ")
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            membership.map((m: any) => m.displayName || m.userSub).join(", ")
           : "No members";
       // Build task summary including due date and assignee if available
       const tasksSummary =
         tasks && tasks.length
           ? tasks
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .map((t: any) => {
-              const dueDateStr = t.dueDate
-                ? new Date(t.dueDate).toLocaleDateString()
-                : "No due date";
-              let assigneeName = "Unassigned";
-              if (t.assignedTo) {
-                const found = membership
-                  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  membership.find((m: any) => m.userSub === t.assignedTo)
-                  : null;
-                assigneeName = found
-                  ? found.displayName || found.userSub
-                  : t.assignedTo;
-              }
-              return `${t.title} [${t.status}] Due: ${dueDateStr} Assignee: ${assigneeName}`;
-            })
-            .join("; ")
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              .map((t: any) => {
+                const dueDateStr = t.dueDate
+                  ? new Date(t.dueDate).toLocaleDateString()
+                  : "No due date";
+                let assigneeName = "Unassigned";
+                if (t.assignedTo) {
+                  const found = membership
+                    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      membership.find((m: any) => m.userSub === t.assignedTo)
+                    : null;
+                  assigneeName = found
+                    ? found.displayName || found.userSub
+                    : t.assignedTo;
+                }
+                return `${t.title} [${t.status}] Due: ${dueDateStr} Assignee: ${assigneeName}`;
+              })
+              .join("; ")
           : "No tasks";
       return `Project Name: ${name}
 Description: ${description}
@@ -286,7 +284,7 @@ const DraggableChatbot: React.FC = () => {
             }
             try {
               const resp = await fetch(
-                `/api/projects/${project.projectId}/membership`
+                `/api/projects/${project.projectId}/membership`,
               );
               if (!resp.ok) throw new Error("Failed to fetch membership");
               const membershipData = await resp.json(); // { membership: [...] }
@@ -294,7 +292,7 @@ const DraggableChatbot: React.FC = () => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const userSubs = membershipRaw.map((entry: any) => entry.userSub);
               const userInfoResp = await fetch(
-                `/api/users/infoBatch?users=${encodeURIComponent(userSubs.join(","))}`
+                `/api/users/infoBatch?users=${encodeURIComponent(userSubs.join(","))}`,
               );
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               let usersInfo: Record<string, any> = {};
@@ -312,7 +310,7 @@ const DraggableChatbot: React.FC = () => {
               console.error("Error enriching project", project.projectId, err);
               return project;
             }
-          })
+          }),
         );
         setProjects(projectsFetched);
       } catch (error) {
@@ -370,7 +368,10 @@ const DraggableChatbot: React.FC = () => {
   // Persist conversation messages to localStorage whenever they update.
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("draggableChatbotMessages", JSON.stringify(messages));
+      localStorage.setItem(
+        "draggableChatbotMessages",
+        JSON.stringify(messages),
+      );
     }
   }, [messages]);
 
@@ -576,7 +577,9 @@ const DraggableChatbot: React.FC = () => {
                           animate="visible"
                           exit={{ opacity: 0, y: -10 }}
                           className={`mb-3 transition-all duration-200 ${
-                            msg.sender === "user" ? "flex justify-end" : "flex justify-start"
+                            msg.sender === "user"
+                              ? "flex justify-end"
+                              : "flex justify-start"
                           }`}
                         >
                           <div

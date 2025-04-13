@@ -394,6 +394,10 @@ Step-by-step instructions for adding a new language:
 
 Users can ask various questions about their taska and projects, and get even recommendations on how to improve their productivity. The chatbot is powered by [OpenAI's GPT-3](https://openai.com/) and uses the [OpenAI API](https://platform.openai.com/docs/api-reference) to generate responses.
 
+_Cool stuff_: I took some time to make the chatbot toggler look like Apple's Assistive Touch button that you can drag around the screen and it'll snap to the edges. This is a fun little feature that adds a nice touch to the user experience.
+
+> Note: In mobile, the drag and drop feature may not work as expected due to the limitations of mobile gestures. However, it should work perfectly fine on desktop and laptop devices.
+
 ## Deployment
 
 Collabify is built with Next.js, so it’s optimized for platforms like [Vercel](https://vercel.com/). For deployment:
