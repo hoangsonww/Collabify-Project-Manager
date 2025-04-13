@@ -8,7 +8,6 @@ import { ArrowUp } from "lucide-react";
 function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
 
-  // Show button when page is scrolled down 50px
   useEffect(() => {
     const toggleVisibility = () => {
       setIsVisible(window.pageYOffset > 50);

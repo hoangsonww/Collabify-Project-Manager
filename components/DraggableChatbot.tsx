@@ -1,5 +1,4 @@
-// components/DraggableChatbot.tsx
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { X, MessageSquare, Loader2, Send, Trash2 } from "lucide-react";
@@ -7,103 +6,135 @@ import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { chatWithCollabifyAI } from "@/lib/chatWithCollabifyAI";
-import { useTranslation } from "react-i18next"; // added translation hook
+import { useTranslation } from "react-i18next";
 
 // Create a motion-wrapped version of Card
 const MotionCard = motion(Card);
 
-/* --------------------------------------------------------------------------
-   Custom Markdown Components
-   --------------------------------------------------------------------------
-   We define base components then create two variants—one for user messages
-   (forcing black text on paragraphs) and one for model messages (keeping white text).
-   Additionally, we override links so that any link starting with "#" has its default
-   behavior prevented, and all links open in a new tab.
--------------------------------------------------------------------------- */
 const baseMarkdownComponents = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h1: ({ children, ...props }: any) => (
-    <h1 className="text-2xl font-bold my-4 border-b-2 border-white pb-2 overflow-x-auto" {...props}>
+    <h1
+      className="text-2xl font-bold my-4 border-b-2 border-white pb-2 overflow-x-auto"
+      {...props}
+    >
       {children}
     </h1>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h2: ({ children, ...props }: any) => (
-    <h2 className="text-xl font-bold my-3 border-b border-white pb-1 overflow-x-auto" {...props}>
+    <h2
+      className="text-xl font-bold my-3 border-b border-white pb-1 overflow-x-auto"
+      {...props}
+    >
       {children}
     </h2>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h3: ({ children, ...props }: any) => (
     <h3 className="text-lg font-bold my-3 overflow-x-auto" {...props}>
       {children}
     </h3>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h4: ({ children, ...props }: any) => (
     <h4 className="text-base font-bold my-2 overflow-x-auto" {...props}>
       {children}
     </h4>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h5: ({ children, ...props }: any) => (
     <h5 className="text-sm font-bold my-2 overflow-x-auto" {...props}>
       {children}
     </h5>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h6: ({ children, ...props }: any) => (
     <h6 className="text-xs font-bold my-2 overflow-x-auto" {...props}>
       {children}
     </h6>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   p: ({ children, ...props }: any) => (
     <p className="mb-3 leading-relaxed overflow-x-auto" {...props}>
       {children}
     </p>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   blockquote: ({ children, ...props }: any) => (
-    <blockquote className="border-l-4 border-white pl-4 italic my-3 text-white overflow-x-auto" {...props}>
+    <blockquote
+      className="border-l-4 border-white pl-4 italic my-3 text-white overflow-x-auto"
+      {...props}
+    >
       {children}
     </blockquote>
   ),
-  hr: ({ ...props }: any) => <hr className="border-t border-white my-3" {...props} />,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  hr: ({ ...props }: any) => (
+    <hr className="border-t border-white my-3" {...props} />
+  ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   code: ({ inline, children, ...props }: any) => {
     if (inline) {
       return (
-        <code className="bg-white text-black px-1 py-0.5 rounded text-sm font-mono overflow-x-auto" {...props}>
+        <code
+          className="bg-white text-black px-1 py-0.5 rounded text-sm font-mono overflow-x-auto"
+          {...props}
+        >
           {children}
         </code>
       );
     }
     return (
-      <pre className="bg-white text-black p-2 rounded text-sm font-mono overflow-x-auto my-3" {...props}>
+      <pre
+        className="bg-white text-black p-2 rounded text-sm font-mono overflow-x-auto my-3"
+        {...props}
+      >
         <code>{children}</code>
       </pre>
     );
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   table: ({ children, ...props }: any) => (
     <div className="overflow-x-auto my-3">
-      <table className="min-w-full border-collapse border border-white text-sm" {...props}>
+      <table
+        className="min-w-full border-collapse border border-white text-sm"
+        {...props}
+      >
         {children}
       </table>
     </div>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   thead: ({ children, ...props }: any) => (
     <thead className="bg-white border-b border-white text-black" {...props}>
-    {children}
+      {children}
     </thead>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tbody: ({ children, ...props }: any) => <tbody {...props}>{children}</tbody>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tr: ({ children, ...props }: any) => (
     <tr className="border-b last:border-0" {...props}>
       {children}
     </tr>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   th: ({ children, ...props }: any) => (
-    <th className="border border-white px-3 py-2 font-semibold text-left overflow-x-auto" {...props}>
+    <th
+      className="border border-white px-3 py-2 font-semibold text-left overflow-x-auto"
+      {...props}
+    >
       {children}
     </th>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   td: ({ children, ...props }: any) => (
     <td className="border border-white px-3 py-2 overflow-x-auto" {...props}>
       {children}
     </td>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   a: ({ href, children, ...props }: any) => (
     <a
       href={href}
@@ -124,6 +155,7 @@ const baseMarkdownComponents = {
 
 const userMarkdownComponents = {
   ...baseMarkdownComponents,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   p: ({ children, ...props }: any) => (
     <p className="mb-3 leading-relaxed text-black overflow-x-auto" {...props}>
       {children}
@@ -133,6 +165,7 @@ const userMarkdownComponents = {
 
 const modelMarkdownComponents = {
   ...baseMarkdownComponents,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   p: ({ children, ...props }: any) => (
     <p className="mb-3 leading-relaxed text-white overflow-x-auto" {...props}>
       {children}
@@ -140,9 +173,6 @@ const modelMarkdownComponents = {
   ),
 };
 
-/* --------------------------------------------------------------------------
-   Chat Message Type & Animation Variants
--------------------------------------------------------------------------- */
 interface Message {
   sender: "user" | "model";
   text: string;
@@ -185,12 +215,17 @@ const DraggableChatbot: React.FC = () => {
 
   // Draggable toggler button state and refs
   const margin = 16;
-  const [position, setPosition] = useState<{ x: number; y: number }>({ x: margin, y: 0 });
-  // alignment: "left" or "right" flag to preserve the edge alignment when resizing
+  const [position, setPosition] = useState<{ x: number; y: number }>({
+    x: margin,
+    y: 0,
+  });
   const [alignment, setAlignment] = useState<"left" | "right">("left");
   const buttonRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const initialPointerPos = useRef<{ x: number; y: number } | null>(null);
+  const hasDragged = useRef(false);
+  const DRAG_THRESHOLD = 5; // pixels
 
   // On mount, load toggler position from localStorage or default to left edge, vertically centered.
   useEffect(() => {
@@ -214,12 +249,18 @@ const DraggableChatbot: React.FC = () => {
   // Persist conversation messages to localStorage whenever they update.
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("draggableChatbotMessages", JSON.stringify(messages));
+      localStorage.setItem(
+        "draggableChatbotMessages",
+        JSON.stringify(messages),
+      );
     }
   }, [messages]);
 
   // Save toggler position and alignment to localStorage.
-  const savePosition = (newPos: { x: number; y: number }, align: "left" | "right") => {
+  const savePosition = (
+    newPos: { x: number; y: number },
+    align: "left" | "right",
+  ) => {
     localStorage.setItem("draggableChatbotPosition", JSON.stringify(newPos));
     setAlignment(align);
   };
@@ -237,7 +278,10 @@ const DraggableChatbot: React.FC = () => {
         } else {
           newX = windowWidth - width - margin;
         }
-        const newY = Math.min(Math.max(position.y, margin), windowHeight - height - margin);
+        const newY = Math.min(
+          Math.max(position.y, margin),
+          windowHeight - height - margin,
+        );
         const newPos = { x: newX, y: newY };
         setPosition(newPos);
         savePosition(newPos, alignment);
@@ -250,34 +294,62 @@ const DraggableChatbot: React.FC = () => {
   // Pointer event handlers.
   const handlePointerDown = (e: React.PointerEvent) => {
     isDragging.current = true;
-    dragOffset.current = { x: e.clientX - position.x, y: e.clientY - position.y };
+    dragOffset.current = {
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    };
+    initialPointerPos.current = { x: e.clientX, y: e.clientY };
+    hasDragged.current = false;
     (e.target as Element).setPointerCapture(e.pointerId);
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDragging.current) return;
+
+    // Check if movement exceeds threshold
+    if (initialPointerPos.current && !hasDragged.current) {
+      const dx = e.clientX - initialPointerPos.current.x;
+      const dy = e.clientY - initialPointerPos.current.y;
+      if (Math.hypot(dx, dy) > DRAG_THRESHOLD) {
+        hasDragged.current = true;
+      }
+    }
+
     const newX = e.clientX - dragOffset.current.x;
     const newY = e.clientY - dragOffset.current.y;
     setPosition({ x: newX, y: newY });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handlePointerUp = (e: React.PointerEvent) => {
     isDragging.current = false;
+    initialPointerPos.current = null;
     if (buttonRef.current) {
       const { width, height } = buttonRef.current.getBoundingClientRect();
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
-      const newX = position.x + width / 2 < windowWidth / 2 ? margin : windowWidth - width - margin;
+      const newX =
+        position.x + width / 2 < windowWidth / 2
+          ? margin
+          : windowWidth - width - margin;
       const newAlign = newX === margin ? "left" : "right";
-      const newY = Math.min(Math.max(position.y, margin), windowHeight - height - margin);
+      const newY = Math.min(
+        Math.max(position.y, margin),
+        windowHeight - height - margin,
+      );
       const newPos = { x: newX, y: newY };
       setPosition(newPos);
       savePosition(newPos, newAlign);
     }
   };
 
+  // Only open modal on a click (i.e. if no significant drag occurred)
   const handleButtonClick = () => {
-    if (!isDragging.current) setIsModalOpen(true);
+    if (!hasDragged.current) {
+      setIsModalOpen(true);
+    }
+    // reset flag after handling click
+    hasDragged.current = false;
   };
 
   // Handler to send a message and call the AI helper.
@@ -329,7 +401,7 @@ const DraggableChatbot: React.FC = () => {
         </Button>
       </div>
 
-      {/* Modal Overlay (z-index higher than toggler) - clicking outside the Card closes the modal */}
+      {/* Modal Overlay - clicking outside the Card closes the modal */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
@@ -354,12 +426,18 @@ const DraggableChatbot: React.FC = () => {
                 >
                   <X className="w-6 h-6" />
                 </button>
-                <h2 className="text-2xl font-bold text-white mb-1">{t("collabifyAssistant")}</h2>
-                <p className="text-sm text-gray-300 mb-4">{t("collabifyAssistantDesc")}</p>
+                <h2 className="text-2xl font-bold text-white mb-1">
+                  {t("collabifyAssistant")}
+                </h2>
+                <p className="text-sm text-gray-300 mb-4">
+                  {t("collabifyAssistantDesc")}
+                </p>
                 {/* Chat Messages Container */}
                 <div className="h-72 overflow-y-auto border border-white p-4 mb-4 rounded-xl shadow-inner bg-black">
                   {messages.length === 0 && !loading ? (
-                    <p className="text-white text-center">{t("typeSomething")}</p>
+                    <p className="text-white text-center">
+                      {t("typeSomething")}
+                    </p>
                   ) : (
                     <>
                       {messages.map((msg, idx) => (
@@ -370,7 +448,9 @@ const DraggableChatbot: React.FC = () => {
                           animate="visible"
                           exit={{ opacity: 0, y: -10 }}
                           className={`mb-3 transition-all duration-200 ${
-                            msg.sender === "user" ? "flex justify-end" : "flex justify-start"
+                            msg.sender === "user"
+                              ? "flex justify-end"
+                              : "flex justify-start"
                           }`}
                         >
                           <div
