@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 
 import { useTranslation } from "react-i18next";
 
-// 1) create a "RealHome" component that uses react-i18next for translations
 function RealHome() {
   const { t } = useTranslation("collabify");
 
@@ -77,7 +76,7 @@ function RealHome() {
             >
               {t("howItWorks")}
             </motion.h2>
-            {/* Adding items-stretch to ensure all grid items take full available height */}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
               <HowItWorksStep
                 title={t("createProjects")}
