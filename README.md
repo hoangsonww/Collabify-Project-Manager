@@ -390,9 +390,9 @@ Step-by-step instructions for adding a new language:
 
 **Collabify** also includes a chatbot feature to allow users to interact with the application using natural language, which provides a conversational interface for users to ask questions and receive answers related to project management, tasks, and other features of the application.
 
-**Collabify Assistant** has access to all of the user's projects and tasks, and can provide information about them. It can also help users create new tasks, update existing ones, and manage their projects more efficiently.
+**Collabify Assistant** has access to all the user's projects and tasks, and can provide information about them. It can also help users create new tasks, update existing ones, and manage their projects more efficiently.
 
-Users can ask various questions about their taska and projects, and get even recommendations on how to improve their productivity. The chatbot is powered by [OpenAI's GPT-3](https://openai.com/) and uses the [OpenAI API](https://platform.openai.com/docs/api-reference) to generate responses.
+Users can ask various questions about their taska and projects, and even get recommendations on how to improve their productivity.
 
 _Cool stuff_: I took some time to make the chatbot toggler look like Apple's Assistive Touch button that you can drag around the screen and it'll snap to the edges. This is a fun little feature that adds a nice touch to the user experience.
 
