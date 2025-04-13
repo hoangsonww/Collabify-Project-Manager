@@ -1,3 +1,4 @@
+// components/DraggableChatbot.tsx
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,134 +8,99 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { chatWithCollabifyAI } from "@/lib/chatWithCollabifyAI";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 // Create a motion-wrapped version of Card
 const MotionCard = motion(Card);
 
+/* --------------------------------------------------------------------------
+   Custom Markdown Components
+-------------------------------------------------------------------------- */
 const baseMarkdownComponents = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h1: ({ children, ...props }: any) => (
-    <h1
-      className="text-2xl font-bold my-4 border-b-2 border-white pb-2 overflow-x-auto"
-      {...props}
-    >
+    <h1 className="text-2xl font-bold my-4 border-b-2 border-white pb-2 overflow-x-auto" {...props}>
       {children}
     </h1>
   ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h2: ({ children, ...props }: any) => (
-    <h2
-      className="text-xl font-bold my-3 border-b border-white pb-1 overflow-x-auto"
-      {...props}
-    >
+    <h2 className="text-xl font-bold my-3 border-b border-white pb-1 overflow-x-auto" {...props}>
       {children}
     </h2>
   ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h3: ({ children, ...props }: any) => (
     <h3 className="text-lg font-bold my-3 overflow-x-auto" {...props}>
       {children}
     </h3>
   ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h4: ({ children, ...props }: any) => (
     <h4 className="text-base font-bold my-2 overflow-x-auto" {...props}>
       {children}
     </h4>
   ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h5: ({ children, ...props }: any) => (
     <h5 className="text-sm font-bold my-2 overflow-x-auto" {...props}>
       {children}
     </h5>
   ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h6: ({ children, ...props }: any) => (
     <h6 className="text-xs font-bold my-2 overflow-x-auto" {...props}>
       {children}
     </h6>
   ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   p: ({ children, ...props }: any) => (
     <p className="mb-3 leading-relaxed overflow-x-auto" {...props}>
       {children}
     </p>
   ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   blockquote: ({ children, ...props }: any) => (
-    <blockquote
-      className="border-l-4 border-white pl-4 italic my-3 text-white overflow-x-auto"
-      {...props}
-    >
+    <blockquote className="border-l-4 border-white pl-4 italic my-3 text-white overflow-x-auto" {...props}>
       {children}
     </blockquote>
   ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  hr: ({ ...props }: any) => (
-    <hr className="border-t border-white my-3" {...props} />
-  ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  hr: ({ ...props }: any) => <hr className="border-t border-white my-3" {...props} />,
   code: ({ inline, children, ...props }: any) => {
     if (inline) {
       return (
-        <code
-          className="bg-white text-black px-1 py-0.5 rounded text-sm font-mono overflow-x-auto"
-          {...props}
-        >
+        <code className="bg-white text-black px-1 py-0.5 rounded text-sm font-mono overflow-x-auto" {...props}>
           {children}
         </code>
       );
     }
     return (
-      <pre
-        className="bg-white text-black p-2 rounded text-sm font-mono overflow-x-auto my-3"
-        {...props}
-      >
+      <pre className="bg-white text-black p-2 rounded text-sm font-mono overflow-x-auto my-3" {...props}>
         <code>{children}</code>
       </pre>
     );
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   table: ({ children, ...props }: any) => (
     <div className="overflow-x-auto my-3">
-      <table
-        className="min-w-full border-collapse border border-white text-sm"
-        {...props}
-      >
+      <table className="min-w-full border-collapse border border-white text-sm" {...props}>
         {children}
       </table>
     </div>
   ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   thead: ({ children, ...props }: any) => (
     <thead className="bg-white border-b border-white text-black" {...props}>
-      {children}
+    {children}
     </thead>
   ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tbody: ({ children, ...props }: any) => <tbody {...props}>{children}</tbody>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tr: ({ children, ...props }: any) => (
     <tr className="border-b last:border-0" {...props}>
       {children}
     </tr>
   ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   th: ({ children, ...props }: any) => (
-    <th
-      className="border border-white px-3 py-2 font-semibold text-left overflow-x-auto"
-      {...props}
-    >
+    <th className="border border-white px-3 py-2 font-semibold text-left overflow-x-auto" {...props}>
       {children}
     </th>
   ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   td: ({ children, ...props }: any) => (
     <td className="border border-white px-3 py-2 overflow-x-auto" {...props}>
       {children}
     </td>
   ),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   a: ({ href, children, ...props }: any) => (
     <a
       href={href}
@@ -155,7 +121,6 @@ const baseMarkdownComponents = {
 
 const userMarkdownComponents = {
   ...baseMarkdownComponents,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   p: ({ children, ...props }: any) => (
     <p className="mb-3 leading-relaxed text-black overflow-x-auto" {...props}>
       {children}
@@ -165,7 +130,6 @@ const userMarkdownComponents = {
 
 const modelMarkdownComponents = {
   ...baseMarkdownComponents,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   p: ({ children, ...props }: any) => (
     <p className="mb-3 leading-relaxed text-white overflow-x-auto" {...props}>
       {children}
@@ -173,6 +137,9 @@ const modelMarkdownComponents = {
   ),
 };
 
+/* --------------------------------------------------------------------------
+   Chat Message Type & Animation Variants
+-------------------------------------------------------------------------- */
 interface Message {
   sender: "user" | "model";
   text: string;
@@ -188,6 +155,42 @@ const bubbleVariants = {
     transition: { duration: 0.3, ease: "easeOut" },
   },
 };
+
+/* --------------------------------------------------------------------------
+   Helper: Format Projects Data as Accessible Context
+-------------------------------------------------------------------------- */
+function formatProjectsContext(projects: any[]): string {
+  if (!projects.length) return "No project data available.";
+
+  return projects
+    .map((project) => {
+      const { name, description, membership, tasks } = project;
+      // Build a member list from the enriched membership data
+      const memberList =
+        membership && membership.length
+          ? membership.map((m: any) => m.displayName || m.userSub).join(", ")
+          : "No members";
+      // Build task summary including due date and assignee if available
+      const tasksSummary =
+        tasks && tasks.length
+          ? tasks.map((t: any) => {
+            const dueDateStr = t.dueDate ? new Date(t.dueDate).toLocaleDateString() : "No due date";
+            let assigneeName = "Unassigned";
+            if (t.assignedTo) {
+              // Try to find in membership of the same project for enriched display name
+              const found = membership ? membership.find((m: any) => m.userSub === t.assignedTo) : null;
+              assigneeName = found ? (found.displayName || found.userSub) : t.assignedTo;
+            }
+            return `${t.title} [${t.status}] Due: ${dueDateStr} Assignee: ${assigneeName}`;
+          }).join("; ")
+          : "No tasks";
+      return `Project Name: ${name}
+Description: ${description}
+Members: ${memberList}
+Tasks: ${tasksSummary}`;
+    })
+    .join("\n\n");
+}
 
 /* --------------------------------------------------------------------------
    DraggableChatbot Component
@@ -213,12 +216,71 @@ const DraggableChatbot: React.FC = () => {
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // State: projects data fetched from API so the bot can have full project details
+  const [projects, setProjects] = useState<any[]>([]);
+  const [isProjectsLoading, setIsProjectsLoading] = useState(true);
+
+  // Fetch and enrich all user projects from the API endpoint (combined effect)
+  useEffect(() => {
+    async function fetchAndEnrichProjects() {
+      try {
+        const res = await fetch("/api/projects");
+        if (!res.ok) throw new Error("Failed to fetch projects");
+        const data = await res.json();
+        let projectsFetched = data.projects || [];
+        // Enrich projects: for each project, if membership isn't enriched, fetch membership and user info.
+        projectsFetched = await Promise.all(
+          projectsFetched.map(async (project: any) => {
+            if (project.membership && project.membership.length > 0 && project.membership[0].displayName) {
+              return project;
+            }
+            try {
+              const resp = await fetch(`/api/projects/${project.projectId}/membership`);
+              if (!resp.ok) throw new Error("Failed to fetch membership");
+              const membershipData = await resp.json(); // { membership: [...] }
+              const membershipRaw = membershipData.membership || [];
+              const userSubs = membershipRaw.map((entry: any) => entry.userSub);
+              const userInfoResp = await fetch(
+                `/api/users/infoBatch?users=${encodeURIComponent(userSubs.join(","))}`
+              );
+              let usersInfo: Record<string, any> = {};
+              if (userInfoResp.ok) {
+                usersInfo = await userInfoResp.json();
+              }
+              const membershipWithInfo = membershipRaw.map((entry: any) => {
+                const info = usersInfo[entry.userSub] || {};
+                const displayName = info.name || info.email || entry.userSub;
+                return { ...entry, displayName };
+              });
+              return { ...project, membership: membershipWithInfo };
+            } catch (err) {
+              console.error("Error enriching project", project.projectId, err);
+              return project;
+            }
+          })
+        );
+        setProjects(projectsFetched);
+      } catch (error) {
+        toast.error(t("couldNotFetchProjects"));
+      } finally {
+        setIsProjectsLoading(false);
+      }
+    }
+    fetchAndEnrichProjects();
+  }, [t]);
+
+  // Ref for the chat messages container to scroll to the newest message
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   // Draggable toggler button state and refs
-  const margin = 16;
-  const [position, setPosition] = useState<{ x: number; y: number }>({
-    x: margin,
-    y: 0,
-  });
+  const marginValue = 16;
+  const [position, setPosition] = useState<{ x: number; y: number }>({ x: marginValue, y: 0 });
+  // alignment: "left" or "right" flag to preserve the edge alignment when resizing
   const [alignment, setAlignment] = useState<"left" | "right">("left");
   const buttonRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
@@ -237,10 +299,10 @@ const DraggableChatbot: React.FC = () => {
         setAlignment(pos.x > window.innerWidth / 2 ? "right" : "left");
       } else if (buttonRef.current) {
         const { height } = buttonRef.current.getBoundingClientRect();
-        setPosition({ x: margin, y: window.innerHeight / 2 - height / 2 });
+        setPosition({ x: marginValue, y: window.innerHeight / 2 - height / 2 });
         setAlignment("left");
       } else {
-        setPosition({ x: margin, y: window.innerHeight / 2 });
+        setPosition({ x: marginValue, y: window.innerHeight / 2 });
         setAlignment("left");
       }
     }
@@ -249,18 +311,12 @@ const DraggableChatbot: React.FC = () => {
   // Persist conversation messages to localStorage whenever they update.
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "draggableChatbotMessages",
-        JSON.stringify(messages),
-      );
+      localStorage.setItem("draggableChatbotMessages", JSON.stringify(messages));
     }
   }, [messages]);
 
   // Save toggler position and alignment to localStorage.
-  const savePosition = (
-    newPos: { x: number; y: number },
-    align: "left" | "right",
-  ) => {
+  const savePosition = (newPos: { x: number; y: number }, align: "left" | "right") => {
     localStorage.setItem("draggableChatbotPosition", JSON.stringify(newPos));
     setAlignment(align);
   };
@@ -274,14 +330,11 @@ const DraggableChatbot: React.FC = () => {
         const windowHeight = window.innerHeight;
         let newX: number;
         if (alignment === "left") {
-          newX = margin;
+          newX = marginValue;
         } else {
-          newX = windowWidth - width - margin;
+          newX = windowWidth - width - marginValue;
         }
-        const newY = Math.min(
-          Math.max(position.y, margin),
-          windowHeight - height - margin,
-        );
+        const newY = Math.min(Math.max(position.y, marginValue), windowHeight - height - marginValue);
         const newPos = { x: newX, y: newY };
         setPosition(newPos);
         savePosition(newPos, alignment);
@@ -289,15 +342,12 @@ const DraggableChatbot: React.FC = () => {
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [alignment, margin, position.y]);
+  }, [alignment, marginValue, position.y]);
 
   // Pointer event handlers.
   const handlePointerDown = (e: React.PointerEvent) => {
     isDragging.current = true;
-    dragOffset.current = {
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
-    };
+    dragOffset.current = { x: e.clientX - position.x, y: e.clientY - position.y };
     initialPointerPos.current = { x: e.clientX, y: e.clientY };
     hasDragged.current = false;
     (e.target as Element).setPointerCapture(e.pointerId);
@@ -305,7 +355,6 @@ const DraggableChatbot: React.FC = () => {
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDragging.current) return;
-
     // Check if movement exceeds threshold
     if (initialPointerPos.current && !hasDragged.current) {
       const dx = e.clientX - initialPointerPos.current.x;
@@ -314,7 +363,6 @@ const DraggableChatbot: React.FC = () => {
         hasDragged.current = true;
       }
     }
-
     const newX = e.clientX - dragOffset.current.x;
     const newY = e.clientY - dragOffset.current.y;
     setPosition({ x: newX, y: newY });
@@ -329,14 +377,9 @@ const DraggableChatbot: React.FC = () => {
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
       const newX =
-        position.x + width / 2 < windowWidth / 2
-          ? margin
-          : windowWidth - width - margin;
-      const newAlign = newX === margin ? "left" : "right";
-      const newY = Math.min(
-        Math.max(position.y, margin),
-        windowHeight - height - margin,
-      );
+        position.x + width / 2 < windowWidth / 2 ? marginValue : windowWidth - width - marginValue;
+      const newAlign = newX === marginValue ? "left" : "right";
+      const newY = Math.min(Math.max(position.y, marginValue), windowHeight - height - marginValue);
       const newPos = { x: newX, y: newY };
       setPosition(newPos);
       savePosition(newPos, newAlign);
@@ -348,7 +391,6 @@ const DraggableChatbot: React.FC = () => {
     if (!hasDragged.current) {
       setIsModalOpen(true);
     }
-    // reset flag after handling click
     hasDragged.current = false;
   };
 
@@ -365,7 +407,10 @@ const DraggableChatbot: React.FC = () => {
         parts: [{ text: msg.text }],
       }));
       history.push({ role: "user", parts: [{ text: messageText }] });
-      const response = await chatWithCollabifyAI(history, messageText);
+      // Build user context from formatted projects data
+      const userContext = projects.length ? formatProjectsContext(projects) : "";
+      // Call chatWithCollabifyAI with empty system instruction and the formatted context as the fourth argument.
+      const response = await chatWithCollabifyAI(history, messageText, "", userContext);
       setMessages((prev) => [...prev, { sender: "model", text: response }]);
     } catch (error) {
       console.error(error);
@@ -433,11 +478,12 @@ const DraggableChatbot: React.FC = () => {
                   {t("collabifyAssistantDesc")}
                 </p>
                 {/* Chat Messages Container */}
-                <div className="h-72 overflow-y-auto border border-white p-4 mb-4 rounded-xl shadow-inner bg-black">
+                <div
+                  ref={messagesContainerRef}
+                  className="h-72 overflow-y-auto border border-white p-4 mb-4 rounded-xl shadow-inner bg-black"
+                >
                   {messages.length === 0 && !loading ? (
-                    <p className="text-white text-center">
-                      {t("typeSomething")}
-                    </p>
+                    <p className="text-white text-center">{t("typeSomething")}</p>
                   ) : (
                     <>
                       {messages.map((msg, idx) => (
@@ -448,9 +494,7 @@ const DraggableChatbot: React.FC = () => {
                           animate="visible"
                           exit={{ opacity: 0, y: -10 }}
                           className={`mb-3 transition-all duration-200 ${
-                            msg.sender === "user"
-                              ? "flex justify-end"
-                              : "flex justify-start"
+                            msg.sender === "user" ? "flex justify-end" : "flex justify-start"
                           }`}
                         >
                           <div
