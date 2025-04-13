@@ -11,6 +11,7 @@ import { Suspense } from "react";
 import Head from "next/head";
 import BackToTop from "@/components/BackToTop";
 import DraggableChatbot from "@/components/DraggableChatbot";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -35,6 +36,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             <DraggableChatbot />
             <Toaster position="bottom-right" richColors closeButton />
             <BackToTop />
+            <Analytics />
           </div>
         </UserProvider>
       </Suspense>
