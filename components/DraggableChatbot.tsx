@@ -344,7 +344,7 @@ const DraggableChatbot: React.FC = () => {
   const dragOffset = useRef({ x: 0, y: 0 });
   const initialPointerPos = useRef<{ x: number; y: number } | null>(null);
   const hasDragged = useRef(false);
-  const DRAG_THRESHOLD = 5; // pixels
+  const DRAG_THRESHOLD = 5; // pixels for drag threshold, beyond which we consider it a drag
 
   // On mount, load toggler position from localStorage or default to left edge, vertically centered.
   useEffect(() => {
