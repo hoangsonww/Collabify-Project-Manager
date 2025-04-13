@@ -4,6 +4,13 @@ import { dbConnect } from "@/lib/mongodb";
 import { Project } from "@/models/Project";
 import { roles } from "@/lib/roles";
 
+/**
+ * Handler to get dashboard statistics.
+ *
+ * @param req - The HTTP request object.
+ * @param res - The HTTP response object.
+ * @returns A JSON response with dashboard statistics or an error message.
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

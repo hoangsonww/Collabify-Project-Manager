@@ -17,14 +17,11 @@ import { Bar, Line } from "react-chartjs-2";
 import { motion } from "framer-motion";
 import Head from "next/head";
 import { toast } from "sonner";
-
-// (1) Import react-i18next + dynamic
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Trans, useTranslation } from "react-i18next";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 
-// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -36,7 +33,6 @@ ChartJS.register(
   LineElement,
 );
 
-// Animation variants for staggered children
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
@@ -47,18 +43,14 @@ const cardVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-// (2) Real component using the "admin" namespace
 function AdminPageInternal() {
   const { user, error, isLoading } = useUser();
   const { t } = useTranslation("admin");
-
   const [roleList, setRoleList] = useState<string[]>([]);
   const [loadingRoles, setLoadingRoles] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [logs, setLogs] = useState<any[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(true);
-
-  // For role management form
   const [userSub, setUserSub] = useState("");
   const [roleName, setRoleName] = useState("");
   const [action, setAction] = useState("add");
@@ -384,7 +376,7 @@ function AdminPageInternal() {
   );
 }
 
-// (3) Export a client-only version (no SSR) to avoid hydration mismatch
+// Export a client-only version (no SSR) to avoid hydration mismatch
 export default dynamic(() => Promise.resolve(AdminPageInternal), {
   ssr: false,
 });

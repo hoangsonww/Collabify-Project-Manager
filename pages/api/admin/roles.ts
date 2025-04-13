@@ -73,7 +73,6 @@ export default async function handler(
 
   try {
     // 3) Obtain a Management API token using M2M credentials
-    // (We already obtained mgmtToken above.)
 
     // 4) Find the role by name
     // e.g. GET /api/v2/roles?name_filter=admin
@@ -102,7 +101,6 @@ export default async function handler(
       );
     } else {
       // remove => DELETE /api/v2/users/{id}/roles
-      // We pass roles in the request body via the `data` option
       await axios.delete(
         `https://${domain}/api/v2/users/${encodeURIComponent(userSub)}/roles`,
         {

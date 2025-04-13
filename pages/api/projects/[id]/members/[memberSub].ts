@@ -3,6 +3,12 @@ import { getSession } from "@auth0/nextjs-auth0";
 import { dbConnect } from "@/lib/mongodb";
 import { Project } from "@/models/Project";
 
+/**
+ * This API route handles the removal of a project member.
+ *
+ * @param req - The incoming request object
+ * @param res - The response object to send back
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

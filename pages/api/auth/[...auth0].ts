@@ -1,5 +1,8 @@
 import { handleAuth, handleLogin } from "@auth0/nextjs-auth0";
 
+/**
+ * This API route handles the login process for users.
+ */
 export default handleAuth({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async login(req: any, res: any) {

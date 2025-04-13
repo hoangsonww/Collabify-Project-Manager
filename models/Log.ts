@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const LogSchema = new mongoose.Schema({
   // The log date is expected to be provided by Auth0
   date: { type: Date, required: true },
-  // Event type (for example, 'seccft' in your sample)
+  // Event type (for example, 'seccft')
   type: { type: String, required: true },
   // A description message (empty string if no description)
   description: { type: String, default: "" },

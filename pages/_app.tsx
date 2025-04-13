@@ -33,9 +33,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             </main>
             <Footer />
             <DraggableChatbot />
-            {/* Sonner Toast Portal */}
             <Toaster position="bottom-right" richColors closeButton />
-            {/* Back to Top Button */}
             <BackToTop />
           </div>
         </UserProvider>

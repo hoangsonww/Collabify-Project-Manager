@@ -4,7 +4,11 @@ import { getSession } from "@auth0/nextjs-auth0";
 import { dbConnect } from "@/lib/mongodb";
 import { UserProfile } from "@/models/UserProfile";
 
-// Helper: Fetch full profile from Auth0 Management API.
+/**
+ * Fetches the full user profile from Auth0 using the Management API.
+ *
+ * @param userSub - The user's unique identifier (sub).
+ */
 async function fetchFullProfile(userSub: string) {
   const domain = process.env.AUTH0_TENANT_DOMAIN;
   const clientId = process.env.AUTH0_M2M_CLIENT_ID;
@@ -28,6 +32,13 @@ async function fetchFullProfile(userSub: string) {
   return auth0Res.data;
 }
 
+/**
+ * Handler to get and update user profile information using Auth0 Management API.
+ *
+ * @param req - The HTTP request object.
+ * @param res - The HTTP response object.
+ * @returns A JSON response with the user profile or an error message.
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

@@ -3,6 +3,13 @@ import { getSession } from "@auth0/nextjs-auth0";
 import { dbConnect } from "@/lib/mongodb";
 import { Project } from "@/models/Project";
 
+/**
+ * Handler to get the memberships of a project.
+ *
+ * @param req - The HTTP request object.
+ * @param res - The HTTP response object.
+ * @returns A JSON response containing the membership array or an error.
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

@@ -3,6 +3,13 @@ import { getSession } from "@auth0/nextjs-auth0";
 import { dbConnect } from "@/lib/mongodb";
 import { Project } from "@/models/Project";
 
+/**
+ * Handler to get a project by ID.
+ *
+ * @param req - The HTTP request object.
+ * @param res - The HTTP response object.
+ * @returns A JSON response with the project details or an error message.
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

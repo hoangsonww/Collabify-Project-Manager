@@ -4,6 +4,12 @@ import { dbConnect } from "@/lib/mongodb";
 import Log from "@/models/Log";
 import { roles } from "@/lib/roles";
 
+/**
+ * This API route handles the retrieval of logs.
+ *
+ * @param req - The incoming request object
+ * @param res - The response object to send back
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

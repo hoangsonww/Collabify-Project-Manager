@@ -1,6 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 
+/**
+ * Handler to get user roles using Auth0 Management API.
+ *
+ * @param req - The HTTP request object.
+ * @param res - The HTTP response object.
+ * @returns A JSON response with the user's roles or an error message.
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -13,7 +20,6 @@ export default async function handler(
   }
 
   try {
-    // Hard-coded domain, client_id, client_secret as you requested
     const domain = process.env.AUTH0_TENANT_DOMAIN;
     const clientId = process.env.AUTH0_M2M_CLIENT_ID;
     const clientSecret = process.env.AUTH0_M2M_CLIENT_SECRET;

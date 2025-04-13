@@ -2,6 +2,13 @@ import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { getSession } from "@auth0/nextjs-auth0";
 
+/**
+ * Handler to resend a verification email to the user.
+ *
+ * @param req - The HTTP request object.
+ * @param res - The HTTP response object.
+ * @returns A JSON response indicating success or failure.
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

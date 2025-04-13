@@ -1,6 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 
+/**
+ * Handler to get user information using Auth0 Management API.
+ *
+ * @param req - The HTTP request object.
+ * @param res - The HTTP response object.
+ * @returns A JSON response with the user information or an error message.
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -13,14 +20,17 @@ export default async function handler(
     const domain = process.env.AUTH0_TENANT_DOMAIN;
     const clientId = process.env.AUTH0_M2M_CLIENT_ID;
     const clientSecret = process.env.AUTH0_M2M_CLIENT_SECRET;
+
     const tokenRes = await axios.post(`https://${domain}/oauth/token`, {
       grant_type: "client_credentials",
       client_id: clientId,
       client_secret: clientSecret,
       audience: `https://${domain}/api/v2/`,
     });
+
     const mgmtToken = tokenRes.data.access_token;
     const userSubs = users.split(",");
+
     const userRequests = userSubs.map((userSub) =>
       axios
         .get(`https://${domain}/api/v2/users/${encodeURIComponent(userSub)}`, {
@@ -31,11 +41,13 @@ export default async function handler(
         }))
         .catch(() => ({ [userSub]: {} })),
     );
+
     const resultsArray = await Promise.all(userRequests);
     const result = resultsArray.reduce(
       (acc, curr) => Object.assign(acc, curr),
       {},
     );
+
     return res.status(200).json(result);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {

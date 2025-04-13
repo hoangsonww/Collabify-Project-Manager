@@ -5,7 +5,7 @@
 [![Shadcn UI](https://img.shields.io/badge/Shadcn_UI-v1.0-purple?style=for-the-badge)](https://ui.shadcn.com/)
 [![Auth0](https://img.shields.io/badge/Auth0-Security-brightgreen?style=for-the-badge&logo=auth0)](https://auth0.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Cloud-green?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
-[![React Query](https://img.shields.io/badge/React_Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white)](https://tanstack.com/query/latest)
+[![Generative AI](https://img.shields.io/badge/Generative_AI-FF4154?style=for-the-badge&logo=openai&logoColor=white)](https://www.generativeai.com/)
 [![i18n](https://img.shields.io/badge/i18next-Multilingual-blueviolet?style=for-the-badge&logo=translate)](https://www.i18next.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/)
@@ -16,9 +16,9 @@
 [![Docker](https://img.shields.io/badge/Docker-Container-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-**Collabify** is a modern, feature-rich project management tool designed to help teams plan, organize, and collaborate seamlessly. Built on [Next.js](https://nextjs.org/) (as a full-stack framework), styled with [Tailwind CSS](https://tailwindcss.com/), and powered by [Shadcn UI](https://ui.shadcn.com/), Collabify provides a great user experience with beautiful UI components and smooth animations via [Framer Motion](https://www.framer.com/motion/).
+**Collabify** is a modern, feature-rich project management tool designed to help teams plan, organize, and collaborate seamlessly. Built on [Next.js](https://nextjs.org/) (as a full-stack framework), styled with [Tailwind CSS](https://tailwindcss.com/), and powered by [Shadcn UI](https://ui.shadcn.com/), Collabify provides a great user experience with beautiful UI components and smooth animations via [Framer Motion](https://www.framer.com/motion/), with internationalization support using [i18next](https://www.i18next.com/) for multilingual capabilities.
 
-One of the key features is secure authentication using [Auth0](https://auth0.com/), which is integrated using both Regular Web Applications (RWA) and Machine-to-Machine (M2M) credentials, with Role-Based Access Control (RBAC) for enhanced security. The application also utilizes [MongoDB](https://www.mongodb.com/) for data storage, ensuring reliable and scalable data management. Internationalization (i18n) support is provided through the [i18next](https://www.i18next.com/) library, allowing for easy localization of the application.
+One of the key features is secure authentication using [Auth0](https://auth0.com/), which is integrated using both Regular Web Applications (RWA) and Machine-to-Machine (M2M) credentials, with Role-Based Access Control (RBAC) for enhanced security. The application also utilizes [MongoDB](https://www.mongodb.com/) for data storage, ensuring reliable and scalable data management. Another key feature is the integration of **a chatbot assistant**, which provides users with a conversational interface to interact with the application and get assistance with their projects and tasks.
 
 <p align="center">
   <img src="img/collabify.png" alt="Collabify Logo" width="30%" style="border-radius: 8px">
@@ -46,6 +46,7 @@ One of the key features is secure authentication using [Auth0](https://auth0.com
 - [Shadcn UI](#shadcn-ui)
 - [Tailwind CSS](#tailwind-css)
 - [Internationalization (i18n)](#internationalization-i18n)
+- [Chatbot Feature - Collabify Assistant](#chatbot-feature---collabify-assistant)
 - [Deployment](#deployment)
 - [Containerization](#containerization)
 - [License](#license)
@@ -384,6 +385,14 @@ Step-by-step instructions for adding a new language:
    ```
 
 5. Test the new language by switching to it in the application. You should see the translations applied!
+
+## Chatbot Feature - Collabify Assistant
+
+**Collabify** also includes a chatbot feature to allow users to interact with the application using natural language, which provides a conversational interface for users to ask questions and receive answers related to project management, tasks, and other features of the application.
+
+**Collabify Assistant** has access to all of the user's projects and tasks, and can provide information about them. It can also help users create new tasks, update existing ones, and manage their projects more efficiently.
+
+Users can ask various questions about their taska and projects, and get even recommendations on how to improve their productivity. The chatbot is powered by [OpenAI's GPT-3](https://openai.com/) and uses the [OpenAI API](https://platform.openai.com/docs/api-reference) to generate responses.
 
 ## Deployment
 

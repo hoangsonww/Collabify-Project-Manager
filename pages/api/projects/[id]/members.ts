@@ -2,6 +2,13 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { dbConnect } from "@/lib/mongodb";
 import { Project } from "@/models/Project";
 
+/**
+ * Handler to get project members.
+ *
+ * @param req - The HTTP request object.
+ * @param res - The HTTP response object.
+ * @returns A JSON response with the project members or an error message.
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

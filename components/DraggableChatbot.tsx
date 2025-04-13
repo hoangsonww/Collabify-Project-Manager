@@ -1,4 +1,3 @@
-// components/DraggableChatbot.tsx
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,22 +9,24 @@ import { chatWithCollabifyAI } from "@/lib/chatWithCollabifyAI";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-// Create a motion-wrapped version of Card
 const MotionCard = motion(Card);
 
-/* --------------------------------------------------------------------------
-   Custom Markdown Components
--------------------------------------------------------------------------- */
 const baseMarkdownComponents = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h1: ({ children, ...props }: any) => (
-    <h1 className="text-2xl font-bold my-4 border-b-2 border-white pb-2 overflow-x-auto" {...props}>
+    <h1
+      className="text-2xl font-bold my-4 border-b-2 border-white pb-2 overflow-x-auto"
+      {...props}
+    >
       {children}
     </h1>
   ),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h2: ({ children, ...props }: any) => (
-    <h2 className="text-xl font-bold my-3 border-b border-white pb-1 overflow-x-auto" {...props}>
+    <h2
+      className="text-xl font-bold my-3 border-b border-white pb-1 overflow-x-auto"
+      {...props}
+    >
       {children}
     </h2>
   ),
@@ -61,23 +62,34 @@ const baseMarkdownComponents = {
   ),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   blockquote: ({ children, ...props }: any) => (
-    <blockquote className="border-l-4 border-white pl-4 italic my-3 text-white overflow-x-auto" {...props}>
+    <blockquote
+      className="border-l-4 border-white pl-4 italic my-3 text-white overflow-x-auto"
+      {...props}
+    >
       {children}
     </blockquote>
   ),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  hr: ({ ...props }: any) => <hr className="border-t border-white my-3" {...props} />,
+  hr: ({ ...props }: any) => (
+    <hr className="border-t border-white my-3" {...props} />
+  ),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   code: ({ inline, children, ...props }: any) => {
     if (inline) {
       return (
-        <code className="bg-white text-black px-1 py-0.5 rounded text-sm font-mono overflow-x-auto" {...props}>
+        <code
+          className="bg-white text-black px-1 py-0.5 rounded text-sm font-mono overflow-x-auto"
+          {...props}
+        >
           {children}
         </code>
       );
     }
     return (
-      <pre className="bg-white text-black p-2 rounded text-sm font-mono overflow-x-auto my-3" {...props}>
+      <pre
+        className="bg-white text-black p-2 rounded text-sm font-mono overflow-x-auto my-3"
+        {...props}
+      >
         <code>{children}</code>
       </pre>
     );
@@ -85,7 +97,10 @@ const baseMarkdownComponents = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   table: ({ children, ...props }: any) => (
     <div className="overflow-x-auto my-3">
-      <table className="min-w-full border-collapse border border-white text-sm" {...props}>
+      <table
+        className="min-w-full border-collapse border border-white text-sm"
+        {...props}
+      >
         {children}
       </table>
     </div>
@@ -93,7 +108,7 @@ const baseMarkdownComponents = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   thead: ({ children, ...props }: any) => (
     <thead className="bg-white border-b border-white text-black" {...props}>
-    {children}
+      {children}
     </thead>
   ),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -106,7 +121,10 @@ const baseMarkdownComponents = {
   ),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   th: ({ children, ...props }: any) => (
-    <th className="border border-white px-3 py-2 font-semibold text-left overflow-x-auto" {...props}>
+    <th
+      className="border border-white px-3 py-2 font-semibold text-left overflow-x-auto"
+      {...props}
+    >
       {children}
     </th>
   ),
@@ -155,9 +173,6 @@ const modelMarkdownComponents = {
   ),
 };
 
-/* --------------------------------------------------------------------------
-   Chat Message Type & Animation Variants
--------------------------------------------------------------------------- */
 interface Message {
   sender: "user" | "model";
   text: string;
@@ -184,23 +199,31 @@ function formatProjectsContext(projects: any[]): string {
       // Build a member list from the enriched membership data
       const memberList =
         membership && membership.length
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ? membership.map((m: any) => m.displayName || m.userSub).join(", ")
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            membership.map((m: any) => m.displayName || m.userSub).join(", ")
           : "No members";
       // Build task summary including due date and assignee if available
       const tasksSummary =
         tasks && tasks.length
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ? tasks.map((t: any) => {
-            const dueDateStr = t.dueDate ? new Date(t.dueDate).toLocaleDateString() : "No due date";
-            let assigneeName = "Unassigned";
-            if (t.assignedTo) {
+          ? tasks
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const found = membership ? membership.find((m: any) => m.userSub === t.assignedTo) : null;
-              assigneeName = found ? (found.displayName || found.userSub) : t.assignedTo;
-            }
-            return `${t.title} [${t.status}] Due: ${dueDateStr} Assignee: ${assigneeName}`;
-          }).join("; ")
+              .map((t: any) => {
+                const dueDateStr = t.dueDate
+                  ? new Date(t.dueDate).toLocaleDateString()
+                  : "No due date";
+                let assigneeName = "Unassigned";
+                if (t.assignedTo) {
+                  const found = membership
+                    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      membership.find((m: any) => m.userSub === t.assignedTo)
+                    : null;
+                  assigneeName = found
+                    ? found.displayName || found.userSub
+                    : t.assignedTo;
+                }
+                return `${t.title} [${t.status}] Due: ${dueDateStr} Assignee: ${assigneeName}`;
+              })
+              .join("; ")
           : "No tasks";
       return `Project Name: ${name}
 Description: ${description}
@@ -210,9 +233,6 @@ Tasks: ${tasksSummary}`;
     .join("\n\n");
 }
 
-/* --------------------------------------------------------------------------
-   DraggableChatbot Component
--------------------------------------------------------------------------- */
 const DraggableChatbot: React.FC = () => {
   const { t } = useTranslation("chatbot");
 
@@ -252,18 +272,24 @@ const DraggableChatbot: React.FC = () => {
         projectsFetched = await Promise.all(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           projectsFetched.map(async (project: any) => {
-            if (project.membership && project.membership.length > 0 && project.membership[0].displayName) {
+            if (
+              project.membership &&
+              project.membership.length > 0 &&
+              project.membership[0].displayName
+            ) {
               return project;
             }
             try {
-              const resp = await fetch(`/api/projects/${project.projectId}/membership`);
+              const resp = await fetch(
+                `/api/projects/${project.projectId}/membership`,
+              );
               if (!resp.ok) throw new Error("Failed to fetch membership");
               const membershipData = await resp.json(); // { membership: [...] }
               const membershipRaw = membershipData.membership || [];
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const userSubs = membershipRaw.map((entry: any) => entry.userSub);
               const userInfoResp = await fetch(
-                `/api/users/infoBatch?users=${encodeURIComponent(userSubs.join(","))}`
+                `/api/users/infoBatch?users=${encodeURIComponent(userSubs.join(","))}`,
               );
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               let usersInfo: Record<string, any> = {};
@@ -281,7 +307,7 @@ const DraggableChatbot: React.FC = () => {
               console.error("Error enriching project", project.projectId, err);
               return project;
             }
-          })
+          }),
         );
         setProjects(projectsFetched);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -298,13 +324,17 @@ const DraggableChatbot: React.FC = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
   // Draggable toggler button state and refs
   const marginValue = 16;
-  const [position, setPosition] = useState<{ x: number; y: number }>({ x: marginValue, y: 0 });
+  const [position, setPosition] = useState<{ x: number; y: number }>({
+    x: marginValue,
+    y: 0,
+  });
   // alignment: "left" or "right" flag to preserve the edge alignment when resizing
   const [alignment, setAlignment] = useState<"left" | "right">("left");
   const buttonRef = useRef<HTMLDivElement>(null);
@@ -336,12 +366,18 @@ const DraggableChatbot: React.FC = () => {
   // Persist conversation messages to localStorage whenever they update.
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("draggableChatbotMessages", JSON.stringify(messages));
+      localStorage.setItem(
+        "draggableChatbotMessages",
+        JSON.stringify(messages),
+      );
     }
   }, [messages]);
 
   // Save toggler position and alignment to localStorage.
-  const savePosition = (newPos: { x: number; y: number }, align: "left" | "right") => {
+  const savePosition = (
+    newPos: { x: number; y: number },
+    align: "left" | "right",
+  ) => {
     localStorage.setItem("draggableChatbotPosition", JSON.stringify(newPos));
     setAlignment(align);
   };
@@ -359,7 +395,10 @@ const DraggableChatbot: React.FC = () => {
         } else {
           newX = windowWidth - width - marginValue;
         }
-        const newY = Math.min(Math.max(position.y, marginValue), windowHeight - height - marginValue);
+        const newY = Math.min(
+          Math.max(position.y, marginValue),
+          windowHeight - height - marginValue,
+        );
         const newPos = { x: newX, y: newY };
         setPosition(newPos);
         savePosition(newPos, alignment);
@@ -372,7 +411,10 @@ const DraggableChatbot: React.FC = () => {
   // Pointer event handlers.
   const handlePointerDown = (e: React.PointerEvent) => {
     isDragging.current = true;
-    dragOffset.current = { x: e.clientX - position.x, y: e.clientY - position.y };
+    dragOffset.current = {
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    };
     initialPointerPos.current = { x: e.clientX, y: e.clientY };
     hasDragged.current = false;
     (e.target as Element).setPointerCapture(e.pointerId);
@@ -402,9 +444,14 @@ const DraggableChatbot: React.FC = () => {
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
       const newX =
-        position.x + width / 2 < windowWidth / 2 ? marginValue : windowWidth - width - marginValue;
+        position.x + width / 2 < windowWidth / 2
+          ? marginValue
+          : windowWidth - width - marginValue;
       const newAlign = newX === marginValue ? "left" : "right";
-      const newY = Math.min(Math.max(position.y, marginValue), windowHeight - height - marginValue);
+      const newY = Math.min(
+        Math.max(position.y, marginValue),
+        windowHeight - height - marginValue,
+      );
       const newPos = { x: newX, y: newY };
       setPosition(newPos);
       savePosition(newPos, newAlign);
@@ -433,9 +480,16 @@ const DraggableChatbot: React.FC = () => {
       }));
       history.push({ role: "user", parts: [{ text: messageText }] });
       // Build user context from formatted projects data
-      const userContext = projects.length ? formatProjectsContext(projects) : "";
+      const userContext = projects.length
+        ? formatProjectsContext(projects)
+        : "";
       // Call chatWithCollabifyAI with empty system instruction and the formatted context as the fourth argument.
-      const response = await chatWithCollabifyAI(history, messageText, "", userContext);
+      const response = await chatWithCollabifyAI(
+        history,
+        messageText,
+        "",
+        userContext,
+      );
       setMessages((prev) => [...prev, { sender: "model", text: response }]);
     } catch (error) {
       console.error(error);
@@ -508,7 +562,9 @@ const DraggableChatbot: React.FC = () => {
                   className="h-72 overflow-y-auto border border-white p-4 mb-4 rounded-xl shadow-inner bg-black"
                 >
                   {messages.length === 0 && !loading ? (
-                    <p className="text-white text-center">{t("typeSomething")}</p>
+                    <p className="text-white text-center">
+                      {t("typeSomething")}
+                    </p>
                   ) : (
                     <>
                       {messages.map((msg, idx) => (
@@ -519,7 +575,9 @@ const DraggableChatbot: React.FC = () => {
                           animate="visible"
                           exit={{ opacity: 0, y: -10 }}
                           className={`mb-3 transition-all duration-200 ${
-                            msg.sender === "user" ? "flex justify-end" : "flex justify-start"
+                            msg.sender === "user"
+                              ? "flex justify-end"
+                              : "flex justify-start"
                           }`}
                         >
                           <div

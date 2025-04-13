@@ -16,8 +16,6 @@ import { motion } from "framer-motion";
 import Head from "next/head";
 import { format } from "date-fns";
 import { enUS, vi } from "date-fns/locale";
-
-// === (1) IMPORT i18next + dynamic ===
 import { useTranslation } from "react-i18next";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
@@ -35,9 +33,6 @@ ChartJS.register(
   RadialLinearScale,
 );
 
-// ============================================================
-// Type Definitions
-// ============================================================
 type ProjectStats = {
   projectId: string;
   name: string;
@@ -63,9 +58,6 @@ export type DashboardProps = {
   allProjects: any[];
 };
 
-// ============================================================
-// Dashboard Component – Client Side Data Fetching
-// ============================================================
 function DashboardPageInternal() {
   const { t, i18n } = useTranslation("dashboard");
   const currentLocale = i18n.language === "vi" ? vi : enUS;
@@ -76,9 +68,6 @@ function DashboardPageInternal() {
   );
   const [loading, setLoading] = useState(true);
 
-  // -----------------------------------------------------------------
-  // Fetch Dashboard Data from API endpoint on the client.
-  // -----------------------------------------------------------------
   useEffect(() => {
     async function fetchDashboardData() {
       try {
@@ -113,9 +102,6 @@ function DashboardPageInternal() {
     allProjects: [],
   };
 
-  // -----------------------------------------------------------------
-  // Define common chart options for dark mode.
-  // -----------------------------------------------------------------
   const chartOptions = {
     plugins: {
       legend: {
@@ -137,10 +123,6 @@ function DashboardPageInternal() {
       },
     },
   };
-
-  // -----------------------------------------------------------------
-  // Define all chart data using useMemo.
-  // -----------------------------------------------------------------
 
   // 1) Bar chart for tasks by status.
   const barData = useMemo(() => {
@@ -373,7 +355,6 @@ function DashboardPageInternal() {
     };
   }, [tasksByDueDateCounts, t]);
 
-  // Horizontal Bar Chart Options.
   const horizontalBarChartOptions = useMemo(
     () => ({
       ...chartOptions,
@@ -382,7 +363,6 @@ function DashboardPageInternal() {
     [chartOptions],
   );
 
-  // Animation variants.
   const cardVariants = {
     hidden: { opacity: 0, y: 20, scale: 0.95 },
     visible: {
@@ -398,9 +378,6 @@ function DashboardPageInternal() {
     visible: { opacity: 1, scale: 1 },
   };
 
-  // -----------------------------------------------------------------
-  // Conditional rendering: while loading or if not logged in, display a loader or message.
-  // -----------------------------------------------------------------
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -422,9 +399,6 @@ function DashboardPageInternal() {
       ? 0
       : Math.round((safeData.doneTasks / safeData.totalTasks) * 100);
 
-  // -----------------------------------------------------------------
-  // Render the Dashboard UI.
-  // -----------------------------------------------------------------
   return (
     <>
       <Head>
@@ -672,9 +646,7 @@ function DashboardPageInternal() {
   );
 }
 
-// =============================================================
-// Export a dynamic, client‑only version of the page.
-// =============================================================
+// Export the component wrapped in dynamic import to prevent SSR
 const DashboardPage = dynamic(() => Promise.resolve(DashboardPageInternal), {
   ssr: false,
 });

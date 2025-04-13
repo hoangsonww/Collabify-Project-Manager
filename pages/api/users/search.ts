@@ -2,6 +2,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { dbConnect } from "@/lib/mongodb";
 import { UserProfile } from "@/models/UserProfile";
 
+/**
+ * API route to search for users by name or nickname.
+ *
+ * @param req - The incoming request object
+ * @param res - The response object to send back
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

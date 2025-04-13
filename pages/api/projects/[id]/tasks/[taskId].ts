@@ -3,6 +3,12 @@ import { getSession } from "@auth0/nextjs-auth0";
 import { dbConnect } from "@/lib/mongodb";
 import { Project } from "@/models/Project";
 
+/**
+ * API handler for managing tasks in a project.
+ *
+ * @param req - The HTTP request object.
+ * @param res - The HTTP response object.
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

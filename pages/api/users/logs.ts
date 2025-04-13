@@ -1,6 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 
+/**
+ * Handler to get Auth0 logs using the Management API.
+ *
+ * @param req - The HTTP request object.
+ * @param res - The HTTP response object.
+ * @returns A JSON response with the logs or an error message.
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

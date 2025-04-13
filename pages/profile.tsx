@@ -10,8 +10,6 @@ import { useTranslation } from "react-i18next";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import { Search, Loader2, Eye } from "lucide-react";
-
-// Shadcn/ui components
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -72,6 +70,7 @@ function ProfilePageInternal() {
   // New state for searching users.
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+
   // If a profile is selected from the search results,
   // it will override the current local profile (for display purposes).
   const [selectedProfile, setSelectedProfile] = useState(null);

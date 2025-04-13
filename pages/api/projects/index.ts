@@ -4,6 +4,13 @@ import { dbConnect } from "@/lib/mongodb";
 import { Project } from "@/models/Project";
 import { v4 as uuidv4 } from "uuid";
 
+/**
+ * Handler to manage projects.
+ *
+ * @param req - The HTTP request object.
+ * @param res - The HTTP response object.
+ * @returns A JSON response with the project data or an error message.
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
