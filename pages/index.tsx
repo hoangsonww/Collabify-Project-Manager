@@ -230,12 +230,10 @@ function HowItWorksStep({ title, text }: { title: string; text: string }) {
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      {/* Add h-full and optionally a min-h class to ensure the card has consistent dimensions */}
       <Card className="bg-white shadow-lg border border-gray-200 transition-transform duration-300 hover:-translate-y-1 h-full">
         <CardContent className="p-6 flex flex-col items-center text-center space-y-3 h-full">
           <CheckCircle2 className="w-10 h-10 text-primary mb-2" />
           <h4 className="font-semibold text-lg text-gray-900">{title}</h4>
-          {/* flex-grow ensures the description area uses available space */}
           <p className="text-sm text-gray-600 flex-grow">{text}</p>
         </CardContent>
       </Card>

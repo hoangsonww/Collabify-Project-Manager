@@ -12,11 +12,11 @@ i18n
     debug: true,
 
     backend: {
-      loadPath: "/locales/{{lng}}/{{ns}}.json", // translation path
+      loadPath: "/locales/{{lng}}/{{ns}}.json",
     },
 
     interpolation: {
-      escapeValue: false, // not needed for React
+      escapeValue: false,
     },
 
     react: {
