@@ -23,42 +23,51 @@ const baseMarkdownComponents = {
       {children}
     </h1>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h2: ({ children, ...props }: any) => (
     <h2 className="text-xl font-bold my-3 border-b border-white pb-1 overflow-x-auto" {...props}>
       {children}
     </h2>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h3: ({ children, ...props }: any) => (
     <h3 className="text-lg font-bold my-3 overflow-x-auto" {...props}>
       {children}
     </h3>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h4: ({ children, ...props }: any) => (
     <h4 className="text-base font-bold my-2 overflow-x-auto" {...props}>
       {children}
     </h4>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h5: ({ children, ...props }: any) => (
     <h5 className="text-sm font-bold my-2 overflow-x-auto" {...props}>
       {children}
     </h5>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   h6: ({ children, ...props }: any) => (
     <h6 className="text-xs font-bold my-2 overflow-x-auto" {...props}>
       {children}
     </h6>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   p: ({ children, ...props }: any) => (
     <p className="mb-3 leading-relaxed overflow-x-auto" {...props}>
       {children}
     </p>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   blockquote: ({ children, ...props }: any) => (
     <blockquote className="border-l-4 border-white pl-4 italic my-3 text-white overflow-x-auto" {...props}>
       {children}
     </blockquote>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   hr: ({ ...props }: any) => <hr className="border-t border-white my-3" {...props} />,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   code: ({ inline, children, ...props }: any) => {
     if (inline) {
       return (
@@ -73,6 +82,7 @@ const baseMarkdownComponents = {
       </pre>
     );
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   table: ({ children, ...props }: any) => (
     <div className="overflow-x-auto my-3">
       <table className="min-w-full border-collapse border border-white text-sm" {...props}>
@@ -80,27 +90,33 @@ const baseMarkdownComponents = {
       </table>
     </div>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   thead: ({ children, ...props }: any) => (
     <thead className="bg-white border-b border-white text-black" {...props}>
     {children}
     </thead>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tbody: ({ children, ...props }: any) => <tbody {...props}>{children}</tbody>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tr: ({ children, ...props }: any) => (
     <tr className="border-b last:border-0" {...props}>
       {children}
     </tr>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   th: ({ children, ...props }: any) => (
     <th className="border border-white px-3 py-2 font-semibold text-left overflow-x-auto" {...props}>
       {children}
     </th>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   td: ({ children, ...props }: any) => (
     <td className="border border-white px-3 py-2 overflow-x-auto" {...props}>
       {children}
     </td>
   ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   a: ({ href, children, ...props }: any) => (
     <a
       href={href}
@@ -121,6 +137,7 @@ const baseMarkdownComponents = {
 
 const userMarkdownComponents = {
   ...baseMarkdownComponents,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   p: ({ children, ...props }: any) => (
     <p className="mb-3 leading-relaxed text-black overflow-x-auto" {...props}>
       {children}
@@ -130,6 +147,7 @@ const userMarkdownComponents = {
 
 const modelMarkdownComponents = {
   ...baseMarkdownComponents,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   p: ({ children, ...props }: any) => (
     <p className="mb-3 leading-relaxed text-white overflow-x-auto" {...props}>
       {children}
@@ -156,9 +174,7 @@ const bubbleVariants = {
   },
 };
 
-/* --------------------------------------------------------------------------
-   Helper: Format Projects Data as Accessible Context
--------------------------------------------------------------------------- */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function formatProjectsContext(projects: any[]): string {
   if (!projects.length) return "No project data available.";
 
@@ -168,11 +184,13 @@ function formatProjectsContext(projects: any[]): string {
       // Build a member list from the enriched membership data
       const memberList =
         membership && membership.length
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ? membership.map((m: any) => m.displayName || m.userSub).join(", ")
           : "No members";
       // Build task summary including due date and assignee if available
       const tasksSummary =
         tasks && tasks.length
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ? tasks.map((t: any) => {
             const dueDateStr = t.dueDate ? new Date(t.dueDate).toLocaleDateString() : "No due date";
             let assigneeName = "Unassigned";
@@ -216,8 +234,10 @@ const DraggableChatbot: React.FC = () => {
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // State: projects data fetched from API so the bot can have full project details
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [projects, setProjects] = useState<any[]>([]);
+
+  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isProjectsLoading, setIsProjectsLoading] = useState(true);
 
   // Fetch and enrich all user projects from the API endpoint (combined effect)
