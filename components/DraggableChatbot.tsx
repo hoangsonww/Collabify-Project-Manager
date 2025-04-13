@@ -180,7 +180,7 @@ interface Message {
 }
 
 const bubbleVariants = {
-  hidden: { opacity: 0, y: 10, scale: 0.95 },
+  hidden: { opacity: 0, y: 0, scale: 1 },
   visible: {
     opacity: 1,
     y: 0,
@@ -575,7 +575,7 @@ const DraggableChatbot: React.FC = () => {
                           variants={bubbleVariants}
                           initial="hidden"
                           animate="visible"
-                          exit={{ opacity: 0, y: -10 }}
+                          exit={{ opacity: 0, y: 0 }}
                           className={`mb-3 transition-all duration-200 ${
                             msg.sender === "user"
                               ? "flex justify-end"
