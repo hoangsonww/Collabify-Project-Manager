@@ -240,6 +240,5 @@ function HowItWorksStep({ title, text }: { title: string; text: string }) {
   );
 }
 
-// 2) Export a client-only version of RealHome
 const Home = dynamic(() => Promise.resolve(RealHome), { ssr: false });
 export { Home as default };

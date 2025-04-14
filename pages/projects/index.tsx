@@ -15,13 +15,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import Head from "next/head";
-
-// (1) Import react-i18next + dynamic
 import { useTranslation } from "react-i18next";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 
-// Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
@@ -38,18 +35,16 @@ type ProjectType = {
   projectId: string;
   name: string;
   description: string;
-  // membership is available but not used on the client listing
   membership?: { userSub: string; role: "manager" | "editor" | "viewer" }[];
 };
 
 function ProjectsPageInternal() {
-  // Local state for projects and loading indicator
   const [localProjects, setLocalProjects] = useState<ProjectType[]>([]);
   const [isLoadingProjects, setIsLoadingProjects] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [joinDialogOpen, setJoinDialogOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // loading state for CREATE
-  const [isJoining, setIsJoining] = useState(false); // loading state for JOIN
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
 
   const router = useRouter();
   const { t } = useTranslation("projects");

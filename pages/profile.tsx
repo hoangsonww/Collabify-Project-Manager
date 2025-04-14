@@ -24,7 +24,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-// Define item variants with a subtle pop effect.
 const itemVariants = {
   hidden: { opacity: 0, y: 20, scale: 0.95 },
   visible: {
@@ -35,7 +34,6 @@ const itemVariants = {
   },
 };
 
-// A container variant to stagger children.
 const staggerContainerVariants = {
   visible: { transition: { staggerChildren: 0.1 } },
 };

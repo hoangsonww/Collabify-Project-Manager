@@ -112,22 +112,15 @@ function ProjectDetailPageInternal() {
   const router = useRouter();
   const { t, i18n } = useTranslation("projectDetail");
   const currentLocale = i18n.language === "vi" ? vi : enUS;
-
-  // Use Auth0’s client-side hook to get user info.
   const { user, isLoading: userLoading } = useUser();
   const userSub = user?.sub || null;
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const userRoles: string[] = user?.["http://myapp.example.com/roles"] || [];
   const isAdmin = userRoles.includes(roles.admin);
-
-  // Local copy of the project (for tasks)
-  // Initially null, then set when the client-side fetch is complete.
   const [localProject, setLocalProject] = useState<IProject | null>(null);
   const [isLoadingProject, setIsLoadingProject] = useState(true);
 
-  // Fetch project data client side from the API endpoint.
-  // This replaces the previous getServerSideProps logic.
   useEffect(() => {
     if (!router.query.id) return;
     const fetchProject = async () => {
@@ -748,9 +741,6 @@ function ProjectDetailPageInternal() {
     }
   };
 
-  // ====================================
-  //   RENDER (Conditional Rendering in JSX)
-  // ====================================
   return (
     <>
       <Head>
