@@ -4,5 +4,6 @@
   "typeSomething": "Type something to start a conversation!",
   "typeMessage": "Type your message...",
   "send": "Send",
-  "clearConversation": "Clear Conversation"
+  "clearConversation": "Clear Conversation",
+  "thinking": "Thinking"
 }

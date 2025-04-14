@@ -9,7 +9,7 @@ import { chatWithCollabifyAI } from "@/lib/chatWithCollabifyAI";
 import { useTranslation } from "react-i18next";
 import { useUser } from "@auth0/nextjs-auth0/client";
 
-const MotionCard = motion(Card);
+const MotionCard = motion.create(Card);
 
 const baseMarkdownComponents = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -504,6 +504,19 @@ const DraggableChatbot: React.FC = () => {
     }
   };
 
+  const AnimatedDots: React.FC = () => {
+    const [dots, setDots] = useState("");
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setDots((prev) => (prev.length < 3 ? prev + "." : ""));
+      }, 500);
+      return () => clearInterval(interval);
+    }, []);
+
+    return <span>{dots}</span>;
+  };
+
   // Handler to clear the conversation.
   const handleClearConversation = () => {
     setMessages([]);
@@ -573,7 +586,6 @@ const DraggableChatbot: React.FC = () => {
                         <motion.div
                           key={idx}
                           variants={bubbleVariants}
-                          initial="hidden"
                           animate="visible"
                           exit={{ opacity: 0, y: 0 }}
                           className={`mb-3 transition-all duration-200 ${
@@ -605,13 +617,15 @@ const DraggableChatbot: React.FC = () => {
                       {loading && (
                         <motion.div
                           variants={bubbleVariants}
-                          initial="hidden"
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           className="flex justify-start mb-3 transition-all duration-200 hover:shadow-[0_0_20px_rgba(255,255,255,0.7)] shadow-[0_0_10px_rgba(255,255,255,0.5)] px-4 py-2 rounded-xl max-w-xs break-words text-white"
                         >
                           <Loader2 className="animate-spin w-5 h-5" />
-                          <span className="ml-2">Thinking…</span>
+                          <span className="ml-2">
+                            {t("thinking")}
+                            <AnimatedDots />
+                          </span>
                         </motion.div>
                       )}
                     </>

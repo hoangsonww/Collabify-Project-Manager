@@ -37,6 +37,7 @@ export async function chatWithCollabifyAI(
     ${userContext ?? "No additional context."}
 
     This conversation is between a user and you, the assistant. Remain professional, approachable, and solution‑focused.
+    Also, the conversation may be in either Vietnamese or English, so please respond in the same language as the user.
   `;
 
   const genAI = new GoogleGenerativeAI(apiKey);
