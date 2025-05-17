@@ -529,7 +529,12 @@ const DraggableChatbot: React.FC = () => {
       <div
         ref={buttonRef}
         className="fixed z-50 cursor-pointer"
-        style={{ left: position.x, top: position.y }}
+        style={{
+          left: position.x,
+          top: position.y,
+          touchAction: "none", // enable mobile dragging
+          userSelect: "none", // prevent text selection
+        }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
