@@ -1,0 +1,11 @@
+require 'rake'
+require 'mongoid'
+Mongoid.load!('config/mongoid.yml', :development)
+
+namespace :db do
+  desc 'Drop the development database'
+  task :drop do
+    Mongoid::Clients.default.database.drop
+    puts 'Database dropped'
+  end
+end

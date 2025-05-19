@@ -1,0 +1,13 @@
+source 'https://rubygems.org'
+
+gem 'sinatra',             '~> 2.1'
+gem 'mongoid',             '~> 7.3'
+gem 'jwt',                 '~> 2.6'
+gem 'bcrypt',              '~> 3.1'
+gem 'rack-cors',           '~> 1.1'
+gem 'dotenv',              '~> 3.3'
+
+group :development do
+  gem 'rerun',             '~> 0.14'
+  gem 'pry'
+end

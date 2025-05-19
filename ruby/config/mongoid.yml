@@ -1,0 +1,14 @@
+development:
+  clients:
+    default:
+      uri: <%= ENV['MONGODB_URI'] || 'mongodb://localhost:27017/collabify_development' %>
+      options:
+        server_selection_timeout: 5
+test:
+  clients:
+    default:
+      uri: <%= ENV['MONGODB_URI'] || 'mongodb://localhost:27017/collabify_test' %>
+Production:
+  clients:
+    default:
+      uri: <%= ENV['MONGODB_URI'] %>
