@@ -14,8 +14,11 @@
 [![EsLint](https://img.shields.io/badge/ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)](https://eslint.org/)
 [![Prettier](https://img.shields.io/badge/Prettier-FF69B4?style=for-the-badge&logo=prettier&logoColor=white)](https://prettier.io/)
 [![Framer Motion](https://img.shields.io/badge/Framer_Motion-29D8DB?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
+[![Ruby on Rails](https://img.shields.io/badge/Ruby_on_Rails-CC0000?style=for-the-badge&logo=ruby-on-rails&logoColor=white)](https://rubyonrails.org/)
+[![Lucide React](https://img.shields.io/badge/Lucide_React-FF3D00?style=for-the-badge&logo=lucide&logoColor=white)](https://lucide.dev/)
 [![Chart.js](https://img.shields.io/badge/Chart.js-F38B00?style=for-the-badge&logo=chartdotjs&logoColor=white)](https://www.chartjs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Container-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Git](https://img.shields.io/badge/Git-FF4500?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 **Collabify** is a modern, feature-rich project management tool designed to help teams plan, organize, and collaborate seamlessly. Built on [Next.js](https://nextjs.org/) (as a full-stack framework), styled with [Tailwind CSS](https://tailwindcss.com/), and powered by [Shadcn UI](https://ui.shadcn.com/), Collabify provides a great user experience with beautiful UI components and smooth animations via [Framer Motion](https://www.framer.com/motion/), with internationalization support using [i18next](https://www.i18next.com/) for multilingual capabilities.
@@ -51,6 +54,7 @@ One of the key features is secure authentication using [Auth0](https://auth0.com
 - [Chatbot Feature - Collabify Assistant](#chatbot-feature---collabify-assistant)
 - [Deployment](#deployment)
 - [Containerization](#containerization)
+- [Optional Ruby on Rails Backend](#optional-ruby-on-rails-backend)
 - [License](#license)
 - [Contact](#contact)
 - [Contributing](#contributing)
@@ -423,6 +427,47 @@ docker-compose up
 ```
 
 This will build the Docker image and start the application in a container. Make sure you have Docker installed and running on your machine.
+
+## Optional Ruby on Rails Backend
+
+The _optional_ backend of Collabify is built using Ruby on Rails. The Rails API provides the necessary endpoints for managing projects, tasks, and users. The frontend (Next.js) communicates with the Rails API to fetch and update data.
+
+To run the Rails backend, follow these steps:
+
+1. **Navigate to the backend directory:**
+
+   ```bash
+   cd backend
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   bundle install
+   ```
+
+3. **Set up the database:**
+
+   ```bash
+   rails db:create
+   rails db:migrate
+   ```
+
+4. **Run the Rails server:**
+
+   ```bash
+   rails server
+   ```
+
+5. **Open your browser:** Go to [http://localhost:3000](http://localhost:3000) to access the Rails API.
+
+6. **Test the API:** You can use tools like Postman or Insomnia to test the API endpoints.
+
+7. **Connect the frontend to the backend:** Make sure to update the API URLs in the Next.js application to point to the Rails API endpoints.
+
+8. **Run the Next.js application:** Follow the steps in the "Getting Started" section to run the Next.js application.
+
+> Note: This backend is optional. Without it, the application will still work, but you won't have access to the Rails API features. You can choose to use either the Rails backend or the Next.js API routes based on your preference.
 
 ## License
 
