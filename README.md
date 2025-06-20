@@ -266,6 +266,7 @@ Collabify uses Auth0 for secure authentication and authorization. Auth0 provides
 
 With Auth0, Collabify can provide a secure and efficient authentication process, ensuring that user data is protected and that users have the appropriate access to the features they need.
 
+> [!CAUTION]
 > Disclaimer: I strongly believe that Auth0 is on its way to becoming the best authentication solution for web applications. It is a powerful tool that simplifies the authentication process and provides a wide range of features to enhance security and user experience. However, please note that this is my personal opinion, and I encourage you to evaluate different authentication solutions based on your specific needs and requirements.
 
 ## Auth0 Setup Guide
@@ -402,7 +403,8 @@ Users can ask various questions about their taska and projects, and even get rec
 
 _Cool stuff_: I took some time to make the chatbot toggler look like Apple's Assistive Touch button that you can drag around the screen and it'll snap to the edges. This is a fun little feature that adds a nice touch to the user experience.
 
-> Note: In mobile, the drag and drop feature may not work as expected due to the limitations of mobile gestures. However, it should work perfectly fine on desktop and laptop devices.
+> [!NOTE]
+> In mobile, the drag and drop feature may not work as expected due to the limitations of mobile gestures. However, it should work perfectly fine on desktop and laptop devices.
 
 ## Deployment
 
@@ -467,7 +469,8 @@ To run the Rails backend, follow these steps:
 
 8. **Run the Next.js application:** Follow the steps in the "Getting Started" section to run the Next.js application.
 
-> Note: This backend is optional. Without it, the application will still work, but you won't have access to the Rails API features. You can choose to use either the Rails backend or the Next.js API routes based on your preference.
+> [!TIP]
+> This backend is optional. Without it, the application will still work, but you won't have access to the Rails API features. You can choose to use either the Rails backend or the Next.js API routes based on your preference.
 
 ## License
 
@@ -499,7 +502,8 @@ We appreciate your contributions to make Collabify even better!
 
 Also, feel free to open an issue if you find any bugs or have feature requests. We are always looking to improve the application and your feedback is invaluable.
 
-> Note: Please make sure to follow the code style and conventions used in the project. This will help maintain consistency and readability throughout the codebase.
+> [!IMPORTANT]
+> Please make sure to follow the code style and conventions used in the project. This will help maintain consistency and readability throughout the codebase.
 
 ## Conclusion
 
