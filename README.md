@@ -243,7 +243,8 @@ AUTH0_M2M_CLIENT_SECRET=your_m2m_client_secret
 AUTH0_TENANT_DOMAIN=your-auth0-tenant-domain.auth0.com
 ```
 
-Note: MongoDB connection string should be in the format: `mongodb+srv://<username>:<password>@cluster.mongodb.net/<dbname>?retryWrites=true&w=majority`. Alternatively, if you are using a local MongoDB instance, it can be `mongodb://localhost:27017/collabify`.
+> [!IMPORTANT]
+> **Note**: MongoDB connection string should be in the format: `mongodb+srv://<username>:<password>@cluster.mongodb.net/<dbname>?retryWrites=true&w=majority`. Alternatively, if you are using a local MongoDB instance, it can be `mongodb://localhost:27017/collabify`.
 
 ## Why Auth0?
 
