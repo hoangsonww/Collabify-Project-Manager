@@ -26,7 +26,7 @@
 One of the key features is secure authentication using [Auth0](https://auth0.com/), which is integrated using both Regular Web Applications (RWA) and Machine-to-Machine (M2M) credentials, with Role-Based Access Control (RBAC) for enhanced security. The application also utilizes [MongoDB](https://www.mongodb.com/) for data storage, ensuring reliable and scalable data management. Another key feature is the integration of **a chatbot assistant**, which provides users with a conversational interface to interact with the application and get assistance with their projects and tasks.
 
 <p align="center">
-  <img src="img/collabify.png" alt="Collabify Logo" width="30%" style="border-radius: 8px">
+  <img src="img/logo.jpeg" alt="Collabify Logo" width="35%" style="border-radius: 8px">
 </p>
 
 ## Table of Contents
