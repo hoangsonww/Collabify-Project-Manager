@@ -268,7 +268,7 @@ Collabify uses Auth0 for secure authentication and authorization. Auth0 provides
 With Auth0, Collabify can provide a secure and efficient authentication process, ensuring that user data is protected and that users have the appropriate access to the features they need.
 
 > [!CAUTION]
-> Disclaimer: I strongly believe that Auth0 is on its way to becoming the best authentication solution for web applications. It is a powerful tool that simplifies the authentication process and provides a wide range of features to enhance security and user experience. However, please note that this is my personal opinion, and I encourage you to evaluate different authentication solutions based on your specific needs and requirements.
+> **Disclaimer:** I strongly believe that Auth0 is on its way to becoming the best authentication solution for web applications. It is a powerful tool that simplifies the authentication process and provides a wide range of features to enhance security and user experience. However, please note that this is my personal opinion, and I encourage you to evaluate different authentication solutions based on your specific needs and requirements - it does not have to be Auth0, and this project has been designed to make it easy to switch to another provider if you so choose!
 
 ## Auth0 Setup Guide
 
