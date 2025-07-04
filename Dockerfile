@@ -2,6 +2,9 @@
 FROM node:18-alpine AS builder
 WORKDIR /app
 
+# Make npm ignore peer‐dep conflicts
+ENV NPM_CONFIG_LEGACY_PEER_DEPS=true
+
 # Copy everything and install dependencies
 COPY . .
 RUN npm ci
@@ -13,10 +16,9 @@ RUN npm run build
 FROM node:18-alpine AS runner
 WORKDIR /app
 
-# Ensure production mode
 ENV NODE_ENV=production
 
-# Copy all files (including .next, public, node_modules, next.config.js, etc.) from builder
+# Copy all built output and runtime files
 COPY --from=builder /app /app
 
 # Expose the default Next.js port
