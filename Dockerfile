@@ -1,21 +1,28 @@
-# Stage 1: Build
+# 1) Build stage
 FROM node:18-alpine AS builder
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
+
+# Make npm ignore peer‐dep conflicts
+ENV NPM_CONFIG_LEGACY_PEER_DEPS=true
+
+# Copy everything and install dependencies
 COPY . .
+RUN npm ci
+
+# Build the Next.js application
 RUN npm run build
 
-# Stage 2: Run
+# 2) Runtime stage
 FROM node:18-alpine AS runner
 WORKDIR /app
+
 ENV NODE_ENV=production
 
-# Copy only the necessary files from builder
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/next.config.js ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-RUN npm ci --production
+# Copy all built output and runtime files
+COPY --from=builder /app /app
+
+# Expose the default Next.js port
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+
+# Start the app
+CMD ["npm", "start"]
