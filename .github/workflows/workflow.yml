@@ -6,9 +6,10 @@ on:
   pull_request:
     branches: [main, master]
   workflow_dispatch:
-
+    
 env:
   NODE_VERSION: 18
+  NPM_CONFIG_LEGACY_PEER_DEPS: true
 
 jobs:
   formatting:
