@@ -503,7 +503,7 @@ Our existing GitHub Actions workflow is already set up to deploy the application
 This setup ensures that your application is always up-to-date and that any issues are caught early in the development process.
 
 > [!NOTE]
-> If you want to use GitHub Actions for your own projects, make sure to update the workflow file with your own Vercel project ID and token. You can find more information on how to set up GitHub Actions for Vercel [here](https://vercel.com/docs/git/github-actions).
+> If you want to use GitHub Actions for your own projects, make sure to update the workflow file with your own Vercel project ID and token. You can find more information on how to set up GitHub Actions [here](https://github.com/features/actions).
 
 ## Testing
 
