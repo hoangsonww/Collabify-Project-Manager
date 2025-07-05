@@ -483,10 +483,10 @@ To run the Rails backend, follow these steps:
 
 ## CI / CD with GitHub Actions
 
-Collabify uses GitHub Actions for continuous integration and deployment (CI/CD). The workflow is defined in the `.github/workflows/deploy.yml` file. This workflow automatically builds and deploys the application to Vercel whenever changes are pushed to the main branch.
+Collabify uses GitHub Actions for continuous integration and deployment (CI/CD). The workflow is defined in the `.github/workflows/workflow.yml` file. This workflow automatically builds and deploys the application to Vercel whenever changes are pushed to the main branch.
 
 To set up GitHub Actions for your repository:
-1. **Create or modify the `.github/workflows/deploy.yml` file** in your repository.
+1. **Create or modify the `.github/workflows/workflow.yml` file** in your repository.
 2. **Add the necessary secrets** in your GitHub repository settings (e.g., `VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, etc.) to allow GitHub Actions to deploy to Vercel.
 3. **Push your changes to the main branch.** The workflow will automatically trigger and deploy your application.
 4. **Monitor the Actions tab** in your GitHub repository to see the status of the deployment.
