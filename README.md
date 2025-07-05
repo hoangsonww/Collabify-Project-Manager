@@ -18,7 +18,12 @@
 [![Lucide React](https://img.shields.io/badge/Lucide_React-FF3D00?style=for-the-badge&logo=lucide&logoColor=white)](https://lucide.dev/)
 [![Chart.js](https://img.shields.io/badge/Chart.js-F38B00?style=for-the-badge&logo=chartdotjs&logoColor=white)](https://www.chartjs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Container-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Jest](https://img.shields.io/badge/Testing-Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)](https://jestjs.io/)
+[![React Query](https://img.shields.io/badge/React_Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white)](https://react-query.tanstack.com/)
+[![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)](https://www.postman.com/)
 [![Git](https://img.shields.io/badge/Git-FF4500?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/hoangsonww/Collabify-Project-Manager)
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/hoangsonww/Collabify-Project-Manager/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 **Collabify** is a modern, feature-rich project management tool designed to help teams plan, organize, and collaborate seamlessly. Built on [Next.js](https://nextjs.org/) (as a full-stack framework), styled with [Tailwind CSS](https://tailwindcss.com/), and powered by [Shadcn UI](https://ui.shadcn.com/), Collabify provides a great user experience with beautiful UI components and smooth animations via [Framer Motion](https://www.framer.com/motion/), with internationalization support using [i18next](https://www.i18next.com/) for multilingual capabilities.
@@ -47,7 +52,8 @@ One of the key features is secure authentication using [Auth0](https://auth0.com
   - [2. Creating the Regular Web Application (RWA)](#2-creating-the-regular-web-application-rwa)
   - [3. Creating the Machine-to-Machine (M2M) Application](#3-creating-the-machine-to-machine-m2m-application)
   - [4. Configuring Your Auth0 API and Client Grants](#4-configuring-your-auth0-api-and-client-grants)
-  - [5. Testing the Application](#5-testing-the-application)
+  - [5. Adding Roles](#5-adding-roles)
+  - [6. Testing the Application](#6-testing-the-application)
 - [Shadcn UI](#shadcn-ui)
 - [Tailwind CSS](#tailwind-css)
 - [Internationalization (i18n)](#internationalization-i18n)
@@ -55,6 +61,8 @@ One of the key features is secure authentication using [Auth0](https://auth0.com
 - [Deployment](#deployment)
 - [Containerization](#containerization)
 - [Optional Ruby on Rails Backend](#optional-ruby-on-rails-backend)
+- [CI / CD with GitHub Actions](#ci--cd-with-github-actions)
+- [Testing](#testing)
 - [License](#license)
 - [Contact](#contact)
 - [Contributing](#contributing)
@@ -472,6 +480,37 @@ To run the Rails backend, follow these steps:
 
 > [!TIP]
 > This backend is optional. Without it, the application will still work, but you won't have access to the Rails API features. You can choose to use either the Rails backend or the Next.js API routes based on your preference.
+
+## CI / CD with GitHub Actions
+
+Collabify uses GitHub Actions for continuous integration and deployment (CI/CD). The workflow is defined in the `.github/workflows/deploy.yml` file. This workflow automatically builds and deploys the application to Vercel whenever changes are pushed to the main branch.
+
+To set up GitHub Actions for your repository:
+1. **Create or modify the `.github/workflows/deploy.yml` file** in your repository.
+2. **Add the necessary secrets** in your GitHub repository settings (e.g., `VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, etc.) to allow GitHub Actions to deploy to Vercel.
+3. **Push your changes to the main branch.** The workflow will automatically trigger and deploy your application.
+4. **Monitor the Actions tab** in your GitHub repository to see the status of the deployment.
+
+Our existing GitHub Actions workflow is already set up to deploy the application to Vercel, so you can use it as a reference for your own projects. It covers the following steps:
+
+- Checkout the code from the repository
+- Set up Node.js environment
+- Install dependencies
+- Build the Next.js application
+- Deploy to Vercel
+- Notify the team via Slack (on errors)
+
+## Testing
+
+Collabify includes unit tests and integration tests to ensure the application works as expected. The tests are written using [Jest](https://jestjs.io/) and can be run using the following command:
+
+```bash
+npm run test
+# or
+yarn test
+```
+
+The tests cover various aspects of the application, including authentication, API endpoints, and UI components. You can add more tests as needed to ensure the application remains stable and reliable.
 
 ## License
 
