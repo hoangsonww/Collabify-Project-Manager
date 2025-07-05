@@ -72,7 +72,7 @@ One of the key features is secure authentication using [Auth0](https://auth0.com
 
 Collabify helps teams manage projects and tasks effortlessly. With its intuitive interface, robust security through Auth0, and real-time analytics, Collabify is ideal for organizations looking to boost productivity and collaboration. Its modern UI is built using Next.js, Tailwind CSS, and Shadcn UI components, while animations provided by Framer Motion enhance the user experience.
 
-Currently live at: [https://collabify-pm.vercel.app/](https://collabify-pm.vercel.app/). Create an account and start managing your projects today! 🚀
+Currently live at: **[https://collabify-pm.vercel.app/](https://collabify-pm.vercel.app/)**. Create an account and start managing your projects today! 🚀
 
 ## Features
 
@@ -499,6 +499,11 @@ Our existing GitHub Actions workflow is already set up to deploy the application
 - Build the Next.js application
 - Deploy to Vercel
 - Notify the team via Slack (on errors)
+
+This setup ensures that your application is always up-to-date and that any issues are caught early in the development process.
+
+> [!NOTE]
+> If you want to use GitHub Actions for your own projects, make sure to update the workflow file with your own Vercel project ID and token. You can find more information on how to set up GitHub Actions [here](https://github.com/features/actions).
 
 ## Testing
 
