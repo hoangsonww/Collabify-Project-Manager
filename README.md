@@ -500,6 +500,8 @@ Our existing GitHub Actions workflow is already set up to deploy the application
 - Deploy to Vercel
 - Notify the team via Slack (on errors)
 
+
+
 ## Testing
 
 Collabify includes unit tests and integration tests to ensure the application works as expected. The tests are written using [Jest](https://jestjs.io/) and can be run using the following command:
