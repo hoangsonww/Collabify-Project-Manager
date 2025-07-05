@@ -72,7 +72,7 @@ One of the key features is secure authentication using [Auth0](https://auth0.com
 
 Collabify helps teams manage projects and tasks effortlessly. With its intuitive interface, robust security through Auth0, and real-time analytics, Collabify is ideal for organizations looking to boost productivity and collaboration. Its modern UI is built using Next.js, Tailwind CSS, and Shadcn UI components, while animations provided by Framer Motion enhance the user experience.
 
-Currently live at: [https://collabify-pm.vercel.app/](https://collabify-pm.vercel.app/). Create an account and start managing your projects today! 🚀
+Currently live at: **[https://collabify-pm.vercel.app/](https://collabify-pm.vercel.app/)**. Create an account and start managing your projects today! 🚀
 
 ## Features
 
