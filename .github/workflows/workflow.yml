@@ -58,6 +58,7 @@ jobs:
     env:
       NODE_VERSION: 18
       NPM_CONFIG_LEGACY_PEER_DEPS: true
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -68,23 +69,25 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Build Next.js
         run: npm run build
 
-      - name: Debug build output
+      - name: Verify .next
         run: |
-          echo "Looking for .next here:"
-          find . -maxdepth 2 -type d | grep .next || echo "no .next at this level"
+          echo ">>> Listing .next folder:"
+          find . -maxdepth 2 -type d | sed 's/^/  /'
 
-      - name: Upload build artifacts
+      - name: Zip up .next
+        run: |
+          zip -r nextjs-build.zip .next
+
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: nextjs-build
-          path: |
-            .next
-            .next/**
+          path: nextjs-build.zip
 
   docker:
     name: "🐳 Build & Push Docker Image"
