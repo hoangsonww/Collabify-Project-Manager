@@ -56,20 +56,27 @@ jobs:
     runs-on: ubuntu-latest
     needs: testing
     env:
-      BUILD_B64: ${{ secrets.SCRIPT_BUILD }}
+      NODE_VERSION: 18
+      NPM_CONFIG_LEGACY_PEER_DEPS: true
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Decode & run build
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Debug build output
         run: |
-          echo "$BUILD_B64" | base64 --decode > build.sh
-          chmod +x build.sh
-          ./build.sh
+          echo "Looking for .next here:"
+          find . -maxdepth 2 -type d | grep .next || echo "no .next at this level"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
