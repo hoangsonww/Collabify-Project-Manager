@@ -5,6 +5,95 @@ import {
   GenerationConfig,
 } from "@google/generative-ai";
 
+type GeminiModelListResponse = {
+  models?: Array<{
+    name?: string;
+    supportedGenerationMethods?: string[];
+  }>;
+};
+
+const FALLBACK_GEMINI_MODELS = ["gemini-2.5-flash"];
+const MODEL_CACHE_TTL_MS = 5 * 60 * 1000;
+let cachedGeminiModels: { models: string[]; fetchedAt: number } | null = null;
+let modelRotationIndex = 0;
+
+const isEligibleGeminiModel = (model: {
+  name?: string;
+  supportedGenerationMethods?: string[];
+}): boolean => {
+  const name = model.name ?? "";
+  if (!name.startsWith("models/gemini-")) {
+    return false;
+  }
+
+  const loweredName = name.toLowerCase();
+  if (loweredName.includes("embedding") || loweredName.includes("pro")) {
+    return false;
+  }
+
+  const methods = model.supportedGenerationMethods ?? [];
+  return methods.length === 0 || methods.includes("generateContent");
+};
+
+const normalizeModelName = (name: string): string =>
+  name.replace(/^models\//, "");
+
+const dedupeModels = (models: string[]): string[] => {
+  const seen = new Set<string>();
+  const unique: string[] = [];
+  for (const model of models) {
+    if (!seen.has(model)) {
+      seen.add(model);
+      unique.push(model);
+    }
+  }
+  return unique;
+};
+
+const getRotatedModels = (models: string[]): string[] => {
+  if (models.length === 0) {
+    return models;
+  }
+  const startIndex = modelRotationIndex % models.length;
+  modelRotationIndex = (modelRotationIndex + 1) % models.length;
+  return [...models.slice(startIndex), ...models.slice(0, startIndex)];
+};
+
+const fetchGeminiModels = async (apiKey: string): Promise<string[]> => {
+  if (
+    cachedGeminiModels &&
+    Date.now() - cachedGeminiModels.fetchedAt < MODEL_CACHE_TTL_MS
+  ) {
+    return cachedGeminiModels.models;
+  }
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1/models?key=${encodeURIComponent(
+      apiKey,
+    )}`,
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch Gemini models: ${response.status} ${response.statusText}`,
+    );
+  }
+
+  const data = (await response.json()) as GeminiModelListResponse;
+  const models = (data.models ?? [])
+    .filter(isEligibleGeminiModel)
+    .map((model) => normalizeModelName(model.name ?? ""))
+    .filter(Boolean);
+
+  const uniqueModels = dedupeModels(models);
+  if (uniqueModels.length === 0) {
+    throw new Error("No eligible Gemini models found.");
+  }
+
+  cachedGeminiModels = { models: uniqueModels, fetchedAt: Date.now() };
+  return uniqueModels;
+};
+
 /**
  * Sends a chat message to Gemini AI. This helper preserves conversation history so that the context
  * is maintained between messages. The assistant is identified as "Collabify Assistant" and acts as a
@@ -41,10 +130,6 @@ export async function chatWithCollabifyAI(
   `;
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    systemInstruction: defaultSystemInstruction,
-  });
 
   const generationConfig: GenerationConfig = {
     temperature: 1,
@@ -74,17 +159,44 @@ export async function chatWithCollabifyAI(
 
   history.push({ role: "user", parts: [{ text: message }] });
 
-  const chatSession = model.startChat({
-    generationConfig,
-    safetySettings,
-    history,
-  });
-
-  const result = await chatSession.sendMessage(message);
-
-  if (!result.response || !result.response.text) {
-    throw new Error("Failed to get text response from the AI.");
+  let modelNames = FALLBACK_GEMINI_MODELS;
+  try {
+    modelNames = await fetchGeminiModels(apiKey);
+  } catch {
+    modelNames = FALLBACK_GEMINI_MODELS;
   }
 
-  return result.response.text();
+  const rotatedModels = getRotatedModels(modelNames);
+  let lastError: unknown = null;
+
+  for (const modelName of rotatedModels) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        systemInstruction: defaultSystemInstruction,
+      });
+
+      const chatSession = model.startChat({
+        generationConfig,
+        safetySettings,
+        history,
+      });
+
+      const result = await chatSession.sendMessage(message);
+
+      if (!result.response || !result.response.text) {
+        throw new Error("Failed to get text response from the AI.");
+      }
+
+      return result.response.text();
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  if (lastError instanceof Error) {
+    throw lastError;
+  }
+
+  throw new Error("Failed to get text response from the AI.");
 }
