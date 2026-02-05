@@ -535,7 +535,7 @@ function RealHome() {
 
             <Reveal delay={0.15}>
               <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-card/70 px-6 py-4 text-sm text-muted-foreground shadow-sm">
-                <span className="font-semibold text-foreground">
+                <span className="font-semibold text-foreground mr-2">
                   {t("trustedBy")}
                 </span>
                 <RevealGroup className="flex flex-wrap items-center gap-3">
