@@ -251,8 +251,7 @@ AUTH0_M2M_CLIENT_SECRET=your_m2m_client_secret
 AUTH0_TENANT_DOMAIN=your-auth0-tenant-domain.auth0.com
 ```
 
-> [!IMPORTANT]
-> **Note**: MongoDB connection string should be in the format: `mongodb+srv://<username>:<password>@cluster.mongodb.net/<dbname>?retryWrites=true&w=majority`. Alternatively, if you are using a local MongoDB instance, it can be `mongodb://localhost:27017/collabify`.
+> [!IMPORTANT] > **Note**: MongoDB connection string should be in the format: `mongodb+srv://<username>:<password>@cluster.mongodb.net/<dbname>?retryWrites=true&w=majority`. Alternatively, if you are using a local MongoDB instance, it can be `mongodb://localhost:27017/collabify`.
 
 ## Why Auth0?
 
@@ -275,8 +274,7 @@ Collabify uses Auth0 for secure authentication and authorization. Auth0 provides
 
 With Auth0, Collabify can provide a secure and efficient authentication process, ensuring that user data is protected and that users have the appropriate access to the features they need.
 
-> [!CAUTION]
-> **Disclaimer:** I strongly believe that Auth0 is on its way to becoming the best authentication solution for web applications. It is a powerful tool that simplifies the authentication process and provides a wide range of features to enhance security and user experience. However, please note that this is my personal opinion, and I encourage you to evaluate different authentication solutions based on your specific needs and requirements - it does not have to be Auth0, and this project has been designed to make it easy to switch to another provider if you so choose!
+> [!CAUTION] > **Disclaimer:** I strongly believe that Auth0 is on its way to becoming the best authentication solution for web applications. It is a powerful tool that simplifies the authentication process and provides a wide range of features to enhance security and user experience. However, please note that this is my personal opinion, and I encourage you to evaluate different authentication solutions based on your specific needs and requirements - it does not have to be Auth0, and this project has been designed to make it easy to switch to another provider if you so choose!
 
 ## Auth0 Setup Guide
 
@@ -486,6 +484,7 @@ To run the Rails backend, follow these steps:
 Collabify uses GitHub Actions for continuous integration and deployment (CI/CD). The workflow is defined in the `.github/workflows/workflow.yml` file. This workflow automatically builds and deploys the application to Vercel whenever changes are pushed to the main branch.
 
 To set up GitHub Actions for your repository:
+
 1. **Create or modify the `.github/workflows/workflow.yml` file** in your repository.
 2. **Add the necessary secrets** in your GitHub repository settings (e.g., `VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, etc.) to allow GitHub Actions to deploy to Vercel.
 3. **Push your changes to the main branch.** The workflow will automatically trigger and deploy your application.
