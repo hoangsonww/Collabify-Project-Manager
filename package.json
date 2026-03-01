@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md,html}\"",
-    "test": "echo \"Tests run successfully\" && exit 0"
+    "test": "echo \"Tests run successfully\" && exit 0",
+    "runtime:info": "node --version && npm --version"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.7.0",
